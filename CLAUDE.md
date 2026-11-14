@@ -65,6 +65,10 @@ Run `pnpm check` and the end-to-end suite before every commit.
   `certainty` (`established`, `estimated`, `debated`) and `note`. Data keys are snake_case.
 - The state of the scene is a pure function of `t` (seconds since the collision). Nothing in
   `src/sim/` may keep state between calls or use unseeded randomness.
+- Pure code first: anything computable without a renderer goes in `src/sim/` or `src/ship/`
+  with unit tests; `src/render/` only turns it into GPU resources.
+- Visual baselines (`tests/e2e/__screenshots__/`) are re-recorded only after the images have
+  been looked at; note the review in `docs/STATUS.md`.
 - Tone: sober and informative. No depiction of victims, no sensational wording or sound.
 - Accessibility: WCAG 2.2 level AA on every view.
 
@@ -72,4 +76,6 @@ Run `pnpm check` and the end-to-end suite before every commit.
 
 - Node.js 26.13.1 and pnpm 12.18.0 (`.node-version`, `packageManager`).
 - End-to-end tests run in `mcr.microsoft.com/playwright` at the tag matching `@playwright/test`.
+- Headless Chromium cannot present a WebGPU canvas on a software rasteriser: the `webgpu`
+  project uses `renderer=webgpu-readback` (ADR 0004).
 - No secret is ever committed, logged or written to a pull request.

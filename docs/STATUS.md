@@ -9,8 +9,8 @@ Milestones and acceptance criteria are defined in [PLAN.md](PLAN.md).
 | ------------------------------------------------- | ----------- |
 | M0 — Skeleton                                     | Done        |
 | M1 — Data and TimelineModel                       | Done        |
-| M2 — LOD0 scene and complete timeline             | In progress |
-| M3 — Ocean, exact sky, lighting                   | Not started |
+| M2 — LOD0 scene and complete timeline             | Done        |
+| M3 — Ocean, exact sky, lighting                   | In progress |
 | M4 — Flooding, boats, rockets, break-up, wreck    | Not started |
 | M5 — LOD1/LOD2, post-processing, quality settings | Not started |
 | M6 — Accessibility, UX, support, legal notice     | Not started |
@@ -79,6 +79,51 @@ Corrections to the initial brief, found during research and recorded in the data
 
 Open points are listed in `docs/DATA.md` under "Points to check against works not yet
 consulted".
+
+## M2 — LOD0 scene and complete timeline (done, 2026-11-14)
+
+Delivered:
+
+- Procedural level-of-detail 0 ship generated from the dataset (`src/ship/`): hull, decks,
+  superstructure, four raked funnels, two masts, 716 lamps, twenty boats.
+- WebGPU renderer with WebGL 2 fallback, AgX tone mapping, render pipeline (`src/render/`).
+- Five cameras: guided tour, around the ship, on the bridge, below the surface, free.
+- Timeline: play, pause, backward, ×1 to ×600, one-minute steps, scrubber, bookmarks of key
+  moments, deep links (`?t=01:40&camera=orbit&rate=60`).
+- Panels: "Now" (state in words and figures), "Sources" (records behind the current instant,
+  certainty, other positions), "Narrative" (all 91 events, in step with the timeline).
+- Live announcements of events, reduced-motion support, keyboard operation of every control.
+
+Verified by command:
+
+| Check                                       | Command                               | Result                                                                 |
+| ------------------------------------------- | ------------------------------------- | ---------------------------------------------------------------------- |
+| Type checking, lint, dataset, schema export | `pnpm check`                          | Pass                                                                   |
+| Unit tests                                  | `pnpm test`                           | 195 of 195 pass                                                        |
+| Hull form against recorded coefficients     | `src/ship/hullForm.test.ts`           | Block 0.684, prismatic 0.704, midship 0.972; displacement within 1.6 % |
+| Budgets                                     | `pnpm budgets`                        | JavaScript 284 kB of 400 kB, CSS 3.4 kB, HTML 1.3 kB (gzip)            |
+| End-to-end, WebGL 2 and WebGPU              | Playwright in the official image      | 70 of 70 pass; no axe-core violation on any tab or on a 390 px screen  |
+| Visual baselines at the six key instants    | `tests/e2e/scene.spec.ts`             | Recorded for both backends (12 images)                                 |
+| Same image when reached by playing backward | same file                             | Pass                                                                   |
+| Scene under the production CSP              | suite run against the Caddy container | 28 of 28 scene and accessibility tests pass                            |
+| Container image                             | `node tools/verify-server.ts`         | 77 of 77                                                               |
+
+Visual review of the six baselines (11:40 p.m., 12:45 a.m., 1:40 a.m., 2:15 a.m., 2:20 a.m.,
+wreck), against the documented description of the ship and of the night:
+
+- Agrees: length, breadth, sheer and proportions; four funnels raked aft, buff with black
+  tops; two raked masts; black hull, white upper works, red bottom; rows of lit ports; trim by
+  the head and list to port at 1:40 a.m.; bow under and boats on the water at 2:15 a.m.; empty
+  sea with the boats at 2:20 a.m.; a section of the hull on the seabed under the camera lamp.
+- Differs, to be addressed in the milestones shown: the sea is a flat plane and the sky is
+  empty (M3); no iceberg, no rendering of flooding or of the break itself beyond the two
+  sections parting, pristine wreck sections, standing mainmast on the seabed (M4); schematic
+  deckhouses, no davits, rigging or deck fittings (M5).
+- Both backends give visually identical images.
+
+Environment finding: headless Chromium on a software rasteriser cannot present a WebGPU canvas
+(the device is destroyed). The WebGPU backend is therefore tested through a read-back
+presenter; see the amendment to ADR 0004.
 
 ## Tooling availability in the authoring session
 

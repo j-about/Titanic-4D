@@ -89,6 +89,15 @@ compares them. CI runners have no GPU.
 tests render at 1280×720 and frame rate is not asserted there; performance is measured
 separately on real hardware. A unit test keeps the image tag and the package version aligned.
 
+**Amendment (2026-11-14).** In headless Chromium on SwiftShader, a WebGPU device renders
+correctly off screen but is destroyed as soon as it presents to a canvas (verified with a
+minimal page without three.js, under eleven combinations of browser flags). The `webgpu`
+project therefore opens the application with `renderer=webgpu-readback`: the scene is rendered
+by the WebGPU backend into a texture, read back and painted on the canvas through a 2D context
+(`src/render/presenter.ts`). The WGSL shaders and the WebGPU pipeline are exercised for real;
+only the presentation differs from production. In production, a WebGPU device that is lost
+makes the application start the scene again on WebGL 2.
+
 ## ADR 0005 — Delivery: Caddy, headers, caching and budgets
 
 **Status:** accepted (2026-11-14)
@@ -164,3 +173,41 @@ pure, deterministic function of time so that playing forward, backward and jumpi
 Effects that need randomness must derive their seeds from `t`. Quantities the sources do not
 give (for example positions of the boats after they leave) are either absent from the state or
 flagged as illustrative by the view that draws them.
+
+## ADR 0008 — Application and scene architecture
+
+**Status:** accepted (2026-11-14)
+
+**Context.** The scene, the controls and the text must all show the same instant, and the
+image must depend on that instant alone.
+
+**Decision.**
+
+- One store (`src/app/store.ts`) holds the application state: time, playback, camera mode,
+  panel, scene status. The interface and the scene are both views of it.
+- Each frame, the main loop advances time (`advancePlayback`), evaluates `TimelineModel` once
+  and hands the resulting state to the interface and to the scene. The scene is rendered only
+  when the state, the size or the camera changed, so a paused scene costs nothing.
+- `src/render/` is loaded as a separate chunk. `sceneView.ts` owns the renderer, a
+  `RenderPipeline` and the objects; each object takes the simulation state and sets transforms
+  and uniforms from it. No object keeps history between frames.
+- Geometry that can be computed without a renderer lives in `src/ship/` and `src/sim/` as pure
+  functions with unit tests: hull form, mesh data, lamp positions, boat placement, camera poses,
+  the conversion from poses to matrices. `src/render/` only turns them into GPU resources.
+- The level-of-detail 0 ship is generated from the dataset. Its hull form is analytic and tuned
+  to the recorded block, prismatic and midship coefficients; the test suite checks them, the
+  displacement, the length overall and the breadth.
+- Camera modes are pure functions from the state and a few user-controlled parameters to a
+  position and a target. The guided camera depends on time alone and holds still within a shot
+  when reduced motion is requested.
+- The interface is semantic HTML built by small modules (`src/ui/`). The text of the "Now" tab
+  is also the accessible description of the canvas, and the "Narrative" tab lists every event,
+  so the page is complete without the 3D scene. Announcements go through one polite live
+  region, at most one every four seconds, and only key events at high speed.
+- Keyboard shortcuts that are single keys act only while the 3D view has the focus.
+- The address carries the instant, the camera and the speed (`?t=01:40&camera=orbit&rate=60`).
+
+**Consequences.** Any instant can be linked, reviewed and screenshotted deterministically, on
+either backend. Positions of the boats after they leave, the height of the distress signals and
+the massing of the deckhouses are not in the sources; they are marked as illustrative in the
+code that draws them and in the interface text.

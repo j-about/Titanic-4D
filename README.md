@@ -15,6 +15,23 @@ The project is under construction. Progress is tracked in [docs/STATUS.md](docs/
 milestones in [docs/PLAN.md](docs/PLAN.md) and the architectural decisions in
 [docs/DECISIONS.md](docs/DECISIONS.md).
 
+## Using the application
+
+- **Time.** Play, pause, run backward, change speed from real time to ×600, step by one minute,
+  drag the scrubber or jump to a key moment. The night runs from the collision at 11:40 p.m. to
+  the two sections of the wreck at rest on the seabed.
+- **Views.** Guided tour, around the ship, on the bridge, below the surface, free camera. In the
+  3D view: drag or arrow keys to turn, wheel, pinch or plus and minus to zoom, Space to play or
+  pause, comma and full stop to step by one minute; in the free camera, W, A, S, D, Q and E to
+  move.
+- **Description.** The "Now" tab states the instant in words and figures, "Sources" lists the
+  records behind it with their level of certainty and the competing positions, and "Narrative"
+  tells the whole night in order. The page is complete without the 3D scene.
+- **Links.** The address carries the instant, the view and the speed, for example
+  `?t=01:40&camera=orbit&rate=60` (ship's time on a 24-hour clock). `renderer=webgl2` selects
+  the WebGL 2 backend; `renderer=webgpu-readback` is a test mode described in
+  [docs/DECISIONS.md](docs/DECISIONS.md).
+
 ## Historical data
 
 The dataset lives in [`data/`](data/) and is documented in [docs/DATA.md](docs/DATA.md). Every
