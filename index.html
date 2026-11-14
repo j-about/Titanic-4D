@@ -23,21 +23,54 @@
     <meta property="og:locale" content="en_GB">
     <script type="module" src="/src/main.ts"></script>
   </head>
-  <body>
-    <a class="skip-link" href="#main">Skip to main content</a>
-    <header class="site-header">
+  <body class="app">
+    <a class="skip-link" href="#timeline">Skip to the timeline</a>
+    <a class="skip-link" href="#panel">Skip to the description of the scene</a>
+    <header class="app-header">
       <p class="site-title"><a href="/" aria-current="page">Titanic 4D</a></p>
+      <p class="site-tagline">The sinking of RMS Titanic, 14–15 April 1912</p>
     </header>
-    <main id="main" tabindex="-1">
-      <h1>The sinking of RMS Titanic, 14–15 April 1912</h1>
-      <p>
-        Titanic 4D is an interactive reconstruction of the night RMS Titanic was lost, built on
-        documented historical sources. The reconstruction is in preparation.
-      </p>
+    <main id="main" class="app-main" tabindex="-1">
+      <h1 class="visually-hidden">
+        The sinking of RMS Titanic, 14–15 April 1912, in space and time
+      </h1>
+      <section class="scene" aria-labelledby="scene-heading">
+        <h2 id="scene-heading" class="visually-hidden">3D scene</h2>
+        <div id="scene-frame" class="scene__frame" data-status="loading">
+          <!-- biome-ignore lint/a11y/noInteractiveElementToNoninteractiveRole: the application role makes assistive technology pass the arrow keys to the camera controls of the canvas -->
+          <canvas
+            id="scene-canvas"
+            class="scene__canvas"
+            tabindex="0"
+            role="application"
+            aria-roledescription="3D view"
+            aria-label="3D view of the ship"
+            aria-describedby="scene-description camera-help"
+          ></canvas>
+          <div id="camera-root" class="scene__toolbar"></div>
+          <p id="scene-status" class="scene__status" role="status">Loading the 3D scene…</p>
+        </div>
+        <p id="scene-description" class="visually-hidden"></p>
+      </section>
+      <section id="timeline" class="timeline" aria-labelledby="timeline-heading" tabindex="-1">
+        <h2 id="timeline-heading" class="visually-hidden">Timeline</h2>
+        <div id="timeline-root"></div>
+      </section>
+      <section id="panel" class="panel" aria-labelledby="panel-heading" tabindex="-1">
+        <h2 id="panel-heading" class="visually-hidden">Description of the scene</h2>
+        <div id="panel-root"></div>
+      </section>
+      <p id="announcer" class="visually-hidden" aria-live="polite" aria-atomic="true"></p>
+      <noscript>
+        <p class="notice">
+          This reconstruction needs JavaScript to draw the scene and to move through time. The
+          project and its sources are described in the repository linked below.
+        </p>
+      </noscript>
     </main>
-    <footer class="site-footer">
+    <footer class="app-footer">
       <p>
-        Contact:
+        A sober, source-backed reconstruction. More than 1,500 people died that night.
         <a href="mailto:contact@titanic-4d.org">contact@titanic-4d.org</a>
       </p>
     </footer>
