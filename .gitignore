@@ -147,3 +147,11 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# Playwright
+test-results/
+playwright-report/
+
+# Python
+.venv/
+__pycache__/
