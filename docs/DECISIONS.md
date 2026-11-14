@@ -134,3 +134,33 @@ when it is the latest stable release and is listed explicitly in `minimumRelease
 (currently `playwright-core@1.65.1`). Entries are removed once the version has aged.
 
 **Consequences.** Every exception is visible in `pnpm-workspace.yaml` and reviewed like code.
+
+## ADR 0007 — Dataset and timeline model
+
+**Status:** accepted (2026-11-14)
+
+**Context.** Every displayed state must derive from a sourced record, and the state must be a
+pure, deterministic function of time so that playing forward, backward and jumping agree.
+
+**Decision.**
+
+- The dataset is a set of JSON files in `data/`, one schema per file written with Zod and
+  exported as JSON Schema. Every record carries `source_ids`, `certainty` and `note`, and may
+  carry `alternatives`. Cross-file rules are code (`src/data/validation.ts`).
+- Zod is a development dependency. Files are validated by the unit tests and before every build
+  (`pnpm data:validate`); the browser imports the JSON as typed modules and does not validate
+  again, which keeps the schema library out of the bundle.
+- The simulation clock is seconds since the collision in ship's time. Conversions to New York
+  time and GMT take the clock offset from the dataset, so that the offset remains a parameter.
+- `createTimelineModel` prepares its curves once and returns an `evaluate(t)` that reads them
+  without mutating anything. Interpolation is monotone cubic for attitudes and positions and
+  linear for water levels and lighting, so that no value overshoots its keyframes.
+- While intact, the hull rotates about the pivot of the waterline given by Halpern. From the
+  break, each section follows keyframes that start from the pose computed at the break.
+- Where sources disagree, the record adopts one value for the scene, states why, and lists the
+  other positions. The choices are summarised in `docs/DATA.md`.
+
+**Consequences.** Adding or correcting history is a data change validated by schema and tests.
+Effects that need randomness must derive their seeds from `t`. Quantities the sources do not
+give (for example positions of the boats after they leave) are either absent from the state or
+flagged as illustrative by the view that draws them.

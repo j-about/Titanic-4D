@@ -7,8 +7,9 @@ code, comments, commits and documentation are in English only.
 ## Read first
 
 1. `docs/STATUS.md` — done, in progress, next, blockers.
-2. `docs/PLAN.md` — milestones and acceptance criteria.
-3. `docs/DECISIONS.md` — architecture decision records (ADR).
+2. `docs/DATA.md` — dataset structure, conventions and modelling rules.
+3. `docs/PLAN.md` — milestones and acceptance criteria.
+4. `docs/DECISIONS.md` — architecture decision records (ADR).
 
 Update STATUS.md at the end of every task. A change of behaviour updates the affected
 documentation in the same commit series.
@@ -61,7 +62,9 @@ Run `pnpm check` and the end-to-end suite before every commit.
   a task that uses it (at most three searches per item).
 - Python (asset pipeline): use uv, ruff and ty through the `/astral:*` skills.
 - Historical data: never invent a fact, time or figure. Every record carries `source_ids`,
-  `certainty` (`established`, `estimated`, `debated`) and `note`.
+  `certainty` (`established`, `estimated`, `debated`) and `note`. Data keys are snake_case.
+- The state of the scene is a pure function of `t` (seconds since the collision). Nothing in
+  `src/sim/` may keep state between calls or use unseeded randomness.
 - Tone: sober and informative. No depiction of victims, no sensational wording or sound.
 - Accessibility: WCAG 2.2 level AA on every view.
 

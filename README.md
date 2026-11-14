@@ -15,6 +15,13 @@ The project is under construction. Progress is tracked in [docs/STATUS.md](docs/
 milestones in [docs/PLAN.md](docs/PLAN.md) and the architectural decisions in
 [docs/DECISIONS.md](docs/DECISIONS.md).
 
+## Historical data
+
+The dataset lives in [`data/`](data/) and is documented in [docs/DATA.md](docs/DATA.md). Every
+record names its sources and carries a level of certainty (`established`, `estimated` or
+`debated`); where sources disagree, the competing positions are kept side by side. The state of
+the ship at any instant is computed from these records by a pure function of time.
+
 ## Requirements
 
 - Node.js 26.13.1 (see `.node-version`)
