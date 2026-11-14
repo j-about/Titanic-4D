@@ -1,0 +1,10 @@
+{
+  "$comment": "Performance budgets enforced by tools/check-budgets.ts. Sizes are bytes after gzip level 9, the least efficient encoding the server offers.",
+  "entry": "index.html",
+  "budgets": {
+    "initialJavaScript": 409600,
+    "initialCss": 20480,
+    "entryHtml": 8192
+  },
+  "deferredChunkPatterns": []
+}
