@@ -28,9 +28,10 @@ milestones in [docs/PLAN.md](docs/PLAN.md) and the architectural decisions in
   records behind it with their level of certainty and the competing positions, and "Narrative"
   tells the whole night in order. The page is complete without the 3D scene.
 - **Links.** The address carries the instant, the view and the speed, for example
-  `?t=01:40&camera=orbit&rate=60` (ship's time on a 24-hour clock). `renderer=webgl2` selects
-  the WebGL 2 backend; `renderer=webgpu-readback` is a test mode described in
-  [docs/DECISIONS.md](docs/DECISIONS.md).
+  `?t=01:40&camera=orbit&rate=60` (ship's time on a 24-hour clock). `quality=low`, `medium`
+  (the default) or `high` sets the level of detail of the sea and of its reflections.
+  `renderer=webgl2` selects the WebGL 2 backend; `renderer=webgpu-readback` is a test mode
+  described in [docs/DECISIONS.md](docs/DECISIONS.md).
 
 ## Historical data
 
@@ -38,6 +39,11 @@ The dataset lives in [`data/`](data/) and is documented in [docs/DATA.md](docs/D
 record names its sources and carries a level of certainty (`established`, `estimated` or
 `debated`); where sources disagree, the competing positions are kept side by side. The state of
 the ship at any instant is computed from these records by a pure function of time.
+
+The sky is computed for the date, the hour and the place from a star catalogue and an ephemeris
+library, and the sea from a wave spectrum; the method and its tests are in
+[docs/SKY.md](docs/SKY.md). Third-party data and software are credited in
+[ATTRIBUTIONS.md](ATTRIBUTIONS.md).
 
 ## Requirements
 
@@ -85,9 +91,15 @@ docker run --rm --publish 8080:8080 titanic-4d
 node tools/verify-server.ts --origin http://127.0.0.1:8080
 ```
 
+```bash
+E2E_BASE_URL=http://127.0.0.1:8080 tools/e2e-container.sh scene.spec.ts home.spec.ts
+```
+
 The image serves the static build with Caddy as an unprivileged user on port 8080, with
 precompressed files, security headers and the redirect of the secondary hosts
-(`titanic-4d.org`, `www.titanic-4d.com`, `titanic-4d.com`) to the canonical origin.
+(`titanic-4d.org`, `www.titanic-4d.com`, `titanic-4d.com`) to the canonical origin. The last
+command runs the scene and accessibility tests against the running image, under its content
+security policy.
 
 ## Contact
 

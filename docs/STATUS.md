@@ -10,7 +10,7 @@ Milestones and acceptance criteria are defined in [PLAN.md](PLAN.md).
 | M0 — Skeleton                                     | Done        |
 | M1 — Data and TimelineModel                       | Done        |
 | M2 — LOD0 scene and complete timeline             | Done        |
-| M3 — Ocean, exact sky, lighting                   | In progress |
+| M3 — Ocean, exact sky, lighting                   | Done        |
 | M4 — Flooding, boats, rockets, break-up, wreck    | Not started |
 | M5 — LOD1/LOD2, post-processing, quality settings | Not started |
 | M6 — Accessibility, UX, support, legal notice     | Not started |
@@ -125,10 +125,65 @@ Environment finding: headless Chromium on a software rasteriser cannot present a
 (the device is destroyed). The WebGPU backend is therefore tested through a read-back
 presenter; see the amendment to ADR 0004.
 
+## M3 — Ocean, exact sky, lighting (done, 2026-11-14)
+
+Delivered:
+
+- **Sky.** Star field from the Yale Bright Star Catalogue (8,404 stars to magnitude 6.5, moved
+  to epoch 1912 by proper motion, 67 kB), oriented for the instant, the foundering position and
+  the heading by Astronomy Engine; Jupiter and Mars drawn while they are up; Moon and Sun
+  computed and below the horizon all night; haze band at the horizon. Method in `docs/SKY.md`.
+- **Sea.** JONSWAP spectrum scaled to a 5 cm significant wave height; FFT wave field on the
+  processor; mirror reflection displaced by the slopes with Fresnel weighting; band of disturbed
+  water along the waterline of each section; analytic (Gerstner, first order) waves as the
+  fallback of the lowest quality level; waves frozen with reduced motion.
+- **Lighting.** Glow of the lamps on the hull and upper works, following `data/lighting.json`
+  and each station going under; dim starlight keeps the unlit ship readable; AgX tone mapping.
+- **Quality levels.** `quality=low|medium|high` in the address (`src/render/quality.ts`); the
+  control in the interface comes with M5.
+- **Visual tests.** Screenshot tolerance tightened and content assertions added (ADR 0004,
+  second amendment).
+
+Verified:
+
+| Check                                         | Command                               | Result                                                                |
+| --------------------------------------------- | ------------------------------------- | --------------------------------------------------------------------- |
+| Type checking, lint, dataset, schema export   | `pnpm check`                          | Pass                                                                  |
+| Unit tests                                    | `pnpm test`                           | 242 of 242 pass                                                       |
+| Sky against ephemeris cross-checks            | `src/sky/skyModel.test.ts`            | Hour-angle formula within 1°; Polaris, spring sky, Moon, Sun, Jupiter |
+| Sea: FFT, exact slopes, determinism, fallback | `src/ocean/*.test.ts`                 | 20 of 20 pass                                                         |
+| Budgets                                       | `pnpm budgets`                        | JavaScript 314 kB of 400 kB, CSS 3.4 kB, HTML 1.3 kB (gzip)           |
+| End-to-end, WebGL 2 and WebGPU                | Playwright in the official image      | 80 of 80 pass; no axe-core violation                                  |
+| Old baselines fail under the new tolerance    | same suite before re-recording        | 5 of 6 instants fail on each backend; the wreck image is unchanged    |
+| Content of the night image                    | `tests/e2e/scene.spec.ts`             | Stars in a dark sky, reflection of the lit ship, none after 2:17      |
+| Low and high quality levels                   | same file                             | Draw without console errors on both backends                          |
+| Scene under the production CSP                | suite run against the Caddy container | 50 of 50 scene and accessibility tests pass, same baselines           |
+
+Visual review of the six re-recorded baselines (12 images) and of close-ups at 12:45 a.m. and
+1:40 a.m., against the witnesses' description of the night recorded in `data/site.json`:
+
+- Agrees: moonless sky full of stars down to a hazy horizon; flat sea, dark except where it
+  mirrors the ship; rows of lit ports and warm glow on the upper works, reflected as a broken
+  path of light; black hull staying dark; lights and reflection gone at 2:20 a.m.; boats alone
+  on a starlit sea; the wreck image is unchanged.
+- Differs, to be addressed in the milestones shown: the upper works are lit more evenly than
+  lamps would light them, and bright stars reflect as a few sharp glints near the camera rather
+  than soft ones (M5, with bloom and the detailed model); the distress signals rise above the
+  frame of the guided camera at 12:47 a.m. (M4); no Milky Way or diffuse sky light.
+- Both backends give visually identical images (a few hundred pixels differ slightly).
+
+Findings, both recorded in the second amendment to ADR 0004:
+
+- The tolerance used until M2 let the M3 images pass against the M2 baselines, because a night
+  image is mostly black.
+- Under the production content security policy the style sheet that hid the controls for
+  screenshots was refused, so the controls stayed in the picture; the tests now hide them
+  through the CSS object model and CI runs them against the container image.
+
 ## Tooling availability in the authoring session
 
 - Context7 and DeepWiki MCP servers: both available and consulted for Vite, Biome, Vitest,
-  Playwright, Caddy and TypeScript.
+  Playwright, Caddy, TypeScript, Zod, three.js and Astronomy Engine.
 - Astral skills (`uv`, `ty`, `ruff`): available; they apply from M5 (Python pipeline).
 - Dokploy MCP server: not available in the session that produced M0. M7 must be run from a
   session that has it.

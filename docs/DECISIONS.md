@@ -82,8 +82,8 @@ compares them. CI runners have no GPU.
 `mcr.microsoft.com/playwright` at the tag matching the installed `@playwright/test`
 (`tools/e2e-container.sh`, used locally and by CI). Two projects run every test: `webgl2`
 (ANGLE on SwiftShader) and `webgpu` (Dawn on SwiftShader, enabled by
-`--enable-unsafe-webgpu --use-webgpu-adapter=swiftshader`). Screenshots are compared with
-`maxDiffPixelRatio` 0.02 and a per-pixel `threshold` of 0.2.
+`--enable-unsafe-webgpu --use-webgpu-adapter=swiftshader`). Screenshots are compared with a
+tolerance set in `playwright.config.ts` (see the second amendment).
 
 **Consequences.** Baselines are reproducible. Software rasterisation is slow, so end-to-end
 tests render at 1280×720 and frame rate is not asserted there; performance is measured
@@ -211,3 +211,60 @@ image must depend on that instant alone.
 either backend. Positions of the boats after they leave, the height of the distress signals and
 the massing of the deckhouses are not in the sources; they are marked as illustrative in the
 code that draws them and in the interface text.
+
+## ADR 0009 — Sea, sky and light of the night
+
+**Status:** accepted (2026-11-14)
+
+**Context.** The night was moonless, clear and flat calm. The image must show a sky that is
+right for the date, the hour and the place, a sea that reflects the lit ship, and lamps that go
+out as recorded, while staying a deterministic function of the instant on both backends.
+
+**Decision.**
+
+- The star field is the Yale Bright Star Catalogue to magnitude 6.5, moved to epoch 1912 by
+  proper motion at build time and shipped as a 67 kB binary file loaded with the scene chunk.
+  Its orientation, the planets, the Moon and the Sun come from Astronomy Engine (MIT, no
+  dependency) for the foundering position and the adopted ship's time. Method and tests are in
+  `docs/SKY.md`.
+- The sea is a mirror plane whose reflection is displaced by wave slopes. The slopes come from a
+  Tessendorf FFT field evaluated on the processor (128 × 128 samples, three inverse transforms
+  per instant) and uploaded as a texture. A GPU implementation was not retained: compute
+  shaders do not exist on the WebGL 2 backend, and the field is small enough for the processor.
+- A second source of slopes, twelve sinusoidal waves from the same spectrum evaluated in the
+  shader, serves the lowest quality level. It is the first-order form of Gerstner waves: the
+  surface is never seen close enough for horizontal displacement to matter on a 5 cm sea.
+- The amplitudes of both wave models come from a generator seeded with a constant; only phases
+  depend on time. With reduced motion the waves are frozen.
+- Quality levels (`src/render/quality.ts`): `low` (analytic waves, reflection at a quarter of
+  the resolution, pixel ratio 1), `medium` (FFT waves, reflection at half resolution, pixel
+  ratio up to 1.5; the default) and `high` (FFT waves, full-resolution reflection, pixel ratio
+  up to 2). The level is chosen with `quality=` in the address; a control in the interface and
+  the remaining settings come with M5.
+- The logarithmic depth buffer is no longer used: a near plane of 1 m and a far plane of 45 km
+  give enough depth precision for the scene, and every pass, the reflection included, then
+  shares the same projection.
+- The glow of the lamps is eight point lights beside the hull whose intensity follows `data/lighting.json`. No
+  shift of colour is rendered as the output falls, for want of a primary testimony.
+
+**Consequences.** The initial JavaScript grows to 314 kB gzip (budget 400 kB). The sky can be
+checked against ephemerides by unit tests. The reflection costs one additional render of the
+scene per frame, scaled by the quality level.
+
+## ADR 0004 — second amendment (2026-11-14)
+
+A night scene is mostly black, so a tolerance expressed as a share of the image hides real
+changes: the images of M3 (stars, reflections, glow) still matched the baselines of M2 under
+`maxDiffPixelRatio` 0.02 and `threshold` 0.2. Screenshots are now compared with `maxDiffPixels`
+50 and `threshold` 0.1, which the M2 baselines fail at five of the six instants, and
+`tests/e2e/scene.spec.ts` asserts the content of the image directly: stars as points in a dark
+sky, the lit ship reflected in the sea, no reflection once the lights have failed.
+
+The tighter comparison exposed a second weakness. The controls laid over the canvas were hidden
+for screenshots by a style sheet that Playwright injects into the page; the content security
+policy of the production server (`style-src 'self'`) rightly refuses it, so against the
+container image the controls stayed in the picture, unnoticed under the old tolerance. The tests
+now hide them through the CSS object model, which the policy allows, and the `container` job of
+CI runs the scene and accessibility tests against the built image
+(`E2E_BASE_URL=http://127.0.0.1:8080 tools/e2e-container.sh scene.spec.ts home.spec.ts`), with
+the same baselines as the preview server.

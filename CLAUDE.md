@@ -10,6 +10,7 @@ code, comments, commits and documentation are in English only.
 2. `docs/DATA.md` — dataset structure, conventions and modelling rules.
 3. `docs/PLAN.md` — milestones and acceptance criteria.
 4. `docs/DECISIONS.md` — architecture decision records (ADR).
+5. `docs/SKY.md` — how the sky, the sea and the night lighting are computed and tested.
 
 Update STATUS.md at the end of every task. A change of behaviour updates the affected
 documentation in the same commit series.
@@ -29,6 +30,7 @@ documentation in the same commit series.
 | All of the above                  | `pnpm check`                                 |
 | End-to-end tests (pinned image)   | `pnpm test:e2e:container`                    |
 | Verify a running container        | `node tools/verify-server.ts --origin <url>` |
+| End-to-end against a running site | `E2E_BASE_URL=<url> tools/e2e-container.sh`  |
 
 Run `pnpm check` and the end-to-end suite before every commit.
 
@@ -37,12 +39,22 @@ Run `pnpm check` and the end-to-end suite before every commit.
 | Path           | Content                                                                 |
 | -------------- | ----------------------------------------------------------------------- |
 | `index.html`   | Application document                                                    |
+| `data/`        | Historical dataset (JSON) and its exported JSON Schemas                 |
+| `src/data/`    | Zod schemas, typed loader and validation of the dataset                 |
+| `src/sim/`     | Pure simulation: timeline model, poses, events, waterline               |
+| `src/ship/`    | Pure geometry of the ship: hull form, mesh data, lamps                  |
+| `src/sky/`     | Star catalogue codec, sky orientation (ephemerides), star appearance    |
+| `src/ocean/`   | Wave spectrum, FFT field and analytic waves                             |
+| `src/render/`  | three.js scene, objects, cameras, quality levels (separate chunk)       |
+| `src/app/`     | Store, playback, address state                                          |
+| `src/ui/`      | Timeline, panels, camera controls, announcements                        |
+| `src/time/`    | Ship's time conversions and formatting                                  |
 | `src/config/`  | Typed configuration (site identity, later support links and legal data) |
 | `src/styles/`  | Design tokens, base styles and layout                                   |
 | `public/`      | Files served unchanged                                                  |
 | `tools/`       | Build and verification scripts, run by Node.js as TypeScript            |
 | `tests/e2e/`   | Playwright tests (accessibility, behaviour, visual regression)          |
-| `docs/`        | Plan, status, decisions                                                 |
+| `docs/`        | Plan, status, decisions, data and sky documentation                     |
 | `Dockerfile`   | Build with Node.js, serve with Caddy as an unprivileged user            |
 | `Caddyfile`    | Headers, caching, fallback, host redirects                              |
 | `budgets.json` | Performance budgets checked by `tools/check-budgets.ts`                 |
@@ -69,6 +81,10 @@ Run `pnpm check` and the end-to-end suite before every commit.
   with unit tests; `src/render/` only turns it into GPU resources.
 - Visual baselines (`tests/e2e/__screenshots__/`) are re-recorded only after the images have
   been looked at; note the review in `docs/STATUS.md`.
+- A night image is mostly black: after a visual change, check that the old baselines fail before
+  re-recording them, and assert new content directly (see `tests/e2e/pixels.ts`).
+- Tests must work under the production content security policy: no injected style or script
+  (`hideOverlays` in `tests/e2e/app.ts` uses the CSS object model).
 - Tone: sober and informative. No depiction of victims, no sensational wording or sound.
 - Accessibility: WCAG 2.2 level AA on every view.
 
