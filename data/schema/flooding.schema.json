@@ -1,0 +1,256 @@
+{
+  "$id": "https://www.titanic-4d.org/schema/flooding.schema.json",
+  "title": "Titanic 4D dataset: flooding.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "damage": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema0"
+      }
+    },
+    "compartments": {
+      "minItems": 16,
+      "maxItems": 16,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema7"
+      }
+    },
+    "water_aboard": {
+      "minItems": 2,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema10"
+      }
+    }
+  },
+  "required": [
+    "damage",
+    "compartments",
+    "water_aboard"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "__schema0": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema4"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema5"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "summary",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "__schema1": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "__schema2": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema1"
+      }
+    },
+    "__schema3": {
+      "type": "string",
+      "enum": [
+        "established",
+        "estimated",
+        "debated"
+      ],
+      "description": "established: primary evidence and broad consensus; estimated: derived or approximate, with the method stated in the note; debated: competing positions exist and are listed."
+    },
+    "__schema4": {
+      "type": "string",
+      "minLength": 1
+    },
+    "__schema5": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema6"
+      }
+    },
+    "__schema6": {
+      "type": "object",
+      "properties": {
+        "holder": {
+          "type": "string",
+          "minLength": 1
+        },
+        "position": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_ids": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema1"
+          }
+        }
+      },
+      "required": [
+        "holder",
+        "position",
+        "source_ids"
+      ],
+      "additionalProperties": false
+    },
+    "__schema7": {
+      "type": "object",
+      "properties": {
+        "compartment_id": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "levels": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema8"
+          },
+          "description": "Water level inside the compartment, never higher than the sea outside the hull at the same station."
+        },
+        "equalised_from": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/__schema9"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Time from which the water inside stands level with the sea outside. Between the last keyframe and this time the level rises linearly to meet the sea; null when the compartment is not assumed to equalise."
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema4"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema5"
+        }
+      },
+      "required": [
+        "compartment_id",
+        "levels",
+        "equalised_from",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "__schema8": {
+      "type": "object",
+      "properties": {
+        "ats": {
+          "$ref": "#/$defs/__schema9"
+        },
+        "level_above_keel_m": {
+          "type": "number",
+          "minimum": 0
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema4"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema5"
+        }
+      },
+      "required": [
+        "ats",
+        "level_above_keel_m",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "__schema9": {
+      "type": "string",
+      "pattern": "^1912-04-1[45]T(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d)?$",
+      "description": "Titanic ship's time (Apparent Time Ship), ISO 8601 local date-time."
+    },
+    "__schema10": {
+      "type": "object",
+      "properties": {
+        "ats": {
+          "$ref": "#/$defs/__schema9"
+        },
+        "tonnes": {
+          "type": "number",
+          "minimum": 0
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema4"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema5"
+        }
+      },
+      "required": [
+        "ats",
+        "tonnes",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

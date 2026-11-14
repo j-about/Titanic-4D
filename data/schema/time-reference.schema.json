@@ -1,0 +1,277 @@
+{
+  "$id": "https://www.titanic-4d.org/schema/time-reference.schema.json",
+  "title": "Titanic 4D dataset: time-reference.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "collision": {
+      "type": "object",
+      "properties": {
+        "ats": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema4"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema5"
+        }
+      },
+      "required": [
+        "ats",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "foundering": {
+      "type": "object",
+      "properties": {
+        "ats": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema4"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema5"
+        }
+      },
+      "required": [
+        "ats",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "adopted_offset": {
+      "$ref": "#/$defs/__schema7"
+    },
+    "alternative_offsets": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema7"
+      }
+    },
+    "other_vessels": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/__schema2"
+          },
+          "vessel": {
+            "type": "string",
+            "minLength": 1
+          },
+          "vessel_minus_titanic_min": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "source_ids": {
+            "$ref": "#/$defs/__schema1"
+          },
+          "certainty": {
+            "$ref": "#/$defs/__schema3"
+          },
+          "note": {
+            "$ref": "#/$defs/__schema4"
+          },
+          "alternatives": {
+            "$ref": "#/$defs/__schema5"
+          }
+        },
+        "required": [
+          "id",
+          "vessel",
+          "vessel_minus_titanic_min",
+          "source_ids",
+          "certainty",
+          "note"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "open_questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/__schema2"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "value": {
+            "type": "number"
+          },
+          "unit": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_ids": {
+            "$ref": "#/$defs/__schema1"
+          },
+          "certainty": {
+            "$ref": "#/$defs/__schema3"
+          },
+          "note": {
+            "$ref": "#/$defs/__schema4"
+          },
+          "alternatives": {
+            "$ref": "#/$defs/__schema5"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "summary",
+          "source_ids",
+          "certainty",
+          "note"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "collision",
+    "foundering",
+    "adopted_offset",
+    "alternative_offsets",
+    "other_vessels",
+    "open_questions"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "__schema0": {
+      "type": "string",
+      "pattern": "^1912-04-1[45]T(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d)?$",
+      "description": "Titanic ship's time (Apparent Time Ship), ISO 8601 local date-time."
+    },
+    "__schema1": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema2"
+      }
+    },
+    "__schema2": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "__schema3": {
+      "type": "string",
+      "enum": [
+        "established",
+        "estimated",
+        "debated"
+      ],
+      "description": "established: primary evidence and broad consensus; estimated: derived or approximate, with the method stated in the note; debated: competing positions exist and are listed."
+    },
+    "__schema4": {
+      "type": "string",
+      "minLength": 1
+    },
+    "__schema5": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema6"
+      }
+    },
+    "__schema6": {
+      "type": "object",
+      "properties": {
+        "holder": {
+          "type": "string",
+          "minLength": 1
+        },
+        "position": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_ids": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema2"
+          }
+        }
+      },
+      "required": [
+        "holder",
+        "position",
+        "source_ids"
+      ],
+      "additionalProperties": false
+    },
+    "__schema7": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "holder": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ship_minus_new_york_min": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "ship_minus_gmt_min": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema4"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema5"
+        }
+      },
+      "required": [
+        "id",
+        "holder",
+        "ship_minus_new_york_min",
+        "ship_minus_gmt_min",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

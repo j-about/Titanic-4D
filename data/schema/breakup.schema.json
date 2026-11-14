@@ -1,0 +1,320 @@
+{
+  "$id": "https://www.titanic-4d.org/schema/breakup.schema.json",
+  "title": "Titanic 4D dataset: breakup.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "reference_model": {
+      "$ref": "#/$defs/__schema0"
+    },
+    "competing_models": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema0"
+      }
+    },
+    "facts": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema0"
+      }
+    },
+    "break": {
+      "type": "object",
+      "properties": {
+        "ats": {
+          "$ref": "#/$defs/__schema7"
+        },
+        "trim_min_deg": {
+          "type": "number"
+        },
+        "trim_max_deg": {
+          "type": "number"
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema4"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema5"
+        }
+      },
+      "required": [
+        "ats",
+        "trim_min_deg",
+        "trim_max_deg",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "funnel_falls": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "funnel_id": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4
+          },
+          "ats": {
+            "$ref": "#/$defs/__schema7"
+          },
+          "source_ids": {
+            "$ref": "#/$defs/__schema2"
+          },
+          "certainty": {
+            "$ref": "#/$defs/__schema3"
+          },
+          "note": {
+            "$ref": "#/$defs/__schema4"
+          },
+          "alternatives": {
+            "$ref": "#/$defs/__schema5"
+          }
+        },
+        "required": [
+          "funnel_id",
+          "ats",
+          "source_ids",
+          "certainty",
+          "note"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "bow_section": {
+      "$ref": "#/$defs/__schema8"
+    },
+    "stern_section": {
+      "$ref": "#/$defs/__schema8"
+    }
+  },
+  "required": [
+    "reference_model",
+    "competing_models",
+    "facts",
+    "break",
+    "funnel_falls",
+    "bow_section",
+    "stern_section"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "__schema0": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema4"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema5"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "summary",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "__schema1": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "__schema2": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema1"
+      }
+    },
+    "__schema3": {
+      "type": "string",
+      "enum": [
+        "established",
+        "estimated",
+        "debated"
+      ],
+      "description": "established: primary evidence and broad consensus; estimated: derived or approximate, with the method stated in the note; debated: competing positions exist and are listed."
+    },
+    "__schema4": {
+      "type": "string",
+      "minLength": 1
+    },
+    "__schema5": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema6"
+      }
+    },
+    "__schema6": {
+      "type": "object",
+      "properties": {
+        "holder": {
+          "type": "string",
+          "minLength": 1
+        },
+        "position": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_ids": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema1"
+          }
+        }
+      },
+      "required": [
+        "holder",
+        "position",
+        "source_ids"
+      ],
+      "additionalProperties": false
+    },
+    "__schema7": {
+      "type": "string",
+      "pattern": "^1912-04-1[45]T(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d)?$",
+      "description": "Titanic ship's time (Apparent Time Ship), ISO 8601 local date-time."
+    },
+    "__schema8": {
+      "type": "object",
+      "properties": {
+        "x_start_m": {
+          "type": "number"
+        },
+        "x_end_m": {
+          "type": "number"
+        },
+        "reference_x_m": {
+          "type": "number",
+          "description": "Station of the reference point of the section, on the centre line at the height of the original waterline."
+        },
+        "keyframes": {
+          "minItems": 2,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema9"
+          }
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema4"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema5"
+        }
+      },
+      "required": [
+        "x_start_m",
+        "x_end_m",
+        "reference_x_m",
+        "keyframes",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "__schema9": {
+      "type": "object",
+      "properties": {
+        "ats": {
+          "$ref": "#/$defs/__schema7"
+        },
+        "pitch_deg": {
+          "type": "number",
+          "description": "Positive when the forward end is down."
+        },
+        "heel_deg": {
+          "type": "number",
+          "description": "Positive to starboard."
+        },
+        "yaw_deg": {
+          "type": "number",
+          "description": "Rotation about the vertical, clockwise seen from above, from the heading at the break."
+        },
+        "forward_m": {
+          "type": "number",
+          "description": "Position of the section reference point along the heading at the break, from the surface point above the break."
+        },
+        "starboard_m": {
+          "type": "number"
+        },
+        "up_m": {
+          "type": "number",
+          "description": "Height of the section reference point above the sea surface."
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema4"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema5"
+        }
+      },
+      "required": [
+        "ats",
+        "pitch_deg",
+        "heel_deg",
+        "yaw_deg",
+        "forward_m",
+        "starboard_m",
+        "up_m",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    }
+  }
+}
