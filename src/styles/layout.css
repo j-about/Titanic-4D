@@ -1,0 +1,43 @@
+.site-header,
+.site-footer {
+  padding: var(--space-4) var(--space-5);
+}
+
+.site-header {
+  border-block-end: 0.0625rem solid var(--color-border);
+}
+
+.site-footer {
+  border-block-start: 0.0625rem solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.site-footer p {
+  margin: 0;
+}
+
+.site-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.site-title a {
+  color: var(--color-text);
+  text-decoration-line: none;
+}
+
+.site-title a:hover {
+  text-decoration-line: underline;
+}
+
+main {
+  flex: 1;
+  inline-size: 100%;
+  max-inline-size: 72rem;
+  margin-inline: auto;
+  padding: var(--space-6) var(--space-5);
+}
