@@ -7,17 +7,23 @@ import {
   WebGPURenderer,
 } from 'three/webgpu';
 import type { Dataset } from '../data/schema/dataset.ts';
+import { createHullForm } from '../ship/hullForm.ts';
 import { factValue } from '../ship/particulars.ts';
 import { createBoatPlacer } from '../sim/boatPlacement.ts';
 import type { ShipState, TimelineModel } from '../sim/timelineModel.ts';
+import { waterlineFootprint } from '../sim/waterline.ts';
+import { createSkyModel, type SkyState } from '../sky/skyModel.ts';
 import { createBoatsObject } from './boatsObject.ts';
 import { createCameraInput } from './camera/cameraInput.ts';
 import type { CameraMode } from './camera/cameraPose.ts';
 import { createCameraRig } from './camera/cameraRig.ts';
 import { createEnvironment } from './environment.ts';
+import { createOceanObject } from './oceanObject.ts';
 import { createCanvasPresenter, createReadbackPresenter } from './presenter.ts';
+import { QUALITY_SETTINGS, type QualityLevel } from './quality.ts';
 import { createRocketsObject } from './rocketsObject.ts';
 import { createShipObject } from './shipObject.ts';
+import { createSkyObject } from './skyObject.ts';
 
 export type RenderBackend = 'webgpu' | 'webgl2';
 
@@ -33,6 +39,7 @@ export interface SceneViewOptions {
   readonly dataset: Dataset;
   readonly model: TimelineModel;
   readonly renderer: RendererChoice;
+  readonly quality: QualityLevel;
   /** Called when the graphics device is lost and the view can no longer draw. */
   onDeviceLost(reason: string): void;
 }
@@ -58,7 +65,7 @@ export interface SceneView {
 }
 
 const FIELD_OF_VIEW_DEG = 42;
-const NEAR_PLANE_M = 0.6;
+const NEAR_PLANE_M = 1;
 const FAR_PLANE_M = 45_000;
 
 /** Creates the renderer and the scene. Rejects when neither WebGPU nor WebGL 2 is available. */
@@ -71,7 +78,6 @@ export async function createSceneView(options: SceneViewOptions): Promise<SceneV
     ...(readback ? {} : { canvas }),
     antialias: true,
     forceWebGL: options.renderer === 'webgl2',
-    logarithmicDepthBuffer: true,
     powerPreference: 'high-performance',
   });
   await renderer.init();
@@ -92,10 +98,28 @@ export async function createSceneView(options: SceneViewOptions): Promise<SceneV
   const scene = new Scene();
   const camera = new PerspectiveCamera(FIELD_OF_VIEW_DEG, 1, NEAR_PLANE_M, FAR_PLANE_M);
   const environment = createEnvironment(scene, seabedHeightM);
+  const sky = await createSkyObject();
+  const ocean = createOceanObject(QUALITY_SETTINGS[options.quality]);
   const ship = createShipObject(dataset);
   const boats = createBoatsObject(dataset, createBoatPlacer(dataset, model));
   const rockets = createRocketsObject(dataset);
-  scene.add(environment.root, ship.root, boats.root, rockets.root);
+  scene.add(environment.root, sky.root, ocean.root, ship.root, boats.root, rockets.root);
+
+  const site = dataset.site.positions.find((position) => position.id === 'wreck-boiler-field');
+  if (site === undefined) {
+    throw new RangeError('The dataset has no foundering position.');
+  }
+  const skyModel = createSkyModel({
+    latitudeDeg: site.latitude_deg,
+    longitudeDeg: site.longitude_deg,
+    headingTrueDeg: dataset.site.heading.true_deg,
+    shipMinusGmtMinutes: dataset.timeReference.adopted_offset.ship_minus_gmt_min,
+  });
+  let skyState: SkyState = skyModel.evaluate(model.startSeconds);
+  let skyTime = model.startSeconds;
+  const hullForm = createHullForm(dataset.ship);
+  const { bow_section: bowSection, stern_section: sternSection } = dataset.breakup;
+  let viewportHeightPx = 1;
 
   const pipeline = new RenderPipeline(renderer);
   pipeline.outputNode = pass(scene, camera);
@@ -117,6 +141,7 @@ export async function createSceneView(options: SceneViewOptions): Promise<SceneV
     renderer.setPixelRatio(pixelRatio);
     renderer.setSize(width, height, false);
     presenter.resize(Math.round(width * pixelRatio), Math.round(height * pixelRatio));
+    viewportHeightPx = height;
     camera.aspect = width / Math.max(height, 1);
     camera.updateProjectionMatrix();
   };
@@ -134,6 +159,31 @@ export async function createSceneView(options: SceneViewOptions): Promise<SceneV
     camera.position.set(pose.position[0], pose.position[1], pose.position[2]);
     camera.lookAt(pose.target[0], pose.target[1], pose.target[2]);
     environment.update(pose.position);
+    if (frame.state.t !== skyTime) {
+      skyTime = frame.state.t;
+      skyState = skyModel.evaluate(skyTime);
+    }
+    sky.update({
+      sky: skyState,
+      cameraPosition: pose.position,
+      viewportHeightPx,
+      fieldOfViewDeg: FIELD_OF_VIEW_DEG,
+    });
+    const footprints = [
+      waterlineFootprint(
+        hullForm,
+        frame.state.bow,
+        bowSection.x_start_m,
+        frame.state.intact ? sternSection.x_start_m : bowSection.x_end_m,
+      ),
+      waterlineFootprint(hullForm, frame.state.stern, sternSection.x_start_m, sternSection.x_end_m),
+    ].filter((footprint) => footprint !== undefined);
+    ocean.update({
+      // With reduced motion the waves are frozen; the sea is then the same at every instant.
+      timeSeconds: frame.reducedMotion ? 0 : frame.state.t,
+      cameraPosition: pose.position,
+      footprints,
+    });
     return presenter.present();
   };
 
@@ -143,6 +193,8 @@ export async function createSceneView(options: SceneViewOptions): Promise<SceneV
     boats.dispose();
     rockets.dispose();
     environment.dispose();
+    sky.dispose();
+    ocean.dispose();
     presenter.dispose();
     pipeline.dispose();
     renderer.dispose();

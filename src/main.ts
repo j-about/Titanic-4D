@@ -4,6 +4,7 @@ import { advancePlayback, seekBy } from './app/playback.ts';
 import { createStore } from './app/store.ts';
 import { formatUrlState, parseUrlState } from './app/urlState.ts';
 import { dataset } from './data/dataset.ts';
+import { QUALITY_SETTINGS } from './render/quality.ts';
 import type { RendererChoice, SceneView } from './render/sceneView.ts';
 import { createTimelineModel, type ShipState } from './sim/timelineModel.ts';
 import { formatShipClock } from './time/shipTime.ts';
@@ -17,8 +18,6 @@ import { describeScene } from './ui/stateText.ts';
 import { createTabs } from './ui/tabs.ts';
 import { createTimelinePanel } from './ui/timelinePanel.ts';
 
-/** Greatest device pixel ratio used for the drawing buffer. */
-const MAX_PIXEL_RATIO = 2;
 /** Interval between rewrites of the page address while time is moving, in milliseconds. */
 const URL_UPDATE_INTERVAL_MS = 500;
 /** Delay before a position reached by seeking is announced, in milliseconds. */
@@ -149,7 +148,11 @@ const updateAddress = (nowMs: number, force: boolean): void => {
     return;
   }
   lastUrlUpdateMs = nowMs;
-  history.replaceState(null, '', formatUrlState(store.get(), rendererChoice));
+  history.replaceState(
+    null,
+    '',
+    formatUrlState(store.get(), { renderer: rendererChoice, quality: url.quality }),
+  );
 };
 
 store.subscribe((state, previous) => {
@@ -180,7 +183,7 @@ const resizeView = (): void => {
   view?.resize(
     canvas.clientWidth,
     canvas.clientHeight,
-    Math.min(devicePixelRatio, MAX_PIXEL_RATIO),
+    Math.min(devicePixelRatio, QUALITY_SETTINGS[url.quality].maxPixelRatio),
   );
   needsRender = true;
 };
@@ -231,6 +234,7 @@ async function startScene(choice: RendererChoice, canvas: HTMLCanvasElement): Pr
       dataset,
       model,
       renderer: choice,
+      quality: url.quality,
       onDeviceLost: fallBack,
     });
     resizeView();

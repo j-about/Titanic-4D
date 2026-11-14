@@ -23,36 +23,47 @@ describe('clock conversion', () => {
 });
 
 describe('parseUrlState', () => {
-  it('reads time, camera, rate and renderer', () => {
-    expect(parseUrlState('?t=01:40&camera=deck&rate=300&renderer=webgl2', 9960)).toEqual({
+  it('reads time, camera, rate, renderer and quality', () => {
+    expect(
+      parseUrlState('?t=01:40&camera=deck&rate=300&renderer=webgl2&quality=low', 9960),
+    ).toEqual({
       t: 7200,
       cameraMode: 'deck',
       rate: 300,
       renderer: 'webgl2',
+      quality: 'low',
     });
   });
 
   it('ignores unknown or out-of-range values', () => {
-    expect(parseUrlState('?t=12:00&camera=helicopter&rate=7', 9960)).toEqual({ renderer: 'auto' });
-    expect(parseUrlState('?renderer=vulkan', 9960)).toEqual({ renderer: 'auto' });
+    const defaults = { renderer: 'auto', quality: 'medium' };
+    expect(parseUrlState('?t=12:00&camera=helicopter&rate=7', 9960)).toEqual(defaults);
+    expect(parseUrlState('?renderer=vulkan&quality=ultra', 9960)).toEqual(defaults);
   });
 });
 
 describe('formatUrlState', () => {
   it('writes a readable query string', () => {
-    expect(formatUrlState({ t: 7200, cameraMode: 'orbit', rate: 60 }, 'auto')).toBe(
-      '?t=01:40:00&camera=orbit&rate=60',
-    );
-    expect(formatUrlState({ t: 0, cameraMode: 'guided', rate: 1 }, 'webgl2')).toBe(
-      '?t=23:40:00&camera=guided&rate=1&renderer=webgl2',
-    );
+    expect(
+      formatUrlState(
+        { t: 7200, cameraMode: 'orbit', rate: 60 },
+        { renderer: 'auto', quality: 'medium' },
+      ),
+    ).toBe('?t=01:40:00&camera=orbit&rate=60');
+    expect(
+      formatUrlState(
+        { t: 0, cameraMode: 'guided', rate: 1 },
+        { renderer: 'webgl2', quality: 'high' },
+      ),
+    ).toBe('?t=23:40:00&camera=guided&rate=1&renderer=webgl2&quality=high');
   });
 
   it('is read back unchanged', () => {
     const state = { t: 9450, cameraMode: 'underwater' as const, rate: 600 as const };
-    expect(parseUrlState(formatUrlState(state, 'webgpu-readback'), 9960)).toEqual({
+    const rendering = { renderer: 'webgpu-readback', quality: 'low' } as const;
+    expect(parseUrlState(formatUrlState(state, rendering), 9960)).toEqual({
       ...state,
-      renderer: 'webgpu-readback',
+      ...rendering,
     });
   });
 });

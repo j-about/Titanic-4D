@@ -7,6 +7,7 @@ import {
   MeshBasicNodeMaterial,
   MeshStandardNodeMaterial,
   PlaneGeometry,
+  PointLight,
   Quaternion,
   Vector3,
 } from 'three/webgpu';
@@ -32,6 +33,16 @@ const SUBMERGED_LAMP_FACTOR = 0.08;
 const LAMP_FADE_DEPTH_M = 1.2;
 /** Distance by which lamps stand proud of the plating, to avoid coplanar surfaces. */
 const LAMP_OFFSET_M = 0.04;
+/**
+ * Lights standing for the glow of the lit decks on the ship's own structure: stations along the
+ * hull, on both sides, with their intensity in candelas and their reach in metres. They follow
+ * the electric lighting output and go out as they are submerged.
+ */
+const GLOW_STATIONS_M: readonly number[] = [70, 115, 190, 228];
+const GLOW_OUTBOARD_M = 9;
+const GLOW_HEIGHT_M = 23;
+const GLOW_INTENSITY_CD = 650;
+const GLOW_REACH_M = 140;
 
 function applyPose(group: Group, pose: Pose): void {
   group.matrix.fromArray(poseToMatrix(pose));
@@ -120,6 +131,20 @@ export function createShipObject(dataset: Dataset): ShipObject {
     groups[mast.section].add(new Mesh(geometry, paint));
   }
 
+  const halfBreadth = Math.max(...model.lamps.map((lamp) => Math.abs(lamp.position.y)));
+  const glowLights = GLOW_STATIONS_M.flatMap((x) =>
+    ([1, -1] as const).map((side) => {
+      const light = new PointLight(LAMP_COLOUR, 0, GLOW_REACH_M, 2);
+      light.position.set(-x, GLOW_HEIGHT_M, side * (halfBreadth + GLOW_OUTBOARD_M));
+      const section =
+        model.ranges.find((range) => x >= range.xStart && x < range.xEnd)?.id ?? 'stern';
+      groups[section].add(light);
+      disposables.push(light);
+      return light;
+    }),
+  );
+  const glowPosition = new Vector3();
+
   const update = (state: ShipState): void => {
     applyPose(groups.bow, state.bow);
     applyPose(groups.stern, state.stern);
@@ -130,6 +155,12 @@ export function createShipObject(dataset: Dataset): ShipObject {
       funnel.visible = state.funnelsStanding[index] ?? false;
     });
     lightingOutput.value = state.lightingOutput;
+    root.updateMatrixWorld();
+    for (const light of glowLights) {
+      const height = light.getWorldPosition(glowPosition).y;
+      const aboveWater = Math.min(Math.max(height / LAMP_FADE_DEPTH_M + 1, 0), 1);
+      light.intensity = GLOW_INTENSITY_CD * state.lightingOutput * aboveWater;
+    }
   };
 
   const dispose = (): void => {
