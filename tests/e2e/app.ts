@@ -44,19 +44,40 @@ export async function waitForFrame(page: Page, clock: string): Promise<void> {
   );
 }
 
-/** Opens the application at a ship's clock time with the renderer of the current project. */
+/**
+ * Opens the application at a ship's clock time with the renderer of the current project.
+ * `extraQuery` adds parameters to the address, for example `quality=low`.
+ */
 export async function openAt(
   page: Page,
   testInfo: TestInfo,
   clock: string,
   camera = 'guided',
+  extraQuery = '',
 ): Promise<void> {
   const renderer = RENDERER_BY_PROJECT[testInfo.project.name];
   if (renderer === undefined) {
     throw new Error(`No renderer is defined for project "${testInfo.project.name}".`);
   }
-  await page.goto(`/?t=${clock}&camera=${camera}&renderer=${renderer}`);
+  const suffix = extraQuery === '' ? '' : `&${extraQuery}`;
+  await page.goto(`/?t=${clock}&camera=${camera}&renderer=${renderer}${suffix}`);
   await waitForFrame(page, clock);
+}
+
+/** Controls and messages laid over the canvas. */
+const OVERLAY_SELECTOR = '#camera-root, #scene-status';
+
+/**
+ * Hides what is laid over the canvas, so that a screenshot of it shows the scene alone. The
+ * style is set through the CSS object model, which the content security policy of the
+ * production server allows, unlike an injected style sheet.
+ */
+export async function hideOverlays(page: Page): Promise<void> {
+  await page.evaluate((selector) => {
+    for (const element of document.querySelectorAll<HTMLElement>(selector)) {
+      element.style.visibility = 'hidden';
+    }
+  }, OVERLAY_SELECTOR);
 }
 
 function readData<T>(name: string): T {

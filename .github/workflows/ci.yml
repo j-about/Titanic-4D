@@ -49,9 +49,9 @@ jobs:
           retention-days: 14
 
   container:
-    name: Container image, headers and redirects
+    name: Container image, headers, redirects and scene under the production policy
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
@@ -74,5 +74,18 @@ jobs:
         run: node tools/verify-server.ts --origin http://127.0.0.1:8080
       - name: Verify the container runs unprivileged
         run: test "$(docker exec titanic-4d id -u)" != "0"
+      - name: Run the scene and accessibility tests under the production content security policy
+        run: tools/e2e-container.sh scene.spec.ts home.spec.ts
+        env:
+          E2E_BASE_URL: http://127.0.0.1:8080
+      - if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: playwright-report-container
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 14
       - if: ${{ always() }}
         run: docker rm --force titanic-4d
