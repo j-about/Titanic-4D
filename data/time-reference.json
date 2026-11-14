@@ -1,0 +1,101 @@
+{
+  "collision": {
+    "ats": "1912-04-14T23:40",
+    "source_ids": ["brit-inquiry-report", "halpern-master-of-time", "halpern-chronology-2023"],
+    "certainty": "established",
+    "note": "The British report gives 11.40 p.m. ship's time; accounts range from 11:40 to 11:45 and the US report gives 11:46. 11:40 p.m. in unadjusted 14 April time is the accepted figure (Hichens, Haines)."
+  },
+  "foundering": {
+    "ats": "1912-04-15T02:20",
+    "source_ids": ["brit-inquiry-report", "us-inquiry-report", "halpern-chronology-2023"],
+    "certainty": "established",
+    "note": "\"Disappeared at 2.20 a.m.\" in the British report (Lee, Q2558), supported by independent watch readings (Pitman and two passengers). The British report notes a duration of two hours and forty minutes."
+  },
+  "adopted_offset": {
+    "id": "halpern-noon-longitude",
+    "holder": "Samuel Halpern; adopted by Wormstedt, Fitch, Behe and Layton",
+    "ship_minus_new_york_min": 122,
+    "ship_minus_gmt_min": -178,
+    "source_ids": ["halpern-1h33", "halpern-master-of-time", "lee-desperate-dialogue"],
+    "certainty": "debated",
+    "note": "Clocks were set for local apparent noon of 14 April near longitude 44°31′W, where apparent noon fell at 2:58 p.m. GMT: ship's time was 2 h 02 min ahead of New York time and 2 h 58 min behind GMT. This offset is used by the project to convert wireless logs and to compute the sky; the other positions are recorded under alternative_offsets and are not dismissed."
+  },
+  "alternative_offsets": [
+    {
+      "id": "us-senate-1912",
+      "holder": "US Senate report, Boxhall, Lightoller, Rostron (1912)",
+      "ship_minus_new_york_min": 93,
+      "ship_minus_gmt_min": -207,
+      "source_ids": ["us-inquiry-report", "halpern-1h33"],
+      "certainty": "debated",
+      "note": "The US report equates 11.46 p.m. ship's time with 10.13 p.m. New York time. Halpern argues the figure is an error linked to Boxhall's distress position: 35 extra minutes of run at 22 knots is about the 13 miles separating that position from the wreck."
+    },
+    {
+      "id": "british-report-1912",
+      "holder": "Implied by the British report (1912)",
+      "ship_minus_new_york_min": 110,
+      "ship_minus_gmt_min": -190,
+      "source_ids": ["brit-inquiry-report", "lee-desperate-dialogue", "project-derivation"],
+      "certainty": "debated",
+      "note": "Not stated as an offset in the report. Its message times (12.15, 12.25, 12.26, 1.45 and 2.17 a.m.) sit 1 h 50 min after the New York log times of the same entries (10:25, 10:35, 10:36, 11:55 p.m. and 12:27 a.m.); the offset is inferred by the project from those pairs."
+    }
+  ],
+  "other_vessels": [
+    {
+      "id": "californian-clock",
+      "vessel": "SS Californian",
+      "vessel_minus_titanic_min": -12,
+      "source_ids": ["halpern-dozen-rockets", "halpern-collision-point"],
+      "certainty": "estimated",
+      "note": "From the noon longitudes of the two ships (apparent noon at 3:10 p.m. GMT for Californian against 2:58 p.m. for Titanic). Californian's 2:05 a.m. is thus taken as 2:17 a.m. Titanic time."
+    },
+    {
+      "id": "carpathia-clock",
+      "vessel": "RMS Carpathia",
+      "vessel_minus_titanic_min": -5,
+      "source_ids": ["halpern-chronology-2023", "us-inquiry-testimony"],
+      "certainty": "debated",
+      "note": "Halpern puts Carpathia's time 1 h 57 min ahead of New York, 5 minutes behind Titanic.",
+      "alternatives": [
+        {
+          "holder": "Captain Rostron (US Inquiry, Day 1)",
+          "position": "Carpathia's time 1 h 50 min ahead of New York (12:35 a.m. = 10:45 p.m. New York), which would be 12 minutes behind Titanic.",
+          "source_ids": ["us-inquiry-testimony"]
+        }
+      ]
+    }
+  ],
+  "open_questions": [
+    {
+      "id": "clock-setback",
+      "title": "Were the clocks put back before the collision?",
+      "summary": "A setback of 47 minutes was planned for the night, in two steps of 23 and 24 minutes around midnight. Halpern and the authors of the lifeboat studies hold that neither step was made, so that 11:40 p.m. and 2:20 a.m. are unadjusted 14 April time; they add that some individuals, such as Quartermaster Rowe, reckoned in time already put back 23 minutes. Other researchers have argued that the first step had been made before the collision. The dataset follows the first position and keeps the offset as a parameter.",
+      "source_ids": ["halpern-master-of-time", "wfb-lifeboat-sequence"],
+      "certainty": "debated",
+      "note": "If the first setback had been made, every time after the collision would shift by about 23 or 24 minutes relative to New York time and GMT.",
+      "alternatives": [
+        {
+          "holder": "Researchers holding that a first setback preceded the collision (not named by Halpern)",
+          "position": "\"11:40\" is partly adjusted time; crew were due on watch about twenty minutes after the accident.",
+          "source_ids": ["halpern-master-of-time"]
+        }
+      ]
+    },
+    {
+      "id": "rostron-547-gmt",
+      "title": "Rostron's \"5.47 GMT\" for the foundering",
+      "summary": "On 15 April Carpathia signalled Olympic that Titanic foundered about 2.20 a.m., 5.47 GMT. That equivalence implies a ship-to-GMT difference of 3 h 27 min, the same as the 1 h 33 min New York difference of the US inquiry. With the adopted offset, 2:20 a.m. ship's time is 5:18 a.m. GMT. Halpern regards 5.47 as an error carried over from that mistaken difference.",
+      "source_ids": ["halpern-chronology-2023", "halpern-1h33"],
+      "certainty": "debated",
+      "note": "The time of 2:20 a.m. ship's time is established; only its GMT equivalent is disputed (5:18 against 5:47)."
+    },
+    {
+      "id": "wireless-log-clocks",
+      "title": "Wireless logs are not in ship's time",
+      "summary": "Titanic's own wireless log was lost. Every contemporary message time comes from the logs of other ships and of Cape Race, kept in New York time or in GMT (one ship used her own local time), often rounded to five minutes. A ship's time for a message is always a conversion.",
+      "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023"],
+      "certainty": "established",
+      "note": "The dataset stores the logged time with its reference clock and the converted ship's time side by side."
+    }
+  ]
+}

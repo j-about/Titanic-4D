@@ -1,0 +1,519 @@
+{
+  "rockets": {
+    "facts": [
+      {
+        "id": "rocket-type",
+        "title": "Socket distress signals",
+        "summary": "The ship carried socket distress signals, fired from a socket in the bridge rail. Each rose with a luminous tail, burst with a loud report and threw out white stars.",
+        "source_ids": ["brit-inquiry-testimony", "brit-inquiry-report", "halpern-what-color"],
+        "certainty": "established",
+        "note": "Boxhall, Q15396–15397; the report speaks of signals \"throwing off white stars\"."
+      },
+      {
+        "id": "rocket-position",
+        "title": "Firing position",
+        "summary": "The signals were fired from the starboard side of the bridge, from a socket in the rail close to emergency boat No. 1.",
+        "source_ids": ["brit-inquiry-report", "halpern-what-color", "wfb-lifeboat-sequence"],
+        "certainty": "established",
+        "note": "Report, Means Taken to Procure Assistance."
+      },
+      {
+        "id": "rocket-colour",
+        "title": "Colour",
+        "summary": "White.",
+        "source_ids": ["brit-inquiry-testimony", "brit-inquiry-report", "halpern-what-color"],
+        "certainty": "established",
+        "note": "Boxhall and Lightoller on Titanic, Stone and Gibson on the Californian. A minority of survivors spoke of colours; a 2012 suggestion that the signals burst into coloured balls is disputed by Halpern.",
+        "alternatives": [
+          {
+            "holder": "Don Lynch and Parks Stephenson (2012), as reported by Halpern",
+            "position": "The signals burst into coloured balls.",
+            "source_ids": ["halpern-what-color"]
+          }
+        ]
+      },
+      {
+        "id": "rocket-count",
+        "title": "Number fired",
+        "summary": "About eight according to the British Inquiry, which notes that the Californian saw eight. Nobody on board counted them.",
+        "value": 8,
+        "unit": "signals",
+        "source_ids": ["brit-inquiry-report", "brit-inquiry-testimony", "halpern-dozen-rockets"],
+        "certainty": "debated",
+        "note": "Boxhall: \"between half a dozen and a dozen\" (Q15395).",
+        "alternatives": [
+          {
+            "holder": "Samuel Halpern",
+            "position": "Eleven or twelve fired over about an hour, eight of them seen from the Californian.",
+            "source_ids": ["halpern-dozen-rockets"]
+          }
+        ]
+      },
+      {
+        "id": "rocket-interval",
+        "title": "Interval",
+        "summary": "About five to six minutes between signals.",
+        "value": 6,
+        "unit": "min",
+        "source_ids": ["brit-inquiry-testimony", "halpern-dozen-rockets"],
+        "certainty": "estimated",
+        "note": "Boxhall: \"probably five minutes; I did not take any times\" (Q15399). Rowe later wrote of five to six minutes; Stone, watching from the Californian, thought three to four."
+      },
+      {
+        "id": "rocket-crew",
+        "title": "Who fired them",
+        "summary": "Fourth Officer Boxhall fired the signals until he left in boat No. 2, helped by Quartermasters Rowe and Bright; Rowe then fired at least the last one under Captain Smith's direction.",
+        "source_ids": ["brit-inquiry-testimony", "wfb-lifeboat-sequence", "halpern-dozen-rockets"],
+        "certainty": "established",
+        "note": "Boxhall, Q15394, Q15420; Rowe, Q17683–17685. That Rowe fired the last is an inference."
+      },
+      {
+        "id": "rocket-stock",
+        "title": "Stock carried",
+        "summary": "Thirty-six signals were carried. A box of unfired signals was photographed at the wreck in 2004.",
+        "value": 36,
+        "unit": "signals",
+        "source_ids": ["halpern-dozen-rockets", "halpern-what-color"],
+        "certainty": "established",
+        "note": "The split between the bridge and the poop locker is Halpern's inference."
+      }
+    ],
+    "firings": [
+      {
+        "id": "rocket-01",
+        "ats": "1912-04-15T00:47",
+        "source_ids": [
+          "wfb-lifeboat-sequence",
+          "flw-new-study-2026",
+          "halpern-dozen-rockets",
+          "brit-inquiry-report"
+        ],
+        "certainty": "estimated",
+        "note": "First signal, fired by Boxhall after boat No. 5 had started down and before boat No. 3. The time is derived by Wormstedt, Fitch and Behe from the testimony of Rowe and Hichens and adopted by Halpern; the British report says about 12.45."
+      },
+      {
+        "id": "rocket-02",
+        "ats": "1912-04-15T00:53",
+        "source_ids": ["halpern-dozen-rockets"],
+        "certainty": "estimated",
+        "note": "Modelled time, not an observation: Halpern assumes one signal every six minutes from 12:47. No individual firing time is attested."
+      },
+      {
+        "id": "rocket-03",
+        "ats": "1912-04-15T00:59",
+        "source_ids": ["halpern-dozen-rockets"],
+        "certainty": "estimated",
+        "note": "Modelled time, not an observation: Halpern assumes one signal every six minutes from 12:47. No individual firing time is attested."
+      },
+      {
+        "id": "rocket-04",
+        "ats": "1912-04-15T01:05",
+        "source_ids": ["halpern-dozen-rockets"],
+        "certainty": "estimated",
+        "note": "Modelled time, not an observation: Halpern assumes one signal every six minutes from 12:47. No individual firing time is attested."
+      },
+      {
+        "id": "rocket-05",
+        "ats": "1912-04-15T01:11",
+        "source_ids": ["halpern-dozen-rockets"],
+        "certainty": "estimated",
+        "note": "Modelled time, not an observation: Halpern assumes one signal every six minutes from 12:47. No individual firing time is attested."
+      },
+      {
+        "id": "rocket-06",
+        "ats": "1912-04-15T01:17",
+        "source_ids": ["halpern-dozen-rockets"],
+        "certainty": "estimated",
+        "note": "Modelled time, not an observation: Halpern assumes one signal every six minutes from 12:47. No individual firing time is attested."
+      },
+      {
+        "id": "rocket-07",
+        "ats": "1912-04-15T01:23",
+        "source_ids": ["halpern-dozen-rockets"],
+        "certainty": "estimated",
+        "note": "Modelled time, not an observation: Halpern assumes one signal every six minutes from 12:47. No individual firing time is attested."
+      },
+      {
+        "id": "rocket-08",
+        "ats": "1912-04-15T01:29",
+        "source_ids": ["halpern-dozen-rockets"],
+        "certainty": "estimated",
+        "note": "Modelled time, not an observation: Halpern assumes one signal every six minutes from 12:47. No individual firing time is attested."
+      },
+      {
+        "id": "rocket-09",
+        "ats": "1912-04-15T01:35",
+        "source_ids": ["halpern-dozen-rockets"],
+        "certainty": "estimated",
+        "note": "Modelled time, not an observation: Halpern assumes one signal every six minutes from 12:47. No individual firing time is attested."
+      },
+      {
+        "id": "rocket-10",
+        "ats": "1912-04-15T01:41",
+        "source_ids": ["halpern-dozen-rockets"],
+        "certainty": "estimated",
+        "note": "Modelled time, not an observation: Halpern assumes one signal every six minutes from 12:47. No individual firing time is attested."
+      },
+      {
+        "id": "rocket-11",
+        "ats": "1912-04-15T01:47",
+        "source_ids": ["halpern-dozen-rockets"],
+        "certainty": "debated",
+        "note": "Modelled time, not an observation. Halpern notes that this signal may not have been fired, Boxhall then leaving in boat No. 2."
+      },
+      {
+        "id": "rocket-12",
+        "ats": "1912-04-15T01:53",
+        "source_ids": ["halpern-dozen-rockets", "wfb-lifeboat-sequence", "brit-inquiry-testimony"],
+        "certainty": "debated",
+        "note": "Last signal. Halpern's model gives 1:53; Wormstedt, Fitch and Behe give about 1:52, from Stone's last sighting at about 1:40 by the Californian's clock.",
+        "alternatives": [
+          {
+            "holder": "Quartermaster Rowe (1912)",
+            "position": "\"From about a quarter to one to about 1.25\" (Q17684).",
+            "source_ids": ["brit-inquiry-testimony"]
+          },
+          {
+            "holder": "British Inquiry report (1912)",
+            "position": "Firing continued until Boxhall left the ship at about 1.45.",
+            "source_ids": ["brit-inquiry-report"]
+          }
+        ]
+      }
+    ]
+  },
+  "wireless": {
+    "facts": [
+      {
+        "id": "wireless-operators",
+        "title": "Operators and call sign",
+        "summary": "The Marconi station, call sign MGY, was worked by John Phillips, who was lost, and Harold Bride, who survived.",
+        "source_ids": ["brit-inquiry-testimony", "lee-desperate-dialogue"],
+        "certainty": "established",
+        "note": "Bride, British Inquiry, Day 14."
+      },
+      {
+        "id": "cqd-then-sos",
+        "title": "CQD first, SOS later",
+        "summary": "The first distress call was CQD. The first logged use of SOS came half an hour later, and the two were then used together.",
+        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023"],
+        "certainty": "established",
+        "note": "First CQD at 10:25 p.m. New York time; first logged SOS at 10:55 p.m. (Mount Temple log)."
+      },
+      {
+        "id": "positions-sent",
+        "title": "Two positions were transmitted",
+        "summary": "The first calls gave 41°44′N, 50°24′W. From the message logged at 10:35 p.m. New York time they gave the position worked out by Boxhall, 41°46′N, 50°14′W. Both lie west of where the wreck was found.",
+        "source_ids": ["brit-inquiry-testimony", "lee-desperate-dialogue", "us-inquiry-report"],
+        "certainty": "established",
+        "note": "Boxhall, Q15389–15391."
+      },
+      {
+        "id": "ships-answering",
+        "title": "Ships that answered",
+        "summary": "Frankfurt, Carpathia, Mount Temple, Olympic, Baltic, Caronia, Celtic, Asian, Virginian, Ypiranga, Birma and La Provence heard or relayed the calls, with the shore station at Cape Race. The Californian, whose single operator was asleep, heard none of them.",
+        "source_ids": ["lee-desperate-dialogue", "us-inquiry-report", "brit-inquiry-report"],
+        "certainty": "established",
+        "note": "Distances when first called, per the US report: Mount Temple about 49 miles, Carpathia 58, Olympic about 512."
+      },
+      {
+        "id": "log-clocks",
+        "title": "Clocks of the wireless logs",
+        "summary": "Titanic's log was lost. The surviving logs were kept in New York time or in GMT, and many round to five minutes. The ship's times shown here are conversions with the adopted offset of 2 h 02 min from New York time.",
+        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023"],
+        "certainty": "established",
+        "note": "The British report's times for the same entries are 12 minutes earlier, the US report's 29 minutes earlier."
+      },
+      {
+        "id": "last-signal",
+        "title": "Last signal",
+        "summary": "The last message that other ships certainly received from Titanic was heard by Carpathia at 11:55 p.m. New York time. Fainter signals logged later by the Virginian alone are disputed.",
+        "source_ids": [
+          "lee-desperate-dialogue",
+          "halpern-chronology-2023",
+          "brit-inquiry-report",
+          "us-inquiry-report"
+        ],
+        "certainty": "debated",
+        "note": "Both 1912 reports take the Virginian's entry of 12:27 a.m. New York time as Titanic's last signal.",
+        "alternatives": [
+          {
+            "holder": "Samuel Halpern; Paul Lee",
+            "position": "The Virginian's later entries were not from Titanic: with the adopted offset the last falls nine minutes after the ship sank, and nearer ships heard nothing.",
+            "source_ids": ["halpern-chronology-2023", "lee-desperate-dialogue"]
+          }
+        ]
+      }
+    ],
+    "messages": [
+      {
+        "id": "first-cqd",
+        "logged_time": "22:25",
+        "logged_reference": "new-york",
+        "ats": "1912-04-15T00:27",
+        "sender": "Titanic (MGY)",
+        "summary": "First distress call: CQD, requiring assistance, position 41°44′N, 50°24′W.",
+        "heard_by": ["Cape Race", "Mount Temple", "La Provence"],
+        "source_ids": ["us-inquiry-report", "lee-desperate-dialogue", "halpern-chronology-2023"],
+        "certainty": "debated",
+        "note": "The logged time is established. The ship's time depends on the clock offset.",
+        "alternatives": [
+          {
+            "holder": "British Inquiry report (1912)",
+            "position": "12.15 a.m. ship's time.",
+            "source_ids": ["brit-inquiry-report"]
+          }
+        ]
+      },
+      {
+        "id": "cqd-repeated",
+        "logged_time": "22:28",
+        "logged_reference": "new-york",
+        "ats": "1912-04-15T00:30",
+        "sender": "Titanic (MGY)",
+        "summary": "CQD with the same position, repeated about ten times.",
+        "heard_by": ["Ypiranga"],
+        "source_ids": ["lee-desperate-dialogue"],
+        "certainty": "established",
+        "note": "Ypiranga's log."
+      },
+      {
+        "id": "corrected-position",
+        "logged_time": "22:35",
+        "logged_reference": "new-york",
+        "ats": "1912-04-15T00:37",
+        "sender": "Titanic (MGY)",
+        "summary": "To Carpathia: come at once, we have struck a berg; corrected position 41°46′N, 50°14′W.",
+        "heard_by": ["Carpathia", "Cape Race"],
+        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023", "brit-inquiry-report"],
+        "certainty": "debated",
+        "note": "The logged time is established. The ship's time depends on the clock offset.",
+        "alternatives": [
+          {
+            "holder": "British Inquiry report (1912)",
+            "position": "12.25 a.m. ship's time.",
+            "source_ids": ["brit-inquiry-report"]
+          }
+        ]
+      },
+      {
+        "id": "noise-of-steam",
+        "logged_time": "22:36",
+        "logged_reference": "new-york",
+        "ats": "1912-04-15T00:38",
+        "sender": "Titanic (MGY)",
+        "summary": "Collision with an iceberg, sinking; nothing can be heard for the noise of steam.",
+        "heard_by": ["Ypiranga"],
+        "source_ids": ["lee-desperate-dialogue", "brit-inquiry-report"],
+        "certainty": "established",
+        "note": "Ypiranga's log."
+      },
+      {
+        "id": "frankfurt-stand-by",
+        "logged_time": "22:40",
+        "logged_reference": "new-york",
+        "ats": "1912-04-15T00:42",
+        "sender": "Frankfurt (DFT)",
+        "summary": "Frankfurt acknowledges the call. Mount Temple turns toward the position given.",
+        "heard_by": ["Mount Temple", "Caronia", "Cape Race"],
+        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023"],
+        "certainty": "established",
+        "note": "Logs of Mount Temple and Frankfurt."
+      },
+      {
+        "id": "carpathia-coming",
+        "logged_time": "22:47",
+        "logged_reference": "new-york",
+        "ats": "1912-04-15T00:49",
+        "sender": "Carpathia (MPA)",
+        "summary": "Carpathia gives her position and says she is coming; Bride takes the news to Captain Smith.",
+        "heard_by": ["Titanic"],
+        "source_ids": ["halpern-chronology-2023", "brit-inquiry-testimony"],
+        "certainty": "estimated",
+        "note": "Time reconstructed by Halpern; Bride, Q16516–16527."
+      },
+      {
+        "id": "first-sos",
+        "logged_time": "22:55",
+        "logged_reference": "new-york",
+        "ats": "1912-04-15T00:57",
+        "sender": "Titanic (MGY)",
+        "summary": "First logged SOS, in a call to Olympic.",
+        "heard_by": ["Mount Temple", "Celtic"],
+        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023"],
+        "certainty": "established",
+        "note": "Mount Temple's log; Celtic logged it at 3:55 a.m. GMT."
+      },
+      {
+        "id": "sos-cqd",
+        "logged_time": "23:02",
+        "logged_reference": "new-york",
+        "ats": "1912-04-15T01:04",
+        "sender": "Titanic (MGY)",
+        "summary": "SOS and CQD with the position.",
+        "heard_by": ["Ypiranga"],
+        "source_ids": ["lee-desperate-dialogue"],
+        "certainty": "established",
+        "note": "Ypiranga's log."
+      },
+      {
+        "id": "to-olympic-position",
+        "logged_time": "23:10",
+        "logged_reference": "new-york",
+        "ats": "1912-04-15T01:12",
+        "sender": "Titanic (MGY)",
+        "summary": "To Olympic: position 41°46′N, 50°14′W; we have struck an iceberg.",
+        "heard_by": ["Olympic", "Baltic", "Virginian"],
+        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023"],
+        "certainty": "established",
+        "note": "Olympic's log."
+      },
+      {
+        "id": "going-down-at-head",
+        "logged_time": "23:20",
+        "logged_reference": "new-york",
+        "ats": "1912-04-15T01:22",
+        "sender": "Titanic (MGY)",
+        "summary": "To Olympic: the captain says get your boats ready; going down fast at the head.",
+        "heard_by": ["Olympic", "Mount Temple", "Baltic"],
+        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023"],
+        "certainty": "established",
+        "note": "Several logs."
+      },
+      {
+        "id": "frankfurt-coming",
+        "logged_time": "23:26",
+        "logged_reference": "new-york",
+        "ats": "1912-04-15T01:28",
+        "sender": "Frankfurt (DFT)",
+        "summary": "Frankfurt says her captain will make for Titanic; Titanic acknowledges.",
+        "heard_by": ["Mount Temple", "Ypiranga"],
+        "source_ids": ["halpern-chronology-2023", "lee-desperate-dialogue"],
+        "certainty": "established",
+        "note": "Logs of Ypiranga and Mount Temple."
+      },
+      {
+        "id": "women-in-boats",
+        "logged_time": "23:35",
+        "logged_reference": "new-york",
+        "ats": "1912-04-15T01:37",
+        "sender": "Titanic (MGY)",
+        "summary": "To Olympic: we are putting the women off in the boats. Cape Race hears Titanic no more after this.",
+        "heard_by": ["Olympic", "Mount Temple", "Baltic", "Virginian"],
+        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023"],
+        "certainty": "established",
+        "note": "Several logs."
+      },
+      {
+        "id": "engine-room-flooded",
+        "logged_time": "23:41",
+        "logged_reference": "new-york",
+        "ats": "1912-04-15T01:43",
+        "sender": "Titanic (MGY)",
+        "summary": "CQD: engine room flooded.",
+        "heard_by": ["Mount Temple"],
+        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023"],
+        "certainty": "established",
+        "note": "Mount Temple's log."
+      },
+      {
+        "id": "clear-and-calm",
+        "logged_time": "23:45",
+        "logged_reference": "new-york",
+        "ats": "1912-04-15T01:47",
+        "sender": "Titanic (MGY)",
+        "summary": "To Olympic: weather clear and calm. To Baltic: engine room getting flooded.",
+        "heard_by": ["Olympic", "Baltic"],
+        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023"],
+        "certainty": "established",
+        "note": "Logs of Olympic and Baltic."
+      },
+      {
+        "id": "baltic-rushing",
+        "logged_time": "23:47",
+        "logged_reference": "new-york",
+        "ats": "1912-04-15T01:49",
+        "sender": "Baltic (MBC)",
+        "summary": "Baltic says she is rushing to Titanic. Last time Mount Temple hears Titanic.",
+        "heard_by": ["Mount Temple", "Olympic"],
+        "source_ids": ["us-inquiry-report", "halpern-chronology-2023"],
+        "certainty": "established",
+        "note": "US report: Mount Temple last heard Titanic at 11.47 p.m. New York time."
+      },
+      {
+        "id": "last-heard-by-carpathia",
+        "logged_time": "23:55",
+        "logged_reference": "new-york",
+        "ats": "1912-04-15T01:57",
+        "sender": "Titanic (MGY)",
+        "summary": "Last message heard by Carpathia: engine room full up to boilers.",
+        "heard_by": ["Carpathia"],
+        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023", "brit-inquiry-report"],
+        "certainty": "debated",
+        "note": "The logged time is established. The ship's time depends on the clock offset.",
+        "alternatives": [
+          {
+            "holder": "British Inquiry report (1912)",
+            "position": "1.45 a.m. ship's time.",
+            "source_ids": ["brit-inquiry-report"]
+          }
+        ]
+      },
+      {
+        "id": "asian-no-reply",
+        "logged_time": "23:58",
+        "logged_reference": "new-york",
+        "ats": "1912-04-15T02:00",
+        "sender": "Titanic (MGY)",
+        "summary": "Titanic is heard calling CQD and SOS; Asian answers and gets no reply.",
+        "heard_by": ["Asian"],
+        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023"],
+        "certainty": "established",
+        "note": "Asian's log."
+      },
+      {
+        "id": "virginian-faint",
+        "logged_time": "00:10",
+        "logged_reference": "new-york",
+        "ats": "1912-04-15T02:12",
+        "sender": "Attributed to Titanic",
+        "summary": "The Virginian's operator logs Titanic calling very faintly, her power greatly reduced.",
+        "heard_by": ["Virginian"],
+        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023"],
+        "certainty": "debated",
+        "note": "Heard by the Virginian alone.",
+        "alternatives": [
+          {
+            "holder": "Samuel Halpern; Paul Lee",
+            "position": "Probably not Titanic: nearer ships heard nothing.",
+            "source_ids": ["halpern-chronology-2023", "lee-desperate-dialogue"]
+          }
+        ]
+      },
+      {
+        "id": "virginian-cq",
+        "logged_time": "00:27",
+        "logged_reference": "new-york",
+        "ats": "1912-04-15T02:29",
+        "sender": "Attributed to Titanic",
+        "summary": "The Virginian logs a blurred CQ that ends abruptly, as if the power had been switched off.",
+        "heard_by": ["Virginian"],
+        "source_ids": [
+          "us-inquiry-report",
+          "brit-inquiry-report",
+          "lee-desperate-dialogue",
+          "halpern-chronology-2023"
+        ],
+        "certainty": "debated",
+        "note": "Accepted by both 1912 reports as Titanic's last signal; the British report dates it 2.17 a.m. ship's time.",
+        "alternatives": [
+          {
+            "holder": "Samuel Halpern; Paul Lee",
+            "position": "Not from Titanic: with the adopted offset it falls nine minutes after the ship had sunk.",
+            "source_ids": ["halpern-chronology-2023", "lee-desperate-dialogue"]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "facts": [
+    {
+      "id": "generating-plant",
+      "title": "Generating plant",
+      "summary": "Four 400 kW dynamos stood in their own watertight compartment abaft the turbine room, with two 30 kW emergency sets on a platform at saloon-deck level, about 20 ft above the waterline. The ship had about 10,000 lamps; an emergency circuit carried 500 of them.",
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "Report, Electrical Installation."
+    },
+    {
+      "id": "lights-stayed-on",
+      "title": "The lights stayed on",
+      "summary": "The lights burned throughout the sinking and went out only two to three minutes before the end. Seen from the boats they shone as before, but fewer and fewer rows remained above the water.",
+      "source_ids": ["brit-inquiry-report", "beesley-1912", "halpern-chronology-2023"],
+      "certainty": "established",
+      "note": "Report, Final Effect of the Damage (Lee, Q2558; Pearcey, Q10454); Joughin read his watch at 2:15 with the lights on; Beesley's account, read through a summary."
+    },
+    {
+      "id": "final-failure",
+      "title": "Final failure",
+      "summary": "The lights went out at about 2:17 a.m., as the hull broke. One survivor wrote that they went out suddenly, came on again for a single flash and then went out altogether.",
+      "source_ids": [
+        "halpern-chronology-2023",
+        "halpern-collision-point",
+        "beesley-1912",
+        "brit-inquiry-testimony"
+      ],
+      "certainty": "estimated",
+      "note": "Symons (Q11510–11525) as cited by Halpern; Gibson on the Californian saw the lights disappear at five past two by her clock (Q7565). The single flash rests on Beesley alone and is not reproduced in the scene."
+    },
+    {
+      "id": "power-failing",
+      "title": "Failing power near the end",
+      "summary": "The wireless operators found the power failing a little before they left their cabin. Halpern reads this as falling steam pressure at the dynamo engines.",
+      "source_ids": ["brit-inquiry-testimony", "halpern-chronology-2023"],
+      "certainty": "estimated",
+      "note": "Bride, Q16566–16570. No primary testimony describing the lamps turning red or dim was found in the sources read; the scene shows no change of colour."
+    },
+    {
+      "id": "engineers",
+      "title": "The engineers",
+      "summary": "None of the engineer officers survived. An open steam valve observed on the stern section in the 2022 scan is presented as evidence that steam was still being supplied to the generators at the end.",
+      "source_ids": ["halpern-chronology-2023", "press-2025-digital-resurrection"],
+      "certainty": "estimated",
+      "note": "Rostron's message of 15 April reported all engineers gone (as quoted by Halpern). The reading of the valve comes from press reports of a documentary."
+    }
+  ],
+  "output": [
+    {
+      "ats": "1912-04-14T23:40",
+      "output": 1,
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "All lighting in service."
+    },
+    {
+      "ats": "1912-04-15T02:07",
+      "output": 1,
+      "source_ids": ["brit-inquiry-report", "brit-inquiry-testimony"],
+      "certainty": "established",
+      "note": "Lights still burning as before; the wireless operators notice the power beginning to fail."
+    },
+    {
+      "ats": "1912-04-15T02:15",
+      "output": 0.75,
+      "source_ids": ["brit-inquiry-testimony", "halpern-chronology-2023", "project-derivation"],
+      "certainty": "estimated",
+      "note": "Lights still on at 2:15 (Joughin). The reduction is the project's assumption to represent the failing power reported by Bride; no witness quantified it."
+    },
+    {
+      "ats": "1912-04-15T02:16:55",
+      "output": 0.6,
+      "source_ids": ["project-derivation"],
+      "certainty": "estimated",
+      "note": "Project's assumption, continuing the previous keyframe up to the failure."
+    },
+    {
+      "ats": "1912-04-15T02:17",
+      "output": 0,
+      "source_ids": [
+        "halpern-chronology-2023",
+        "halpern-collision-point",
+        "brit-inquiry-testimony"
+      ],
+      "certainty": "estimated",
+      "note": "All lights out at about 2:17 (Symons; Gibson from the Californian)."
+    }
+  ]
+}
