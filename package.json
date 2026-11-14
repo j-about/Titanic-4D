@@ -18,7 +18,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node tools/precompress.ts",
+    "build": "pnpm data:validate && vite build && node tools/precompress.ts",
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
     "lint": "biome ci",
@@ -29,7 +29,10 @@
     "test:e2e": "playwright test",
     "test:e2e:container": "tools/e2e-container.sh",
     "budgets": "node tools/check-budgets.ts",
-    "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm budgets"
+    "check": "pnpm typecheck && pnpm lint && pnpm data:schema:check && pnpm test && pnpm build && pnpm budgets",
+    "data:validate": "node tools/validate-data.ts",
+    "data:schema": "node tools/export-json-schema.ts",
+    "data:schema:check": "node tools/export-json-schema.ts --check"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",
@@ -40,6 +43,7 @@
     "happy-dom": "21.0.4",
     "typescript": "7.0.2",
     "vite": "8.3.8",
-    "vitest": "5.1.0"
+    "vitest": "5.1.0",
+    "zod": "4.6.7"
   }
 }
