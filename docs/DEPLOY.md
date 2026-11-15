@@ -174,8 +174,8 @@ The site is static and has no data to migrate, so going back is redeploying an e
 
 3. Run `node tools/verify-server.ts --live` again.
 
-If the new image fails its health check, Dokploy keeps the previous container running: read
-`deployment-readLogs`, correct the cause and redeploy.
+If a deployment fails, read `deployment-readLogs` and `application-readLogs`, correct the cause
+in the repository and redeploy. The live verification shows which version is being served.
 
 ## Maintenance
 
