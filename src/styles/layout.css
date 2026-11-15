@@ -43,7 +43,7 @@
 }
 
 .scene__canvas:focus-visible {
-  outline-offset: calc(-1 * var(--focus-offset) - 0.1875rem);
+  outline-offset: calc(-1 * var(--focus-extent));
 }
 
 .scene__frame[data-status="failed"] .scene__canvas {
@@ -78,6 +78,7 @@
   max-block-size: calc(100% - 2 * var(--space-3));
   padding: var(--space-2);
   overflow-y: auto;
+  scroll-padding: var(--focus-clearance);
   border: 0.0625rem solid var(--color-border);
   border-radius: var(--radius-md);
   background-color: rgb(13 19 27 / 88%);

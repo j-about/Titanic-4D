@@ -56,6 +56,31 @@ function bookmarkLabel(event: TimelineEvent): string {
   return `${formatShipClock(event.t)} ${event.title}`;
 }
 
+/**
+ * Brings a key moment wholly inside its list, once, when it shows the keyboard focus: the browser
+ * leaves the list where it is when part of the button already shows. A press of the pointer does
+ * not match `:focus-visible`, so the list never moves under the pointer; the first key pressed
+ * afterwards makes the ring appear without a new focus event, hence the second listener. Later
+ * keys are left to scroll the list and the page.
+ */
+function keepFocusedBookmarkWhole(list: HTMLElement): void {
+  let revealed: HTMLElement | null = null;
+  const reveal = (event: Event): void => {
+    const bookmark =
+      event.target instanceof Element ? event.target.closest<HTMLElement>('.bookmark') : null;
+    if (bookmark === null || bookmark === revealed || !bookmark.matches(':focus-visible')) {
+      return;
+    }
+    revealed = bookmark;
+    bookmark.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  };
+  list.addEventListener('focusin', reveal);
+  list.addEventListener('keydown', reveal);
+  list.addEventListener('focusout', () => {
+    revealed = null;
+  });
+}
+
 /** Creates the clock, the playback controls, the scrubber and the bookmarks of key moments. */
 export function createTimelinePanel(model: TimelineModel, actions: TimelineActions): TimelinePanel {
   const clockTime = el('span', { class: 'clock__time' });
@@ -144,13 +169,13 @@ export function createTimelinePanel(model: TimelineModel, actions: TimelineActio
     item.addEventListener('click', () => actions.seek(event.t));
     return item;
   });
-  const bookmarks = el('nav', { class: 'bookmarks', 'aria-label': 'Key moments' }, [
-    el(
-      'ul',
-      { class: 'bookmarks__list' },
-      bookmarkButtons.map((item) => el('li', {}, [item])),
-    ),
-  ]);
+  const bookmarkList = el(
+    'ul',
+    { class: 'bookmarks__list' },
+    bookmarkButtons.map((item) => el('li', {}, [item])),
+  );
+  keepFocusedBookmarkWhole(bookmarkList);
+  const bookmarks = el('nav', { class: 'bookmarks', 'aria-label': 'Key moments' }, [bookmarkList]);
 
   toStart.addEventListener('click', () => actions.seek(model.startSeconds));
   toEnd.addEventListener('click', () => actions.seek(model.endSeconds));

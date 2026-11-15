@@ -22,6 +22,14 @@ describe('sources of the current state', () => {
     }
   });
 
+  it('ends no statement with two full stops, at any minute of the night', () => {
+    for (let t = 0; t <= model.endSeconds; t += 60) {
+      for (const entry of describeSources(dataset, model, model.evaluate(t))) {
+        expect(entry.statement, `${entry.id} at ${t}`).not.toMatch(/\.\.$/);
+      }
+    }
+  });
+
   it('has unique identifiers at every instant', () => {
     for (let t = 0; t <= model.endSeconds; t += 240) {
       const ids = describeSources(dataset, model, model.evaluate(t)).map((entry) => entry.id);
@@ -33,7 +41,7 @@ describe('sources of the current state', () => {
     const entries = sourcesAt('15T01:10');
     const trim = entries.find((entry) => entry.id === 'trim');
     expect(trim?.statement).toMatch(
-      /^Trim 3\.\d° by the head, interpolated between 12:55 a\.m\. and 1:20 a\.m\.\.$/,
+      /^Trim 3\.\d° by the head, interpolated between 12:55 a\.m\. and 1:20 a\.m\.$/,
     );
     expect(trim?.certainty).toBe('estimated');
     expect(entries.find((entry) => entry.id === 'list')?.statement).toContain('to starboard');

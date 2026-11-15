@@ -7,6 +7,8 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  /* An element scrolled into view when it takes the focus keeps its ring inside the window. */
+  scroll-padding: var(--focus-clearance);
   background-color: var(--color-bg);
 }
 

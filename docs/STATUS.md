@@ -5,16 +5,16 @@ Milestones and acceptance criteria are defined in [PLAN.md](PLAN.md).
 
 ## Milestones
 
-| Milestone                                         | State                                         |
-| ------------------------------------------------- | --------------------------------------------- |
-| M0 — Skeleton                                     | Done                                          |
-| M1 — Data and TimelineModel                       | Done                                          |
-| M2 — LOD0 scene and complete timeline             | Done                                          |
-| M3 — Ocean, exact sky, lighting                   | Done                                          |
-| M4 — Flooding, boats, rockets, break-up, wreck    | Done                                          |
-| M5 — LOD1/LOD2, post-processing, quality settings | Done                                          |
-| M6 — Accessibility, UX, support, legal notice     | Done                                          |
-| M7 — Deployment                                   | Deployed; verified over IPv4; two checks open |
+| Milestone                                         | State                             |
+| ------------------------------------------------- | --------------------------------- |
+| M0 — Skeleton                                     | Done                              |
+| M1 — Data and TimelineModel                       | Done                              |
+| M2 — LOD0 scene and complete timeline             | Done                              |
+| M3 — Ocean, exact sky, lighting                   | Done                              |
+| M4 — Flooding, boats, rockets, break-up, wreck    | Done                              |
+| M5 — LOD1/LOD2, post-processing, quality settings | Done                              |
+| M6 — Accessibility, UX, support, legal notice     | Done                              |
+| M7 — Deployment                                   | Done; the check over IPv6 is open |
 
 ## M0 — Skeleton (done, 2026-11-14)
 
@@ -341,7 +341,7 @@ Not verified here, and why:
   five seconds at 50 Mb/s is measured and enforced by `tests/e2e/performance.spec.ts` since M5
   (see the M5 table), on the software rasteriser.
 
-## M7 — Deployment (deployed on 2026-11-15; two checks open)
+## M7 — Deployment (done, 2026-11-15)
 
 Carried out on 2026-11-15 from a session that had the tools of the `dokploy-mcp` server, by the
 steps of `docs/DEPLOY.md`; decisions in ADR 0014. Times are UTC.
@@ -365,31 +365,35 @@ What was done, in order:
 6. **Domains** (10:52): the canonical host first, then the three others, each with its own
    Let's Encrypt certificate, port 8080, HTTPS.
 7. **Verification** of the live hosts (10:53 to 10:55).
+8. **Redeployment** (12:22): pull request #2, which carried the first version of this record,
+   was merged, and Dokploy replaced the running deployment by itself.
 
 The deployment therefore preceded the domains, in the reverse order of steps 6 and 7 of
 `docs/DEPLOY.md`: Traefik applies the domain of an application without a new deployment.
 
 Verified:
 
-| Check                                      | Command                                                                                                             | Result                                                                                                                                                                                                               |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Install and every check, on `315f4bd`      | `pnpm install --frozen-lockfile`, `pnpm check`                                                                      | Pass with Node.js 26.13.1 and pnpm 12.18.0; 493 of 493 unit tests; JavaScript 353,913 B of 400,000 B gzip                                                                                                            |
-| Image built from `315f4bd`                 | `docker build --tag titanic-4d .`                                                                                   | Pass (10:16)                                                                                                                                                                                                         |
-| Container of that image                    | `node tools/verify-server.ts --origin http://127.0.0.1:8080`, `docker inspect`, `docker ps`                         | 160 of 160; user `10001:10001`; healthy                                                                                                                                                                              |
-| End-to-end against that container          | `E2E_BASE_URL=http://127.0.0.1:8080 tools/e2e-container.sh`                                                         | 145 pass, 1 skipped by design; ended at 10:18, after the merge                                                                                                                                                       |
-| Checks of pull request #1 before the merge | `gh pr view 1 --json statusCheckRollup`                                                                             | The four jobs successful on `315f4bd`; they were the gate of the merge                                                                                                                                               |
-| Protection of `master`                     | `gh api repos/j-about/Titanic-4D/branches/master/protection`                                                        | Strict status checks on the four jobs, administrators included, pull request required, no force push, no deletion                                                                                                    |
-| CI on `master` after the merge             | `gh run view 43703328850`                                                                                           | The four jobs successful on `d7e705d`                                                                                                                                                                                |
-| Automatic deployment on push               | `deployment-all`                                                                                                    | Deployment of `d7e705d` created at 10:17:11, three seconds after the merge, without any call to `application-deploy`                                                                                                 |
-| Build on the server                        | `deployment-readLogs`                                                                                               | Clone of `d7e705d`; image built from the pinned frontend and base images; dataset valid; 13 files precompressed; done at 10:17:41                                                                                    |
-| Container on the server                    | `application-readLogs`, `docker-getContainersByAppNameMatch`                                                        | Caddy serving on port 8080 without error; container running and healthy                                                                                                                                              |
-| DNS records of the four hosts, 10:51       | A and AAAA queries to the four authoritative servers of the zones; reverse queries for both addresses of the server | Every host: the A record and the AAAA record of the server, whose two addresses have the same reverse name                                                                                                           |
-| … public resolvers                         | The same queries to Cloudflare, Google and Quad9                                                                    | The records of the server at 10:51; at 11:11 one cache of Quad9 still answered the former AAAA record of `www.titanic-4d.com`, with 31 s of its time to live left; at 11:31 Quad9 answered the records of the server |
-| Domains in Dokploy                         | `domain-byApplicationId`                                                                                            | The four hosts, port 8080, HTTPS, `letsencrypt`; no redirect rule                                                                                                                                                    |
-| Deployed site                              | `node tools/verify-server.ts --live`                                                                                | 180 of 180 at 10:53                                                                                                                                                                                                  |
-| … certificates                             | same run; names and expiry read from each certificate in a TLS handshake                                            | Four certificates, each naming its own host only, trusted, issued by Let's Encrypt; they expire on 13 February 2027                                                                                                  |
-| … redirections                             | same run                                                                                                            | Each secondary host: 301 from `/a/b?x=1` to `https://www.titanic-4d.org/a/b?x=1`; each host: HTTP to HTTPS, permanent                                                                                                |
-| End-to-end against the canonical URL       | `E2E_BASE_URL=https://www.titanic-4d.org tools/e2e-container.sh`                                                    | 145 pass, 1 skipped by design, same baselines                                                                                                                                                                        |
+| Check                                      | Command                                                                                                             | Result                                                                                                                                                                                                                  |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Install and every check, on `315f4bd`      | `pnpm install --frozen-lockfile`, `pnpm check`                                                                      | Pass with Node.js 26.13.1 and pnpm 12.18.0; 493 of 493 unit tests; JavaScript 353,913 B of 400,000 B gzip                                                                                                               |
+| Image built from `315f4bd`                 | `docker build --tag titanic-4d .`                                                                                   | Pass (10:16)                                                                                                                                                                                                            |
+| Container of that image                    | `node tools/verify-server.ts --origin http://127.0.0.1:8080`, `docker inspect`, `docker ps`                         | 160 of 160; user `10001:10001`; healthy                                                                                                                                                                                 |
+| End-to-end against that container          | `E2E_BASE_URL=http://127.0.0.1:8080 tools/e2e-container.sh`                                                         | 145 pass, 1 skipped by design; ended at 10:18, after the merge                                                                                                                                                          |
+| Checks of pull request #1 before the merge | `gh pr view 1 --json statusCheckRollup`                                                                             | The four jobs successful on `315f4bd`; they were the gate of the merge                                                                                                                                                  |
+| Protection of `master`                     | `gh api repos/j-about/Titanic-4D/branches/master/protection`                                                        | Strict status checks on the four jobs, administrators included, pull request required, no force push, no deletion                                                                                                       |
+| CI on `master` after the merge             | `gh run view 43703328850`                                                                                           | The four jobs successful on `d7e705d`                                                                                                                                                                                   |
+| Automatic deployment on push               | `deployment-all`                                                                                                    | Deployment of `d7e705d` created at 10:17:11, three seconds after the merge, without any call to `application-deploy`                                                                                                    |
+| Build on the server                        | `deployment-readLogs`                                                                                               | Clone of `d7e705d`; image built from the pinned frontend and base images; dataset valid; 13 files precompressed; done at 10:17:41                                                                                       |
+| Container on the server                    | `application-readLogs`, `docker-getContainersByAppNameMatch`                                                        | Caddy serving on port 8080 without error; container running and healthy                                                                                                                                                 |
+| DNS records of the four hosts, 10:51       | A and AAAA queries to the four authoritative servers of the zones; reverse queries for both addresses of the server | Every host: the A record and the AAAA record of the server, whose two addresses have the same reverse name                                                                                                              |
+| … public resolvers                         | The same queries to Cloudflare, Google and Quad9                                                                    | The records of the server at 10:51; at 11:11 one cache of Quad9 still answered the former AAAA record of `www.titanic-4d.com`, with 31 s of its time to live left; at 11:31 Quad9 answered the records of the server    |
+| Domains in Dokploy                         | `domain-byApplicationId`                                                                                            | The four hosts, port 8080, HTTPS, `letsencrypt`; no redirect rule                                                                                                                                                       |
+| Deployed site                              | `node tools/verify-server.ts --live`                                                                                | 180 of 180 at 10:53                                                                                                                                                                                                     |
+| … certificates                             | same run; names and expiry read from each certificate in a TLS handshake                                            | Four certificates, each naming its own host only, trusted, issued by Let's Encrypt; they expire on 13 February 2027                                                                                                     |
+| … redirections                             | same run                                                                                                            | Each secondary host: 301 from `/a/b?x=1` to `https://www.titanic-4d.org/a/b?x=1`; each host: HTTP to HTTPS, permanent                                                                                                   |
+| End-to-end against the canonical URL       | `E2E_BASE_URL=https://www.titanic-4d.org tools/e2e-container.sh`                                                    | 145 pass, 1 skipped by design, same baselines                                                                                                                                                                           |
+| Redeployment on a later push               | `deployment-all`, `deployment-readLogs`, `docker-getContainersByAppNameMatch`                                       | Pull request #2 merged at 12:22:20 (`3b8b226`), its four checks green; deployment created at 12:22:23 without any call to a Dokploy tool, done at 12:22:37; new container running and healthy, the previous one stopped |
+| Deployed site after the redeployment       | `node tools/verify-server.ts --live`                                                                                | 180 of 180 at 12:22                                                                                                                                                                                                     |
 
 The suite against the preview server (`pnpm test:e2e:container`) was run by CI on `315f4bd`.
 In the session it was run after the deployment, on the branch of this record: 145 pass, 1
@@ -403,14 +407,12 @@ Findings:
 - For up to an hour after the correction of the zone, a resolver could still give the former
   AAAA record of the two `.com` hosts.
 
-Not verified yet:
-
-- That a later push to `master`, through a pull request, replaces the running deployment by
-  itself. The first deployment was started by the push of pull request #1; the merge of the
-  pull request that carries this record is the next push.
-- The four hosts over IPv6. The machine that ran the checks has no IPv6 route: the IPv6
-  address of the server was identified by its reverse name, and every check above went over
-  IPv4. `docs/DEPLOY.md` gives the command to run from a machine that has such a route.
+The acceptance criterion of `docs/PLAN.md` for the deployment (criterion 6) is verified, and so
+is every check that `docs/DEPLOY.md` contained when the milestone was planned. One check was
+added to the procedure during the deployment and is still open: the four hosts over IPv6. The
+machine that ran the checks has no IPv6 route: the IPv6 address of the server was identified by
+its reverse name, and every check above went over IPv4. `docs/DEPLOY.md` gives the command to
+run from a machine that has such a route.
 
 ### Real hardware (measured on 2026-11-15)
 
@@ -490,6 +492,58 @@ another machine.
 Not measured: the frame rate on an integrated GPU and on a slower processor; the processor time
 of a frame; whether each frame reached the screen (no presentation or GPU timing was
 collected); the "low" and "high" levels.
+
+## Accessibility: scripted audit taken again, and corrections (2026-11-15)
+
+The scripted audit of `docs/ACCESSIBILITY.md` was taken again on the deployed code, by two
+scripts written independently and a third measurement that reconciled them, with Chromium in
+the Playwright image against the production image. Decisions in ADR 0015; figures in
+`docs/ACCESSIBILITY.md`.
+
+Found:
+
+- **Two failures of WCAG 2.2 level AA.** At 320 CSS pixels, two key moments took the keyboard
+  focus with less than one pixel in view (2.4.7, 2.4.11). In the night in words, 79 links of
+  the source lists, 17 CSS pixels high, lay within 12 pixels of another target once the lists
+  were open (2.5.8).
+- **Defects of the same kind, found while the corrections were reviewed.** During playback
+  with the "Narrative" tab open in the single-column layout, the page jumped by some two
+  thousand pixels and the focused "Pause" button left the window. Statements of the "Sources"
+  tab and the announcement after a jump ended with two full stops after "a.m." or "p.m.".
+  In a 320 CSS pixel window whose scroll bar takes room, the widest key moments left no room
+  for their ring.
+- **A ring cut by one pixel** on the key moments and on the step buttons of the camera, or with
+  one side outside the window on a control that the browser had scrolled into view.
+- **Statements of `docs/ACCESSIBILITY.md` that the measurements did not bear out**: 41 tab stops
+  on the reconstruction (42 measured) and 16 on the About page (18); operating instructions
+  open when the page loads at 64 rem or more (closed at every width); a ring "never hidden";
+  no target under 24 CSS pixels apart from links inside sentences.
+
+Corrected: the four points above, in the code for the first three and in the document for the
+last. The corrections were reviewed twice against the running pages, in Chromium, Firefox and
+WebKit, and revised after each review. One of them changes a behaviour: in the single-column
+layout the list of the "Narrative" tab no longer follows playback, since following it moved
+the page. Left as measured and recorded as known limits: the contrast of the ring of the 3D
+view over a bright image, one side of the ring of the selected tab, and two side effects of
+the text spacing of criterion 1.4.12.
+
+Seen during the reviews and left as they are, outside these corrections: the last event of the
+night is not brought into view when playback stops on it; in the two-column layout a window
+about 420 CSS pixels high lets the canvas lie over the timeline.
+
+Verified:
+
+| Check                                                                             | Command                                                                       | Result                                                                                                                                                                                                                                                                                                               |
+| --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Type checking, lint, dataset, schema export, unit tests, build, budgets           | `pnpm check`                                                                  | Pass; 499 of 499 unit tests; JavaScript 354,289 B of 400,000 B gzip                                                                                                                                                                                                                                                  |
+| End-to-end, WebGL 2 and WebGPU                                                    | `pnpm test:e2e:container`                                                     | 173 pass, 1 skipped by design; no axe-core violation; same visual baselines                                                                                                                                                                                                                                          |
+| The 14 new end-to-end tests, on both backends, on the code before the corrections | same suite with `-g`, corrections set aside                                   | 24 of 28 fail; the 4 others guard what that code already did (arrow keys in the row, narrative followed in the two-column layout)                                                                                                                                                                                    |
+| Each correction removed in turn (11 mutations)                                    | same suite with `-g`                                                          | The test that guards it fails in every case                                                                                                                                                                                                                                                                          |
+| Scripted audit on the corrected image                                             | scripts of the audit, run again on the production image of the corrected code | No target under 24 CSS pixels apart from links in a line of text; every key moment whole with its ring when it holds the keyboard focus, in Chromium, Firefox and WebKit; ring drawn on four sides on every stop but the panel itself where it is taller than the window; tab stops, order and canvas size unchanged |
+
+Not verified: screen readers, voice control, switch and forced colours, which need a person.
+`docs/ACCESSIBILITY.md` gives the steps of those checks and the weak points that the code lets
+expect: the style sheets have no `forced-colors` rule.
 
 ## Review of 2026-11-15 — corrections
 
@@ -578,11 +632,11 @@ interface around the canvas changed height):
 - Differs: the lowest row of each image shows the edge of the frame, because the canvas is a
   fraction of a pixel high; the content tests leave those rows out.
 
-Not verified in that review: the scripted accessibility audit of M6 predates the new view
-controls, so its tab-stop count and target measurements are to be taken again; screen readers
-remain to be tested by a person (`docs/ACCESSIBILITY.md`). The frame rate has since been
-measured on a discrete card ("Real hardware" under M7) and remains to be measured on an
-integrated one.
+Not verified in that review: the scripted accessibility audit of M6 predated the new view
+controls; it has since been taken again (see "Accessibility: scripted audit taken again, and
+corrections"). Screen readers remain to be tested by a person (`docs/ACCESSIBILITY.md`). The
+frame rate has since been measured on a discrete card ("Real hardware" under M7) and remains
+to be measured on an integrated one.
 
 ## Tooling availability
 

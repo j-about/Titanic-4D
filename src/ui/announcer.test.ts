@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { dataset } from '../data/dataset.ts';
 import { createTimelineModel } from '../sim/timelineModel.ts';
 import { shipTimeToSeconds } from '../time/shipTime.ts';
-import { announcementText, selectAnnouncement } from './announcer.ts';
+import { announcementText, instantAnnouncementText, selectAnnouncement } from './announcer.ts';
 
 const { events } = createTimelineModel(dataset);
 const seconds = (clock: string): number => shipTimeToSeconds(`1912-04-${clock}`);
@@ -44,6 +44,14 @@ describe('announcementText', () => {
     const collision = events.find((event) => event.id === 'collision');
     expect(collision === undefined ? '' : announcementText(collision)).toBe(
       '11:40 p.m. Collision with the iceberg.',
+    );
+  });
+});
+
+describe('instantAnnouncementText', () => {
+  it("follows the ship's time with the description, without a second full stop", () => {
+    expect(instantAnnouncementText(seconds('15T01:50'), 'The ship is down by the head.')).toBe(
+      '1:50 a.m. The ship is down by the head.',
     );
   });
 });

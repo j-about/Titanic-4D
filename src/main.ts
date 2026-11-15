@@ -9,8 +9,7 @@ import { dataset } from './data/dataset.ts';
 import { QUALITY_SETTINGS } from './render/quality.ts';
 import type { SceneView } from './render/sceneView.ts';
 import { createTimelineModel, type ShipState } from './sim/timelineModel.ts';
-import { formatShipClock } from './time/shipTime.ts';
-import { createAnnouncer } from './ui/announcer.ts';
+import { createAnnouncer, instantAnnouncementText } from './ui/announcer.ts';
 import { createCameraPanel } from './ui/cameraPanel.ts';
 import { requireElement, setText } from './ui/dom.ts';
 import { createNarrativePanel } from './ui/narrativePanel.ts';
@@ -79,9 +78,8 @@ const seek = (t: number): void => {
   window.clearTimeout(seekAnnouncement);
   seekAnnouncement = window.setTimeout(() => {
     if (!store.get().playing) {
-      announcer.say(
-        `${formatShipClock(store.get().t)}. ${describeScene(model.evaluate(store.get().t))}`,
-      );
+      const reached = store.get().t;
+      announcer.say(instantAnnouncementText(reached, describeScene(model.evaluate(reached))));
     }
   }, SEEK_ANNOUNCEMENT_DELAY_MS);
 };

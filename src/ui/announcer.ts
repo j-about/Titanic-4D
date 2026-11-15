@@ -29,6 +29,14 @@ export function announcementText(event: TimelineEvent): string {
   return `${formatShipClock(event.t)} ${event.title}.`;
 }
 
+/**
+ * Text announced after the user moves in time: the ship's time, which ends with the full stop of
+ * its abbreviation, then the sentences that describe the scene.
+ */
+export function instantAnnouncementText(t: number, description: string): string {
+  return `${formatShipClock(t)} ${description}`;
+}
+
 export interface Announcer {
   /** Reports the progress of playback; announces at most one event per interval. */
   playbackAdvanced(fromSeconds: number, toSeconds: number, rate: number, nowMs: number): void;

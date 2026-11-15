@@ -42,6 +42,9 @@ const SUPPORT_LINKS = [
   },
 ] as const;
 
+/** Smallest height of a target under WCAG 2.5.8, in CSS pixels. */
+const WCAG_TARGET_MIN_PX = 24;
+
 /** Text of an element with every run of white space reduced to one space. */
 async function normalisedText(locator: import('@playwright/test').Locator): Promise<string> {
   return ((await locator.textContent()) ?? '').replace(/\s+/g, ' ').trim();
@@ -75,6 +78,40 @@ test.describe('static pages', () => {
       );
       expect(overflow).toBeLessThanOrEqual(0);
       expect(await findAccessibilityViolations(page)).toEqual([]);
+    });
+  }
+
+  for (const viewport of [
+    { width: 1280, height: 800 },
+    { width: 640, height: 400 },
+    { width: 320, height: 640 },
+  ]) {
+    test(`gives every link that stands alone on its line a target of 24 CSS pixels, at ${viewport.width} px`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(viewport);
+      /**
+       * Links that are the only text of their parent and one of whose lines is lower than the
+       * smallest target of WCAG 2.5.8, with every disclosure of the page open.
+       */
+      const lowLinksAloneOnTheirLine = (): Promise<string[]> =>
+        page.evaluate((minimum) => {
+          for (const disclosure of document.querySelectorAll('details')) {
+            disclosure.open = true;
+          }
+          const text = (node: Element | null): string =>
+            (node?.textContent ?? '').replace(/\s+/g, ' ').trim();
+          return [...document.querySelectorAll<HTMLAnchorElement>('main a[href]')]
+            .filter((link) => text(link.parentElement) === text(link))
+            .filter((link) => [...link.getClientRects()].some((line) => line.height < minimum))
+            .map((link) => text(link));
+        }, WCAG_TARGET_MIN_PX);
+      for (const path of ['/narrative/', '/about/', '/legal-notice/']) {
+        await page.goto(path);
+        expect(await lowLinksAloneOnTheirLine(), path).toEqual([]);
+      }
+      // The pages do hold such links: the test measures something.
+      await expect(page.locator('.notice-item a')).toHaveCount(3);
     });
   }
 

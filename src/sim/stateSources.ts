@@ -66,6 +66,11 @@ function bracket<K extends Keyframe>(keyframes: readonly K[], t: number): K[] {
   return unique([keyframes[low], keyframes[high]].filter((keyframe) => keyframe !== undefined));
 }
 
+/** Ends a statement with a full stop, unless it ends with that of `a.m.` or `p.m.` already. */
+function sentence(text: string): string {
+  return text.endsWith('.') ? text : `${text}.`;
+}
+
 function between(keyframes: readonly Keyframe[]): string {
   const clocks = keyframes.map((keyframe) => formatShipClock(shipTimeToSeconds(keyframe.ats)));
   return clocks.length === 2
@@ -87,13 +92,15 @@ function attitudeEntries(dataset: Dataset, state: ShipState): SourceEntry[] {
     entry(
       'trim',
       'Trim',
-      `Trim ${oneDecimal.format(Math.abs(state.trimDeg))}° by the ${state.trimDeg >= 0 ? 'head' : 'stern'}, ${between(trim)}.`,
+      sentence(
+        `Trim ${oneDecimal.format(Math.abs(state.trimDeg))}° by the ${state.trimDeg >= 0 ? 'head' : 'stern'}, ${between(trim)}`,
+      ),
       trim,
     ),
     entry(
       'list',
       'List',
-      `List ${oneDecimal.format(Math.abs(state.heelDeg))}° to ${side}, ${between(heel)}.`,
+      sentence(`List ${oneDecimal.format(Math.abs(state.heelDeg))}° to ${side}, ${between(heel)}`),
       heel,
     ),
     entry(
@@ -129,7 +136,9 @@ function floodingEntries(dataset: Dataset, state: ShipState): SourceEntry[] {
       entry(
         'water-aboard',
         'Flooding',
-        `About ${new Intl.NumberFormat('en-GB').format(Math.round(state.waterAboardTonnes / 100) * 100)} tonnes of water aboard, ${between(keyframes)}.`,
+        sentence(
+          `About ${new Intl.NumberFormat('en-GB').format(Math.round(state.waterAboardTonnes / 100) * 100)} tonnes of water aboard, ${between(keyframes)}`,
+        ),
         keyframes,
       ),
     );
@@ -179,7 +188,9 @@ function rocketEntries(dataset: Dataset, state: ShipState): SourceEntry[] {
     entry(
       `rocket-${last.id}`,
       'Distress signals',
-      `Distress signal ${fired.length} of the ${rockets.firings.length} shown, at ${formatShipClock(shipTimeToSeconds(last.ats))}.`,
+      sentence(
+        `Distress signal ${fired.length} of the ${rockets.firings.length} shown, at ${formatShipClock(shipTimeToSeconds(last.ats))}`,
+      ),
       [last],
     ),
     ...(count === undefined
@@ -195,7 +206,7 @@ function lightingEntries(dataset: Dataset, state: ShipState): SourceEntry[] {
     entry(
       'lighting',
       'Lighting',
-      `Electric lighting at ${percent} % of normal, ${between(keyframes)}.`,
+      sentence(`Electric lighting at ${percent} % of normal, ${between(keyframes)}`),
       keyframes,
     ),
   ];
