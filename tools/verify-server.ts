@@ -1,4 +1,6 @@
 import { request as httpRequest, type IncomingHttpHeaders } from 'node:http';
+import { request as httpsRequest } from 'node:https';
+import { connect as tlsConnect } from 'node:tls';
 import { parseArgs } from 'node:util';
 import { legalNotice } from '../src/config/legal.ts';
 import { canonicalUrl, site } from '../src/config/site.ts';
@@ -16,10 +18,23 @@ interface RequestOptions {
   readonly acceptEncoding?: string;
 }
 
+/**
+ * Two modes. By default the tool checks a container reached over HTTP at `--origin`, and
+ * addresses the other hosts through the Host header. With `--live` it checks the deployed site:
+ * every host is reached by its own name over HTTPS, and certificates and the redirection from
+ * HTTP are checked as well.
+ */
 const { values } = parseArgs({
-  options: { origin: { type: 'string', default: 'http://127.0.0.1:8080' } },
+  options: {
+    origin: { type: 'string' },
+    live: { type: 'boolean', default: false },
+  },
 });
-const origin = new URL(values.origin);
+const live = values.live;
+const origin = new URL(values.origin ?? (live ? site.canonicalOrigin : 'http://127.0.0.1:8080'));
+const DAY_MS = 86_400_000;
+/** Shortest remaining validity accepted for a certificate, in days. */
+const MIN_CERTIFICATE_DAYS = 7;
 
 const failures: string[] = [];
 let checkCount = 0;
@@ -32,17 +47,23 @@ function check(description: string, condition: boolean, detail = ''): void {
   console.log(`${condition ? 'PASS' : 'FAIL'}  ${description}`);
 }
 
-/** Sends a GET request to the server under test, optionally overriding the Host header. */
+/**
+ * Sends a GET request. A request for another host goes to the server under test with that Host
+ * header, or, in live mode, to that host itself over HTTPS.
+ */
 function get(path: string, options: RequestOptions = {}): Promise<Response> {
+  const direct = live && options.host !== undefined;
+  const base = direct ? new URL(`https://${options.host}`) : origin;
+  const send = base.protocol === 'https:' ? httpsRequest : httpRequest;
   return new Promise((resolve, reject) => {
-    const outgoing = httpRequest(
+    const outgoing = send(
       {
-        hostname: origin.hostname,
-        port: origin.port,
+        hostname: base.hostname,
+        port: base.port === '' ? undefined : base.port,
         path,
         method: 'GET',
         headers: {
-          ...(options.host === undefined ? {} : { Host: options.host }),
+          ...(options.host === undefined || direct ? {} : { Host: options.host }),
           'Accept-Encoding': options.acceptEncoding ?? 'identity',
         },
       },
@@ -248,16 +269,105 @@ async function verifyStaticPages(): Promise<void> {
   );
   check(
     '/.well-known/security.txt expires within a year, as RFC 9116 recommends',
-    expires - Date.now() < 366 * 86_400_000,
+    expires - Date.now() < 366 * DAY_MS,
   );
 }
 
-await verifyHealth();
-const documentHtml = await verifyDocument();
-await verifyFingerprintedAsset(documentHtml);
-await verifyFallbacks(documentHtml);
-await verifyStaticPages();
-await verifyRedirects();
+interface CertificateSummary {
+  readonly authorized: boolean;
+  readonly issuer: string;
+  readonly validTo: number;
+  readonly names: string;
+}
+
+/** Opens a TLS connection to a host and reports on the certificate it presents. */
+function readCertificate(host: string): Promise<CertificateSummary> {
+  return new Promise((resolve, reject) => {
+    const socket = tlsConnect({ host, port: 443, servername: host }, () => {
+      const certificate = socket.getPeerCertificate();
+      resolve({
+        authorized: socket.authorized,
+        issuer: String(certificate.issuer.O ?? ''),
+        validTo: Date.parse(certificate.valid_to),
+        names: certificate.subjectaltname ?? '',
+      });
+      socket.end();
+    });
+    socket.on('error', reject);
+  });
+}
+
+/** Sends a GET request over plain HTTP to a host, without following redirections. */
+function getOverHttp(host: string, path: string): Promise<Response> {
+  return new Promise((resolve, reject) => {
+    const outgoing = httpRequest({ hostname: host, port: 80, path, method: 'GET' }, (incoming) => {
+      incoming.resume();
+      incoming.on('end', () => {
+        resolve({
+          status: incoming.statusCode ?? 0,
+          headers: incoming.headers,
+          body: Buffer.alloc(0),
+        });
+      });
+    });
+    outgoing.on('error', reject);
+    outgoing.end();
+  });
+}
+
+/** Live mode only: certificates and the redirection from HTTP to HTTPS, on every host. */
+async function verifyTransport(): Promise<void> {
+  const hosts = [new URL(site.canonicalOrigin).host, ...site.secondaryHosts];
+  for (const host of hosts) {
+    const certificate = await readCertificate(host);
+    check(`${host} presents a certificate trusted for that name`, certificate.authorized);
+    check(
+      `${host} certificate is issued by Let's Encrypt`,
+      certificate.issuer.includes("Let's Encrypt"),
+      certificate.issuer,
+    );
+    check(`${host} certificate names the host`, certificate.names.includes(`DNS:${host}`));
+    check(
+      `${host} certificate is valid for at least ${MIN_CERTIFICATE_DAYS} more days`,
+      certificate.validTo - Date.now() > MIN_CERTIFICATE_DAYS * DAY_MS,
+      new Date(certificate.validTo).toString(),
+    );
+
+    const plain = await getOverHttp(host, '/a/b?x=1');
+    check(
+      `http://${host} redirects permanently to HTTPS`,
+      [301, 308].includes(plain.status) && header(plain, 'location').startsWith('https://'),
+      `${plain.status} ${header(plain, 'location')}`,
+    );
+  }
+}
+
+/** Runs a group of checks; a request that cannot be made counts as a failed check. */
+async function run<T>(label: string, group: () => Promise<T>): Promise<T | undefined> {
+  try {
+    return await group();
+  } catch (error) {
+    check(
+      `${label} could be checked`,
+      false,
+      error instanceof Error ? error.message : String(error),
+    );
+    return undefined;
+  }
+}
+
+console.log(`Checking ${origin.href} (${live ? 'deployed site' : 'container'})`);
+await run('health endpoint', verifyHealth);
+const documentHtml = await run('application document', verifyDocument);
+if (documentHtml !== undefined) {
+  await run('fingerprinted asset', () => verifyFingerprintedAsset(documentHtml));
+  await run('fallbacks', () => verifyFallbacks(documentHtml));
+}
+await run('static pages', verifyStaticPages);
+await run('host redirects', verifyRedirects);
+if (live) {
+  await run('certificates and HTTP redirection', verifyTransport);
+}
 
 console.log(`${checkCount - failures.length}/${checkCount} checks passed against ${origin.href}`);
 if (failures.length > 0) {
