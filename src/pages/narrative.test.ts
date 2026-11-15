@@ -36,6 +36,34 @@ describe('text narrative', () => {
     expect(text).toContain('none is preferred');
   });
 
+  it('anchors the table of the counts, to which the other pages link', () => {
+    expect(page.markup).toContain('<h2 id="lives-lost">Lives lost</h2>');
+  });
+
+  it('says in text what the scene shows of the Californian, with the competing positions', () => {
+    expect(page.markup).toContain('<h2 id="californian">The light on the horizon</h2>');
+    for (const fact of dataset.site.californian) {
+      expect(page.markup, fact.id).toContain(`id="fact-${fact.id}"`);
+      expect(text, fact.id).toContain(`${fact.title}: ${fact.summary}`);
+      for (const alternative of fact.alternatives ?? []) {
+        expect(text, fact.id).toContain(`${alternative.holder}: ${alternative.position}`);
+      }
+    }
+    expect(text).toContain('Captain Lord: 19 to 19½ miles.');
+    expect(text).toContain('Samuel Halpern: 12 to at most about 14 nautical miles.');
+  });
+
+  it('keeps the chronology the only list of dated events', () => {
+    expect(page.markup.match(/class="chronicle"/g)).toHaveLength(1);
+  });
+
+  it('gives a wireless message as debated, with the times the other clock offsets give', () => {
+    const start = page.markup.indexOf('id="event-wireless-cqd-repeated"');
+    const item = page.markup.slice(start, page.markup.indexOf('</details>', start));
+    expect(item).toContain('Debated, give or take 3 min.');
+    expect(item).toContain('this log entry falls at 12:18 a.m.');
+  });
+
   it('contains no unresolved value', () => {
     expect(text).not.toMatch(/undefined|null|NaN/);
   });

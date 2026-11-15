@@ -1,13 +1,24 @@
 import { shipTimeToSeconds } from '../time/shipTime.ts';
 import { collectProvenance } from './provenance.ts';
 import type { Dataset } from './schema/dataset.ts';
+import type { Source } from './schema/sources.ts';
 
-/** Sources that cannot, on their own, support a record marked `established`. */
-const WEAK_SOURCE_IDS = new Set([
-  'wikipedia-titanic',
-  'model-monkey-funnels',
-  'project-derivation',
+/** Kinds of source that cannot, on their own, support a record marked `established`. */
+const WEAK_SOURCE_KINDS: ReadonlySet<Source['kind']> = new Set(['reference', 'project']);
+
+/** Ways of access that cannot, on their own, support a record marked `established`. */
+const WEAK_SOURCE_ACCESSES: ReadonlySet<Source['access']> = new Set([
+  'cited-through',
+  'not-consulted',
 ]);
+
+/**
+ * Whether a source is too weak to support a record marked `established` by itself: a work of
+ * reference or a derivation by the project, or a work that the project did not open.
+ */
+export function isWeakSource(source: Source): boolean {
+  return WEAK_SOURCE_KINDS.has(source.kind) || WEAK_SOURCE_ACCESSES.has(source.access);
+}
 
 const CARPATHIA_MINUTES_BEHIND_TITANIC = 5;
 const MINUTES_PER_DAY = 1440;
@@ -48,6 +59,9 @@ function shipTimeMinuteOfDay(shipTime: string): number {
 
 function checkProvenance(dataset: Dataset, issues: string[]): void {
   const knownSources = new Set(dataset.sources.sources.map((source) => source.id));
+  const weakSources = new Set(
+    dataset.sources.sources.filter(isWeakSource).map((source) => source.id),
+  );
   const citedSources = new Set<string>();
   for (const { path, provenance } of collectProvenance(dataset, '')) {
     const cited = [
@@ -62,16 +76,11 @@ function checkProvenance(dataset: Dataset, issues: string[]): void {
     }
     if (
       provenance.certainty === 'established' &&
-      provenance.source_ids.every((sourceId) => WEAK_SOURCE_IDS.has(sourceId))
+      provenance.source_ids.every((sourceId) => weakSources.has(sourceId))
     ) {
-      issues.push(`${path}: an established record needs a primary or secondary source.`);
-    }
-    if (
-      provenance.source_ids.includes('project-derivation') &&
-      provenance.certainty === 'established' &&
-      provenance.source_ids.length === 1
-    ) {
-      issues.push(`${path}: a project derivation cannot be established.`);
+      issues.push(
+        `${path}: an established record needs a source that the project opened and that is neither a work of reference nor its own derivation.`,
+      );
     }
   }
   for (const sourceId of knownSources) {
@@ -186,6 +195,22 @@ function checkFlooding(dataset: Dataset, issues: string[]): void {
   }
 }
 
+function checkRocketMargins(dataset: Dataset, issues: string[]): void {
+  const { facts, firings } = dataset.signals.rockets;
+  const interval = facts.find((fact) => fact.id === 'rocket-interval')?.value;
+  if (interval === undefined) {
+    issues.push('signals.rockets.facts: the fact "rocket-interval" must carry a value.');
+    return;
+  }
+  for (const firing of firings) {
+    if (Math.max(firing.uncertainty.before_min, firing.uncertainty.after_min) > interval / 2) {
+      issues.push(
+        `signals.rockets.firings.${firing.id}: the margin exceeds half the interval between signals.`,
+      );
+    }
+  }
+}
+
 function checkLifeboats(dataset: Dataset, issues: string[]): void {
   for (const type of dataset.lifeboats.types) {
     const count = dataset.lifeboats.boats.filter((boat) => boat.type === type.id).length;
@@ -202,6 +227,11 @@ function checkLifeboats(dataset: Dataset, issues: string[]): void {
     }
     if (boat.launch.mode === 'floated-off' && boat.type !== 'collapsible') {
       issues.push(`lifeboats.boats.${boat.id}: only collapsibles floated off.`);
+    }
+    if ((boat.launch.mode === 'floated-off') !== (boat.occupancy.basis === 'reached-from-water')) {
+      issues.push(
+        `lifeboats.boats.${boat.id}: the occupancy of a boat that floated off, and of no other, counts the people who reached it from the water.`,
+      );
     }
   }
 }
@@ -278,6 +308,7 @@ export function findDatasetIssues(dataset: Dataset): string[] {
   checkKeyframeOrder(dataset, issues);
   checkFlooding(dataset, issues);
   checkLifeboats(dataset, issues);
+  checkRocketMargins(dataset, issues);
   checkClockConversions(dataset, issues);
   checkCasualtyCounts(dataset, issues);
   return issues;

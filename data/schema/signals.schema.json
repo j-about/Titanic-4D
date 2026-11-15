@@ -42,7 +42,7 @@
           "minItems": 1,
           "type": "array",
           "items": {
-            "$ref": "#/$defs/__schema9"
+            "$ref": "#/$defs/__schema12"
           }
         }
       },
@@ -169,6 +169,10 @@
         "ats": {
           "$ref": "#/$defs/__schema8"
         },
+        "uncertainty": {
+          "description": "Margin on the firing time; the note of the record states where it comes from.",
+          "$ref": "#/$defs/__schema11"
+        },
         "source_ids": {
           "$ref": "#/$defs/__schema2"
         },
@@ -185,6 +189,7 @@
       "required": [
         "id",
         "ats",
+        "uncertainty",
         "source_ids",
         "certainty",
         "note"
@@ -197,6 +202,30 @@
       "description": "Titanic ship's time (Apparent Time Ship), ISO 8601 local date-time."
     },
     "__schema9": {
+      "type": "number",
+      "minimum": 0
+    },
+    "__schema10": {
+      "type": "number",
+      "minimum": 0
+    },
+    "__schema11": {
+      "type": "object",
+      "properties": {
+        "before_min": {
+          "$ref": "#/$defs/__schema9"
+        },
+        "after_min": {
+          "$ref": "#/$defs/__schema10"
+        }
+      },
+      "required": [
+        "before_min",
+        "after_min"
+      ],
+      "additionalProperties": false
+    },
+    "__schema12": {
       "type": "object",
       "properties": {
         "id": {
@@ -215,8 +244,12 @@
           "description": "Clock of the station log (procès-verbal): New York time (GMT − 5 h) or Greenwich Mean Time."
         },
         "ats": {
-          "description": "Ship's time obtained from the logged time with the adopted clock offset.",
+          "description": "Ship's time obtained from the logged time with the adopted clock offset; it is never more certain than that offset.",
           "$ref": "#/$defs/__schema8"
+        },
+        "uncertainty": {
+          "description": "Margin on the logged time, stated in the note; absent when none is recorded. It does not cover the choice of clock offset, whose other values are recorded in time-reference.json.",
+          "$ref": "#/$defs/__schema11"
         },
         "sender": {
           "type": "string",
@@ -230,7 +263,7 @@
           "minItems": 1,
           "type": "array",
           "items": {
-            "$ref": "#/$defs/__schema10"
+            "$ref": "#/$defs/__schema13"
           }
         },
         "source_ids": {
@@ -260,7 +293,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema10": {
+    "__schema13": {
       "type": "string",
       "minLength": 1
     }

@@ -3,6 +3,9 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { LEGAL_NOTICE_PATH, navigation } from '../config/navigation.ts';
 import { SUPPORT_PATH } from '../config/support.ts';
+import { dataset } from '../data/dataset.ts';
+import { casualtySentence } from './casualties.ts';
+import { textOf } from './html.ts';
 import { renderSiteFooter, renderSiteHeader } from './layout.ts';
 import { renderPageHead, renderSitemap, sitePaths, staticPages } from './registry.ts';
 
@@ -45,8 +48,27 @@ describe('site menu and footer', () => {
   });
 
   it('link the Legal Notice and the contact address from the footer', () => {
-    const footer = renderSiteFooter().markup;
+    const footer = renderSiteFooter(dataset).markup;
     expect(footer).toContain('<a href="/legal-notice/">Legal Notice</a>');
     expect(footer).toContain('href="mailto:contact@titanic-4d.org"');
+  });
+
+  it('state in the footer the range of the counts of lives lost, with a link to each count', () => {
+    const footer = renderSiteFooter(dataset);
+    expect(textOf(footer)).toContain(
+      `A sober, source-backed reconstruction. ${casualtySentence(dataset)} Counts by source`,
+    );
+    expect(footer.markup).toContain('<a href="/narrative/#lives-lost">Counts by source</a>');
+    expect(textOf(footer)).not.toMatch(/about 1,500/i);
+  });
+
+  it('follow the dataset when its counts change', () => {
+    const changed = structuredClone(dataset);
+    for (const count of changed.people.casualty_counts) {
+      count.lost += 1000;
+    }
+    expect(textOf(renderSiteFooter(changed))).toContain(
+      'Between 2,490 and 2,517 people died that night, depending on the source.',
+    );
   });
 });

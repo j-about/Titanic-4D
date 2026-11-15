@@ -82,91 +82,145 @@
       {
         "id": "rocket-01",
         "ats": "1912-04-15T00:47",
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
         "source_ids": [
           "wfb-lifeboat-sequence",
           "flw-new-study-2026",
           "halpern-dozen-rockets",
-          "brit-inquiry-report"
+          "brit-inquiry-report",
+          "project-derivation"
         ],
         "certainty": "estimated",
-        "note": "First signal, fired by Boxhall after boat No. 5 had started down and before boat No. 3. The time is derived by Wormstedt, Fitch and Behe from the testimony of Rowe and Hichens and adopted by Halpern; the British report says about 12.45."
+        "note": "First signal, fired by Boxhall after boat No. 5 had started down and before boat No. 3. The time is derived by Wormstedt, Fitch and Behe from the testimony of Rowe and Hichens and adopted by Halpern; the British report says about 12.45. The margin of three minutes is the project's estimate; it covers the British report's time."
       },
       {
         "id": "rocket-02",
         "ats": "1912-04-15T00:53",
-        "source_ids": ["halpern-dozen-rockets"],
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
+        "source_ids": ["halpern-dozen-rockets", "project-derivation"],
         "certainty": "estimated",
-        "note": "Modelled time, not an observation: Halpern assumes one signal every six minutes from 12:47. No individual firing time is attested."
+        "note": "Modelled time, not an observation: Halpern assumes one signal every six minutes from 12:47. No individual firing time is attested. The margin is half that interval, by the project's choice."
       },
       {
         "id": "rocket-03",
         "ats": "1912-04-15T00:59",
-        "source_ids": ["halpern-dozen-rockets"],
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
+        "source_ids": ["halpern-dozen-rockets", "project-derivation"],
         "certainty": "estimated",
-        "note": "Modelled time, not an observation: Halpern assumes one signal every six minutes from 12:47. No individual firing time is attested."
+        "note": "Modelled time, not an observation: Halpern assumes one signal every six minutes from 12:47. No individual firing time is attested. The margin is half that interval, by the project's choice."
       },
       {
         "id": "rocket-04",
         "ats": "1912-04-15T01:05",
-        "source_ids": ["halpern-dozen-rockets"],
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
+        "source_ids": ["halpern-dozen-rockets", "project-derivation"],
         "certainty": "estimated",
-        "note": "Modelled time, not an observation: Halpern assumes one signal every six minutes from 12:47. No individual firing time is attested."
+        "note": "Modelled time, not an observation: Halpern assumes one signal every six minutes from 12:47. No individual firing time is attested. The margin is half that interval, by the project's choice."
       },
       {
         "id": "rocket-05",
         "ats": "1912-04-15T01:11",
-        "source_ids": ["halpern-dozen-rockets"],
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
+        "source_ids": ["halpern-dozen-rockets", "project-derivation"],
         "certainty": "estimated",
-        "note": "Modelled time, not an observation: Halpern assumes one signal every six minutes from 12:47. No individual firing time is attested."
+        "note": "Modelled time, not an observation: Halpern assumes one signal every six minutes from 12:47. No individual firing time is attested. The margin is half that interval, by the project's choice."
       },
       {
         "id": "rocket-06",
         "ats": "1912-04-15T01:17",
-        "source_ids": ["halpern-dozen-rockets"],
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
+        "source_ids": ["halpern-dozen-rockets", "project-derivation"],
         "certainty": "estimated",
-        "note": "Modelled time, not an observation: Halpern assumes one signal every six minutes from 12:47. No individual firing time is attested."
+        "note": "Modelled time, not an observation: Halpern assumes one signal every six minutes from 12:47. No individual firing time is attested. The margin is half that interval, by the project's choice."
       },
       {
         "id": "rocket-07",
         "ats": "1912-04-15T01:23",
-        "source_ids": ["halpern-dozen-rockets"],
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
+        "source_ids": ["halpern-dozen-rockets", "project-derivation"],
         "certainty": "estimated",
-        "note": "Modelled time, not an observation: Halpern assumes one signal every six minutes from 12:47. No individual firing time is attested."
+        "note": "Modelled time, not an observation: Halpern assumes one signal every six minutes from 12:47. No individual firing time is attested. The margin is half that interval, by the project's choice."
       },
       {
         "id": "rocket-08",
         "ats": "1912-04-15T01:29",
-        "source_ids": ["halpern-dozen-rockets"],
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
+        "source_ids": ["halpern-dozen-rockets", "project-derivation"],
         "certainty": "estimated",
-        "note": "Modelled time, not an observation: Halpern assumes one signal every six minutes from 12:47. No individual firing time is attested."
+        "note": "Modelled time, not an observation: Halpern assumes one signal every six minutes from 12:47. No individual firing time is attested. The margin is half that interval, by the project's choice."
       },
       {
         "id": "rocket-09",
         "ats": "1912-04-15T01:35",
-        "source_ids": ["halpern-dozen-rockets"],
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
+        "source_ids": ["halpern-dozen-rockets", "project-derivation"],
         "certainty": "estimated",
-        "note": "Modelled time, not an observation: Halpern assumes one signal every six minutes from 12:47. No individual firing time is attested."
+        "note": "Modelled time, not an observation: Halpern assumes one signal every six minutes from 12:47. No individual firing time is attested. The margin is half that interval, by the project's choice."
       },
       {
         "id": "rocket-10",
         "ats": "1912-04-15T01:41",
-        "source_ids": ["halpern-dozen-rockets"],
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
+        "source_ids": ["halpern-dozen-rockets", "project-derivation"],
         "certainty": "estimated",
-        "note": "Modelled time, not an observation: Halpern assumes one signal every six minutes from 12:47. No individual firing time is attested."
+        "note": "Modelled time, not an observation: Halpern assumes one signal every six minutes from 12:47. No individual firing time is attested. The margin is half that interval, by the project's choice."
       },
       {
         "id": "rocket-11",
         "ats": "1912-04-15T01:47",
-        "source_ids": ["halpern-dozen-rockets"],
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
+        "source_ids": ["halpern-dozen-rockets", "project-derivation"],
         "certainty": "debated",
-        "note": "Modelled time, not an observation. Halpern notes that this signal may not have been fired, Boxhall then leaving in boat No. 2."
+        "note": "Modelled time, not an observation. Halpern notes that this signal may not have been fired, Boxhall then leaving in boat No. 2. The margin is half the six-minute interval of the model, by the project's choice."
       },
       {
         "id": "rocket-12",
         "ats": "1912-04-15T01:53",
-        "source_ids": ["halpern-dozen-rockets", "wfb-lifeboat-sequence", "brit-inquiry-testimony"],
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
+        "source_ids": [
+          "halpern-dozen-rockets",
+          "wfb-lifeboat-sequence",
+          "brit-inquiry-testimony",
+          "project-derivation"
+        ],
         "certainty": "debated",
-        "note": "Last signal. Halpern's model gives 1:53; Wormstedt, Fitch and Behe give about 1:52, from Stone's last sighting at about 1:40 by the Californian's clock.",
+        "note": "Last signal. Halpern's model gives 1:53; Wormstedt, Fitch and Behe give about 1:52, from Stone's last sighting at about 1:40 by the Californian's clock. The margin of three minutes is the project's estimate; it covers both times.",
         "alternatives": [
           {
             "holder": "Quartermaster Rowe (1912)",
@@ -251,12 +305,21 @@
         "logged_time": "22:25",
         "logged_reference": "new-york",
         "ats": "1912-04-15T00:27",
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
         "sender": "Titanic (MGY)",
         "summary": "First distress call: CQD, requiring assistance, position 41°44′N, 50°24′W.",
         "heard_by": ["Cape Race", "Mount Temple", "La Provence"],
-        "source_ids": ["us-inquiry-report", "lee-desperate-dialogue", "halpern-chronology-2023"],
-        "certainty": "debated",
-        "note": "The logged time is established. The ship's time depends on the clock offset.",
+        "source_ids": [
+          "us-inquiry-report",
+          "lee-desperate-dialogue",
+          "halpern-chronology-2023",
+          "project-derivation"
+        ],
+        "certainty": "established",
+        "note": "The logged time is established. The ship's time depends on the clock offset. The margin of three minutes on the logged time is the project's estimate, from its research notes: the logs often round to five minutes and differ by a few minutes for the same exchange.",
         "alternatives": [
           {
             "holder": "British Inquiry report (1912)",
@@ -270,24 +333,37 @@
         "logged_time": "22:28",
         "logged_reference": "new-york",
         "ats": "1912-04-15T00:30",
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
         "sender": "Titanic (MGY)",
         "summary": "CQD with the same position, repeated about ten times.",
         "heard_by": ["Ypiranga"],
-        "source_ids": ["lee-desperate-dialogue"],
+        "source_ids": ["lee-desperate-dialogue", "project-derivation"],
         "certainty": "established",
-        "note": "Ypiranga's log."
+        "note": "Ypiranga's log. The margin of three minutes on the logged time is the project's estimate, from its research notes: the logs often round to five minutes and differ by a few minutes for the same exchange."
       },
       {
         "id": "corrected-position",
         "logged_time": "22:35",
         "logged_reference": "new-york",
         "ats": "1912-04-15T00:37",
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
         "sender": "Titanic (MGY)",
         "summary": "To Carpathia: come at once, we have struck a berg; corrected position 41°46′N, 50°14′W.",
         "heard_by": ["Carpathia", "Cape Race"],
-        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023", "brit-inquiry-report"],
-        "certainty": "debated",
-        "note": "The logged time is established. The ship's time depends on the clock offset.",
+        "source_ids": [
+          "lee-desperate-dialogue",
+          "halpern-chronology-2023",
+          "brit-inquiry-report",
+          "project-derivation"
+        ],
+        "certainty": "established",
+        "note": "The logged time is established. The ship's time depends on the clock offset. The margin of three minutes on the logged time is the project's estimate, from its research notes: the logs often round to five minutes and differ by a few minutes for the same exchange.",
         "alternatives": [
           {
             "holder": "British Inquiry report (1912)",
@@ -301,156 +377,220 @@
         "logged_time": "22:36",
         "logged_reference": "new-york",
         "ats": "1912-04-15T00:38",
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
         "sender": "Titanic (MGY)",
         "summary": "Collision with an iceberg, sinking; nothing can be heard for the noise of steam.",
         "heard_by": ["Ypiranga"],
-        "source_ids": ["lee-desperate-dialogue", "brit-inquiry-report"],
+        "source_ids": ["lee-desperate-dialogue", "brit-inquiry-report", "project-derivation"],
         "certainty": "established",
-        "note": "Ypiranga's log."
+        "note": "Ypiranga's log. The margin of three minutes on the logged time is the project's estimate, from its research notes: the logs often round to five minutes and differ by a few minutes for the same exchange.",
+        "alternatives": [
+          {
+            "holder": "British Inquiry report (1912)",
+            "position": "12.26 a.m. ship's time.",
+            "source_ids": ["brit-inquiry-report"]
+          }
+        ]
       },
       {
         "id": "frankfurt-stand-by",
         "logged_time": "22:40",
         "logged_reference": "new-york",
         "ats": "1912-04-15T00:42",
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
         "sender": "Frankfurt (DFT)",
         "summary": "Frankfurt acknowledges the call. Mount Temple turns toward the position given.",
         "heard_by": ["Mount Temple", "Caronia", "Cape Race"],
-        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023"],
+        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023", "project-derivation"],
         "certainty": "established",
-        "note": "Logs of Mount Temple and Frankfurt."
+        "note": "Logs of Mount Temple and Frankfurt. The margin of three minutes on the logged time is the project's estimate, from its research notes: the logs often round to five minutes and differ by a few minutes for the same exchange."
       },
       {
         "id": "carpathia-coming",
         "logged_time": "22:47",
         "logged_reference": "new-york",
         "ats": "1912-04-15T00:49",
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
         "sender": "Carpathia (MPA)",
         "summary": "Carpathia gives her position and says she is coming; Bride takes the news to Captain Smith.",
         "heard_by": ["Titanic"],
-        "source_ids": ["halpern-chronology-2023", "brit-inquiry-testimony"],
+        "source_ids": ["halpern-chronology-2023", "brit-inquiry-testimony", "project-derivation"],
         "certainty": "estimated",
-        "note": "Time reconstructed by Halpern; Bride, Q16516–16527."
+        "note": "Time reconstructed by Halpern, not read in a log; Bride, Q16516–16527. The margin of three minutes is the project's estimate, from its research notes."
       },
       {
         "id": "first-sos",
         "logged_time": "22:55",
         "logged_reference": "new-york",
         "ats": "1912-04-15T00:57",
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
         "sender": "Titanic (MGY)",
         "summary": "First logged SOS, in a call to Olympic.",
         "heard_by": ["Mount Temple", "Celtic"],
-        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023"],
+        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023", "project-derivation"],
         "certainty": "established",
-        "note": "Mount Temple's log; Celtic logged it at 3:55 a.m. GMT."
+        "note": "Mount Temple's log; Celtic logged it at 3:55 a.m. GMT. The margin of three minutes on the logged time is the project's estimate, from its research notes: the logs often round to five minutes and differ by a few minutes for the same exchange."
       },
       {
         "id": "sos-cqd",
         "logged_time": "23:02",
         "logged_reference": "new-york",
         "ats": "1912-04-15T01:04",
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
         "sender": "Titanic (MGY)",
         "summary": "SOS and CQD with the position.",
         "heard_by": ["Ypiranga"],
-        "source_ids": ["lee-desperate-dialogue"],
+        "source_ids": ["lee-desperate-dialogue", "project-derivation"],
         "certainty": "established",
-        "note": "Ypiranga's log."
+        "note": "Ypiranga's log. The margin of three minutes on the logged time is the project's estimate, from its research notes: the logs often round to five minutes and differ by a few minutes for the same exchange."
       },
       {
         "id": "to-olympic-position",
         "logged_time": "23:10",
         "logged_reference": "new-york",
         "ats": "1912-04-15T01:12",
+        "uncertainty": {
+          "before_min": 5,
+          "after_min": 5
+        },
         "sender": "Titanic (MGY)",
         "summary": "To Olympic: position 41°46′N, 50°14′W; we have struck an iceberg.",
         "heard_by": ["Olympic", "Baltic", "Virginian"],
-        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023"],
+        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023", "project-derivation"],
         "certainty": "established",
-        "note": "Olympic's log."
+        "note": "Olympic's log. The margin of five minutes on the logged time is the project's estimate, from its research notes: the logs often round to five minutes and differ by a few minutes for the same exchange."
       },
       {
         "id": "going-down-at-head",
         "logged_time": "23:20",
         "logged_reference": "new-york",
         "ats": "1912-04-15T01:22",
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
         "sender": "Titanic (MGY)",
         "summary": "To Olympic: the captain says get your boats ready; going down fast at the head.",
         "heard_by": ["Olympic", "Mount Temple", "Baltic"],
-        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023"],
+        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023", "project-derivation"],
         "certainty": "established",
-        "note": "Several logs."
+        "note": "Several logs. The margin of three minutes on the logged time is the project's estimate, from its research notes: the logs often round to five minutes and differ by a few minutes for the same exchange."
       },
       {
         "id": "frankfurt-coming",
         "logged_time": "23:26",
         "logged_reference": "new-york",
         "ats": "1912-04-15T01:28",
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
         "sender": "Frankfurt (DFT)",
         "summary": "Frankfurt says her captain will make for Titanic; Titanic acknowledges.",
         "heard_by": ["Mount Temple", "Ypiranga"],
-        "source_ids": ["halpern-chronology-2023", "lee-desperate-dialogue"],
+        "source_ids": ["halpern-chronology-2023", "lee-desperate-dialogue", "project-derivation"],
         "certainty": "established",
-        "note": "Logs of Ypiranga and Mount Temple."
+        "note": "Logs of Ypiranga and Mount Temple. The margin of three minutes on the logged time is the project's estimate, from its research notes: the logs often round to five minutes and differ by a few minutes for the same exchange."
       },
       {
         "id": "women-in-boats",
         "logged_time": "23:35",
         "logged_reference": "new-york",
         "ats": "1912-04-15T01:37",
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
         "sender": "Titanic (MGY)",
         "summary": "To Olympic: we are putting the women off in the boats. Cape Race hears Titanic no more after this.",
         "heard_by": ["Olympic", "Mount Temple", "Baltic", "Virginian"],
-        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023"],
+        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023", "project-derivation"],
         "certainty": "established",
-        "note": "Several logs."
+        "note": "Several logs. The margin of three minutes on the logged time is the project's estimate, from its research notes: the logs often round to five minutes and differ by a few minutes for the same exchange."
       },
       {
         "id": "engine-room-flooded",
         "logged_time": "23:41",
         "logged_reference": "new-york",
         "ats": "1912-04-15T01:43",
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
         "sender": "Titanic (MGY)",
         "summary": "CQD: engine room flooded.",
         "heard_by": ["Mount Temple"],
-        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023"],
+        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023", "project-derivation"],
         "certainty": "established",
-        "note": "Mount Temple's log."
+        "note": "Mount Temple's log. The margin of three minutes on the logged time is the project's estimate, from its research notes: the logs often round to five minutes and differ by a few minutes for the same exchange."
       },
       {
         "id": "clear-and-calm",
         "logged_time": "23:45",
         "logged_reference": "new-york",
         "ats": "1912-04-15T01:47",
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
         "sender": "Titanic (MGY)",
         "summary": "To Olympic: weather clear and calm. To Baltic: engine room getting flooded.",
         "heard_by": ["Olympic", "Baltic"],
-        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023"],
+        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023", "project-derivation"],
         "certainty": "established",
-        "note": "Logs of Olympic and Baltic."
+        "note": "Logs of Olympic and Baltic. The margin of three minutes on the logged time is the project's estimate, from its research notes: the logs often round to five minutes and differ by a few minutes for the same exchange."
       },
       {
         "id": "baltic-rushing",
         "logged_time": "23:47",
         "logged_reference": "new-york",
         "ats": "1912-04-15T01:49",
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
         "sender": "Baltic (MBC)",
         "summary": "Baltic says she is rushing to Titanic. Last time Mount Temple hears Titanic.",
         "heard_by": ["Mount Temple", "Olympic"],
-        "source_ids": ["us-inquiry-report", "halpern-chronology-2023"],
+        "source_ids": ["us-inquiry-report", "halpern-chronology-2023", "project-derivation"],
         "certainty": "established",
-        "note": "US report: Mount Temple last heard Titanic at 11.47 p.m. New York time."
+        "note": "US report: Mount Temple last heard Titanic at 11.47 p.m. New York time. The margin of three minutes on the logged time is the project's estimate, from its research notes: the logs often round to five minutes and differ by a few minutes for the same exchange."
       },
       {
         "id": "last-heard-by-carpathia",
         "logged_time": "23:55",
         "logged_reference": "new-york",
         "ats": "1912-04-15T01:57",
+        "uncertainty": {
+          "before_min": 5,
+          "after_min": 5
+        },
         "sender": "Titanic (MGY)",
         "summary": "Last message heard by Carpathia: engine room full up to boilers.",
         "heard_by": ["Carpathia"],
-        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023", "brit-inquiry-report"],
-        "certainty": "debated",
-        "note": "The logged time is established. The ship's time depends on the clock offset.",
+        "source_ids": [
+          "lee-desperate-dialogue",
+          "halpern-chronology-2023",
+          "brit-inquiry-report",
+          "project-derivation"
+        ],
+        "certainty": "established",
+        "note": "The logged time is established. The ship's time depends on the clock offset. The margin of five minutes on the logged time is the project's estimate, from its research notes: the logs often round to five minutes and differ by a few minutes for the same exchange.",
         "alternatives": [
           {
             "holder": "British Inquiry report (1912)",
@@ -464,12 +604,16 @@
         "logged_time": "23:58",
         "logged_reference": "new-york",
         "ats": "1912-04-15T02:00",
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
         "sender": "Titanic (MGY)",
         "summary": "Titanic is heard calling CQD and SOS; Asian answers and gets no reply.",
         "heard_by": ["Asian"],
-        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023"],
+        "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023", "project-derivation"],
         "certainty": "established",
-        "note": "Asian's log."
+        "note": "Asian's log. The margin of three minutes on the logged time is the project's estimate, from its research notes: the logs often round to five minutes and differ by a few minutes for the same exchange."
       },
       {
         "id": "virginian-faint",
@@ -481,7 +625,7 @@
         "heard_by": ["Virginian"],
         "source_ids": ["lee-desperate-dialogue", "halpern-chronology-2023"],
         "certainty": "debated",
-        "note": "Heard by the Virginian alone.",
+        "note": "Heard by the Virginian alone. No margin is recorded for this entry.",
         "alternatives": [
           {
             "holder": "Samuel Halpern; Paul Lee",
@@ -505,7 +649,7 @@
           "halpern-chronology-2023"
         ],
         "certainty": "debated",
-        "note": "Accepted by both 1912 reports as Titanic's last signal; the British report dates it 2.17 a.m. ship's time.",
+        "note": "Accepted by both 1912 reports as Titanic's last signal; the British report dates it 2.17 a.m. ship's time. No margin is recorded for this entry.",
         "alternatives": [
           {
             "holder": "Samuel Halpern; Paul Lee",

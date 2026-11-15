@@ -338,13 +338,13 @@
         "in_charge": {
           "anyOf": [
             {
-              "type": "string",
-              "minLength": 1
+              "$ref": "#/$defs/__schema11"
             },
             {
               "type": "null"
             }
-          ]
+          ],
+          "description": "Rank and name of the person in charge in the boat; null when nobody was."
         },
         "occupancy": {
           "type": "object",
@@ -361,6 +361,14 @@
                 }
               ]
             },
+            "basis": {
+              "type": "string",
+              "enum": [
+                "attributed",
+                "reached-from-water"
+              ],
+              "description": "attributed: people attributed to the boat by the source, not uniformly a count at launch; reached-from-water: people who reached the boat from the water after it floated off."
+            },
             "source_ids": {
               "$ref": "#/$defs/__schema2"
             },
@@ -376,6 +384,7 @@
           },
           "required": [
             "persons",
+            "basis",
             "source_ids",
             "certainty",
             "note"
@@ -385,13 +394,13 @@
         "remark": {
           "anyOf": [
             {
-              "type": "string",
-              "minLength": 1
+              "$ref": "#/$defs/__schema11"
             },
             {
               "type": "null"
             }
-          ]
+          ],
+          "description": "A circumstance of the launch, as one sentence; null when none is recorded."
         }
       },
       "required": [
@@ -410,6 +419,34 @@
       "type": "string",
       "pattern": "^1912-04-1[45]T(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d)?$",
       "description": "Titanic ship's time (Apparent Time Ship), ISO 8601 local date-time."
+    },
+    "__schema11": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema4"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema5"
+        }
+      },
+      "required": [
+        "value",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
     }
   }
 }

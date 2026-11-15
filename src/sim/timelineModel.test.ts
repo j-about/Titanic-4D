@@ -386,6 +386,20 @@ describe('break-up, foundering and wreck', () => {
     expect(bodyToWorld(state.bow, afterEnd).up).toBeLessThan(0);
   });
 
+  it('brings the stern section to the seabed rudder first', () => {
+    const { x_start_m: forwardEndX, x_end_m: afterEndX } = breakup.stern_section;
+    const rest = shipTimeToSeconds(breakup.stern_section.keyframes.at(-1)?.ats ?? '');
+    const keelUp = (t: number, x: number): number =>
+      bodyToWorld(model.evaluate(t).stern, { x, y: 0, z: 0 }).up;
+    const restingKeelUp = keelUp(rest, afterEndX);
+    for (let t = shipTimeToSeconds('1912-04-15T02:22'); t < rest; t += 1) {
+      expect(model.evaluate(t).stern.pitchDeg, `pitch at ${t}`).toBeLessThan(0);
+      expect(keelUp(t, afterEndX), `after end at ${t}`).toBeLessThan(keelUp(t, forwardEndX));
+      expect(keelUp(t, afterEndX), `seabed at ${t}`).toBeGreaterThan(restingKeelUp);
+    }
+    expect(keelUp(rest, forwardEndX)).toBeCloseTo(restingKeelUp, 6);
+  });
+
   it('rests both sections about 3,800 m down and about 600 m apart', () => {
     const state = model.evaluate(model.endSeconds);
     const depth = factValue(dataset.site.environment, 'depth');

@@ -1,5 +1,7 @@
 import { LEGAL_NOTICE_PATH, navigation } from '../config/navigation.ts';
 import { site } from '../config/site.ts';
+import type { Dataset } from '../data/schema/dataset.ts';
+import { CASUALTY_COUNTS_PATH, casualtySentence } from './casualties.ts';
 import { h, type Markup } from './html.ts';
 
 /**
@@ -27,15 +29,21 @@ export function renderSiteHeader(currentPath: string): Markup {
   );
 }
 
-/** Footer shared by every page: a line on the subject, the Legal Notice and the contact address. */
-export function renderSiteFooter(): Markup {
+/**
+ * Footer shared by every page: a line on the subject, with the number of people who died as the
+ * sources of the dataset count it, then the links to those counts, to the Legal Notice and to
+ * the contact address.
+ */
+export function renderSiteFooter(dataset: Dataset): Markup {
   return h(
     'footer',
     { class: 'app-footer' },
     h(
       'p',
       {},
-      'A sober, source-backed reconstruction. About 1,500 people died that night. ',
+      `A sober, source-backed reconstruction. ${casualtySentence(dataset)} `,
+      h('a', { href: CASUALTY_COUNTS_PATH }, 'Counts by source'),
+      ' · ',
       h('a', { href: LEGAL_NOTICE_PATH }, 'Legal Notice'),
       ' · ',
       h('a', { href: `mailto:${site.contactEmail}` }, site.contactEmail),

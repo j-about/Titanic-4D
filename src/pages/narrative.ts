@@ -1,5 +1,6 @@
-import type { Certainty } from '../data/schema/common.ts';
+import type { Alternative, Certainty } from '../data/schema/common.ts';
 import type { Dataset } from '../data/schema/dataset.ts';
+import type { Fact } from '../data/schema/facts.ts';
 import type { TimelineEvent } from '../sim/events.ts';
 import type { TimelineModel } from '../sim/timelineModel.ts';
 import { formatShipClock, secondsToClock } from '../time/shipTime.ts';
@@ -34,6 +35,19 @@ function sourceList(dataset: Dataset, sourceIds: readonly string[]): Markup {
   );
 }
 
+/** The positions that differ from the one adopted, each with its holder; nothing when there is none. */
+function alternativeList(alternatives: readonly Alternative[]): Markup | null {
+  return alternatives.length === 0
+    ? null
+    : h(
+        'ul',
+        { class: 'chronicle__alternatives' },
+        alternatives.map((alternative) =>
+          h('li', {}, h('strong', {}, `${alternative.holder}: `), alternative.position),
+        ),
+      );
+}
+
 function eventItem(dataset: Dataset, event: TimelineEvent): Markup {
   const clock = formatShipClock(event.t);
   const margin = Math.round(
@@ -62,15 +76,7 @@ function eventItem(dataset: Dataset, event: TimelineEvent): Markup {
         ),
       ),
     ),
-    event.alternatives.length === 0
-      ? null
-      : h(
-          'ul',
-          { class: 'chronicle__alternatives' },
-          event.alternatives.map((alternative) =>
-            h('li', {}, h('strong', {}, `${alternative.holder}: `), alternative.position),
-          ),
-        ),
+    alternativeList(event.alternatives),
     h(
       'details',
       {},
@@ -81,6 +87,23 @@ function eventItem(dataset: Dataset, event: TimelineEvent): Markup {
         h('span', { class: 'visually-hidden' }, ` of ${clock}, ${event.title}`),
       ),
       sourceList(dataset, event.sourceIds),
+    ),
+  );
+}
+
+/** A statement of the dataset with its level of certainty, the positions that differ and its sources. */
+function factItem(dataset: Dataset, fact: Fact): Markup {
+  return h(
+    'li',
+    { id: `fact-${fact.id}` },
+    h('p', {}, h('strong', {}, `${fact.title}: `), fact.summary),
+    h('p', { class: 'chronicle__meta' }, `${CERTAINTY_LABELS[fact.certainty]}.`),
+    alternativeList(fact.alternatives ?? []),
+    h(
+      'details',
+      {},
+      h('summary', {}, 'Sources', h('span', { class: 'visually-hidden' }, ` of ${fact.title}`)),
+      sourceList(dataset, fact.source_ids),
     ),
   );
 }
@@ -148,7 +171,7 @@ export function renderNarrative(dataset: Dataset, model: TimelineModel): Markup 
         ),
       ),
     ),
-    h('h2', {}, 'Lives lost'),
+    h('h2', { id: 'lives-lost' }, 'Lives lost'),
     h(
       'p',
       {},
@@ -156,6 +179,19 @@ export function renderNarrative(dataset: Dataset, model: TimelineModel): Markup 
       'separately; none is preferred.',
     ),
     casualtyTable(dataset),
+    h('h2', { id: 'californian' }, 'The light on the horizon'),
+    h(
+      'p',
+      {},
+      'Until the ship founders, the reconstruction shows one faint light low on the horizon: ',
+      'that of the SS Californian. How far away she lay is disputed; the positions are given ',
+      'side by side.',
+    ),
+    h(
+      'ul',
+      {},
+      dataset.site.californian.map((fact) => factItem(dataset, fact)),
+    ),
     h('h2', {}, 'Chronology'),
     h(
       'ol',

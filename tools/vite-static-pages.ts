@@ -1,4 +1,5 @@
 import type { Plugin } from 'vite';
+import { dataset } from '../src/data/dataset.ts';
 import { renderSiteFooter, renderSiteHeader } from '../src/pages/layout.ts';
 import { renderPageHead, renderSitemap, staticPages } from '../src/pages/registry.ts';
 
@@ -27,7 +28,7 @@ export function staticPagesPlugin(): Plugin {
             case 'site-header':
               return renderSiteHeader(path).markup;
             case 'site-footer':
-              return renderSiteFooter().markup;
+              return renderSiteFooter(dataset).markup;
             case 'page-head':
             case 'page-content': {
               if (page === undefined) {

@@ -105,3 +105,118 @@ describe('sources of the current state', () => {
     expect(iceberg?.sourceIds).toContain('brit-inquiry-testimony');
   });
 });
+
+describe('elements of the scene that are neither the hull nor an event', () => {
+  const find = (clock: string, id: string) => sourcesAt(clock).find((entry) => entry.id === id);
+
+  it('lists the computed sky at every instant, no more certain than the clock offset', () => {
+    const offset = dataset.timeReference.adopted_offset;
+    for (let t = 0; t <= model.endSeconds; t += 240) {
+      const sky = describeSources(dataset, model, model.evaluate(t)).find(
+        (entry) => entry.id === 'sky',
+      );
+      expect(sky?.topic, `at ${t}`).toBe('Sky');
+      expect(sky?.certainty, `at ${t}`).toBe(offset.certainty);
+      expect(sky?.sourceIds, `at ${t}`).toEqual(
+        expect.arrayContaining(['yale-bsc5', 'astronomy-engine', ...offset.source_ids]),
+      );
+    }
+    const sky = find('15T01:00', 'sky');
+    expect(sky?.statement).toContain('computed from a star catalogue and an ephemeris');
+    expect(sky?.statement).toContain('No Moon was in the sky');
+    expect(sky?.notes).toContain(offset.note);
+  });
+
+  it('lists the haze of the horizon with the positions on it', () => {
+    const haze = find('15T01:00', 'haze');
+    expect(haze?.certainty).toBe('debated');
+    expect(haze?.statement).toContain('the officers saw none');
+    expect(haze?.alternatives.map((alternative) => alternative.holder)).toEqual([
+      'Tim Maltin',
+      'Samuel Halpern',
+    ]);
+  });
+
+  it('lists each funnel from the moment the scene no longer shows it', () => {
+    expect(sourcesAt('15T02:15:59').some((entry) => entry.topic === 'Funnels')).toBe(false);
+    expect(find('15T02:16', 'funnel-1')?.statement).toBe(
+      'From 2:16 a.m. the scene no longer shows funnel No. 1, counted from forward.',
+    );
+    const during = sourcesAt('15T02:17:20');
+    expect(during.filter((entry) => entry.topic === 'Funnels').map((entry) => entry.id)).toEqual([
+      'funnel-1',
+      'funnel-2',
+      'funnel-3',
+    ]);
+    const second = during.find((entry) => entry.id === 'funnel-2');
+    expect(second?.statement).toBe(
+      'From 2:17:15 a.m. the scene no longer shows funnel No. 2, counted from forward.',
+    );
+    expect(second?.certainty).toBe('estimated');
+    expect(second?.sourceIds).toEqual(['project-derivation']);
+    expect(second?.notes.join(' ')).toContain('No testimony on its fall was found');
+    expect(find('15T02:26', 'funnel-4')?.sourceIds).toEqual(['halpern-chronology-2023']);
+  });
+
+  it('agrees with the funnels that the state shows standing', () => {
+    for (let t = model.finalPlungeSeconds; t <= model.endSeconds; t += 5) {
+      const state = model.evaluate(t);
+      const listed = describeSources(dataset, model, state)
+        .filter((entry) => entry.topic === 'Funnels')
+        .map((entry) => entry.id);
+      const fallen = dataset.ship.funnels
+        .filter((_, index) => state.funnelsStanding[index] === false)
+        .map((funnel) => `funnel-${funnel.id}`);
+      expect(listed, `at ${t}`).toEqual(fallen);
+    }
+  });
+
+  it('lists the depth of the seabed once the ship has foundered', () => {
+    expect(find('15T02:19:59', 'seabed')).toBeUndefined();
+    const seabed = find('15T02:20', 'seabed');
+    expect(seabed?.statement).toBe('The seabed is shown 3,800 m below the surface.');
+    const depth = dataset.site.environment.find((fact) => fact.id === 'depth');
+    expect(seabed?.certainty).toBe(depth?.certainty);
+    expect(seabed?.sourceIds).toEqual(depth?.source_ids);
+    expect(find('15T02:26', 'seabed')).toBeDefined();
+  });
+
+  it('lists the light of the Californian while the ship is afloat, with the competing distances', () => {
+    const distance = dataset.site.californian.find((fact) => fact.id === 'californian-distance');
+    const bearing = dataset.site.californian.find((fact) => fact.id === 'californian-bearing');
+    for (const clock of ['14T23:40', '15T01:00', '15T02:19:59']) {
+      const light = find(clock, 'californian-light');
+      expect(light?.topic, clock).toBe('Surroundings');
+      expect(light?.certainty, clock).toBe('debated');
+      expect(light?.statement, clock).toBe(`${distance?.summary} ${bearing?.summary}`);
+      expect(light?.notes, clock).toEqual([distance?.note, bearing?.note]);
+      expect(light?.alternatives, clock).toEqual([
+        ...(distance?.alternatives ?? []),
+        ...(bearing?.alternatives ?? []),
+      ]);
+    }
+    const positions = find('15T01:00', 'californian-light')?.alternatives.map(
+      (alternative) => alternative.position,
+    );
+    expect(positions).toEqual(
+      expect.arrayContaining([
+        '19 to 19½ miles.',
+        '17 to 20 miles, most likely about 18; Titanic probably not seen.',
+        '5 to 10 miles, probably nearer five.',
+        '12 to at most about 14 nautical miles.',
+      ]),
+    );
+    expect(find('15T02:20', 'californian-light')).toBeUndefined();
+    expect(find('15T02:26', 'californian-light')).toBeUndefined();
+  });
+
+  it('keeps the entries of one topic together at every instant', () => {
+    for (let t = 0; t <= model.endSeconds; t += 120) {
+      const topics = describeSources(dataset, model, model.evaluate(t)).map((item) => item.topic);
+      const runs = topics.filter((topic, index) => topic !== topics[index - 1]);
+      // The clock offset opens the list on its own; every other topic forms a single run.
+      const afterTime = runs.slice(1);
+      expect(new Set(afterTime).size, `at ${t}: ${runs.join(', ')}`).toBe(afterTime.length);
+    }
+  });
+});

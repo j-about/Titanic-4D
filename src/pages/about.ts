@@ -2,6 +2,7 @@ import { site } from '../config/site.ts';
 import { type SupportLink, supportLinks } from '../config/support.ts';
 import type { Dataset } from '../data/schema/dataset.ts';
 import { CERTAINTY_DESCRIPTIONS, CERTAINTY_LABELS } from '../ui/stateText.ts';
+import { CASUALTY_COUNTS_PATH, casualtySentence } from './casualties.ts';
 import { h, type Markup } from './html.ts';
 
 /** Words announcing, in the accessible name of a link, that it opens a new tab. */
@@ -71,7 +72,9 @@ export function renderAbout(dataset: Dataset): Markup {
     h(
       'p',
       {},
-      'About 1,500 people died that night. The reconstruction shows the ship, the sea and the ',
+      `${casualtySentence(dataset)} `,
+      h('a', { href: CASUALTY_COUNTS_PATH }, 'The count of each source'),
+      ' is given in "The night in words". The reconstruction shows the ship, the sea and the ',
       'sky. It does not depict the people aboard and it has no sound.',
     ),
     h('h2', {}, 'How it is made'),
@@ -97,9 +100,11 @@ export function renderAbout(dataset: Dataset): Markup {
     h(
       'p',
       {},
-      'Where the sources disagree, on the number of lives lost for instance, or on the ',
-      'distance of the SS Californian, the competing positions are kept side by side instead of ',
-      'being settled arbitrarily. The scene at any instant depends on that instant alone, so ',
+      'Where the sources disagree, the competing positions are kept side by side instead of ',
+      'being settled arbitrarily: the counts of lives lost are given source by source in "The ',
+      'night in words", and the distance of the SS Californian, like the times of the boats, ',
+      'in the "Sources" tab of the reconstruction as well. The scene at any instant depends on ',
+      'that instant alone, so ',
       'the night can be played forward, backward or at any speed and always shows the same ',
       'thing at the same time.',
     ),

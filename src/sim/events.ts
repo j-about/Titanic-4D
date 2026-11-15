@@ -1,9 +1,16 @@
+import { combineProvenance, type Provenance } from '../data/provenance.ts';
 import type { EventCategory } from '../data/schema/chronology.ts';
 import type { Alternative, Certainty } from '../data/schema/common.ts';
 import type { Dataset } from '../data/schema/dataset.ts';
 import type { Boat, BoatType } from '../data/schema/lifeboats.ts';
-import { factValue } from '../ship/particulars.ts';
-import { formatOffsetClock, shipTimeToSeconds } from '../time/shipTime.ts';
+import type { WirelessMessage } from '../data/schema/signals.ts';
+import type { TimeReferenceFile } from '../data/schema/time.ts';
+import {
+  formatElapsed,
+  formatOffsetClock,
+  formatShipClock,
+  shipTimeToSeconds,
+} from '../time/shipTime.ts';
 
 export type TimelineEventKind = 'chronology' | 'lifeboat' | 'rocket' | 'wireless';
 
@@ -12,6 +19,7 @@ export interface TimelineEvent {
   readonly id: string;
   /** Seconds since the collision. */
   readonly t: number;
+  /** Margin recorded by the dataset on either side of `t`, in seconds; zero when it records none. */
   readonly uncertaintyBeforeSeconds: number;
   readonly uncertaintyAfterSeconds: number;
   readonly kind: TimelineEventKind;
@@ -41,6 +49,33 @@ function boatName(boat: Boat): string {
   return boat.type === 'cutter' ? `Emergency boat No. ${boat.id}` : `Lifeboat No. ${boat.id}`;
 }
 
+/** The fields of a provenance record, joined into those of one event. */
+function eventProvenance(
+  records: readonly Provenance[],
+): Pick<TimelineEvent, 'certainty' | 'sourceIds' | 'note' | 'alternatives'> {
+  const combined = combineProvenance(records);
+  return {
+    certainty: combined.certainty,
+    sourceIds: combined.sourceIds,
+    note: combined.notes.join(' '),
+    alternatives: combined.alternatives,
+  };
+}
+
+/**
+ * Sentence on the people counted for a boat, worded after the basis of the count: people who
+ * reached a boat from the water are not set against its capacity.
+ */
+function describeOccupancy(boat: Boat, type: BoatType): string {
+  const { persons, basis } = boat.occupancy;
+  if (persons === null) {
+    return '';
+  }
+  return basis === 'reached-from-water'
+    ? ` About ${persons} people reached this boat from the water.`
+    : ` About ${persons} people are attributed to this boat, which could hold ${type.capacity}.`;
+}
+
 function describeBoat(boat: Boat, type: BoatType): string {
   const station =
     boat.station.group === 'officers-quarters-roof'
@@ -50,13 +85,23 @@ function describeBoat(boat: Boat, type: BoatType): string {
     boat.launch.mode === 'floated-off'
       ? `${boatName(boat)} floats off from ${station}.`
       : `${boatName(boat)} begins lowering from ${station}.`;
-  const charge = boat.in_charge === null ? '' : ` In charge: ${boat.in_charge}.`;
+  const charge = boat.in_charge === null ? '' : ` In charge: ${boat.in_charge.value}.`;
+  const remark = boat.remark === null ? '' : ` ${boat.remark.value}`;
+  return `${action}${charge}${describeOccupancy(boat, type)}${remark}`;
+}
+
+/** The records from which the text of a lifeboat event is written. */
+function boatRecords(boat: Boat, type: BoatType): Provenance[] {
   const occupancy =
     boat.occupancy.persons === null
-      ? ''
-      : ` About ${boat.occupancy.persons} people, for a capacity of ${type.capacity}.`;
-  const remark = boat.remark === null ? '' : ` ${boat.remark}`;
-  return `${action}${charge}${occupancy}${remark}`;
+      ? []
+      : [boat.occupancy, ...(boat.occupancy.basis === 'attributed' ? [type] : [])];
+  return [
+    boat.launch,
+    ...(boat.in_charge === null ? [] : [boat.in_charge]),
+    ...occupancy,
+    ...(boat.remark === null ? [] : [boat.remark]),
+  ];
 }
 
 function boatEvents(dataset: Dataset): TimelineEvent[] {
@@ -80,22 +125,17 @@ function boatEvents(dataset: Dataset): TimelineEvent[] {
       description: describeBoat(boat, type),
       location: `Boat deck, ${boat.side} side`,
       keyEvent: KEY_BOAT_IDS.has(boat.id),
-      certainty: boat.launch.certainty,
-      sourceIds: boat.launch.source_ids,
-      note: boat.launch.note,
-      alternatives: boat.launch.alternatives ?? [],
+      ...eventProvenance(boatRecords(boat, type)),
     };
   });
 }
 
 function rocketEvents(dataset: Dataset): TimelineEvent[] {
-  const intervalSeconds =
-    factValue(dataset.signals.rockets.facts, 'rocket-interval') * SECONDS_PER_MINUTE;
   return dataset.signals.rockets.firings.map((firing, index) => ({
     id: firing.id,
     t: shipTimeToSeconds(firing.ats),
-    uncertaintyBeforeSeconds: intervalSeconds / 2,
-    uncertaintyAfterSeconds: intervalSeconds / 2,
+    uncertaintyBeforeSeconds: firing.uncertainty.before_min * SECONDS_PER_MINUTE,
+    uncertaintyAfterSeconds: firing.uncertainty.after_min * SECONDS_PER_MINUTE,
     kind: 'rocket',
     category: 'signal',
     title: index === 0 ? 'First distress signal fired' : 'Distress signal fired',
@@ -110,31 +150,77 @@ function rocketEvents(dataset: Dataset): TimelineEvent[] {
   }));
 }
 
+type ClockOffset = TimeReferenceFile['adopted_offset'];
+
+/** Name of the clock in which the log of a message was kept. */
+function logClockName(message: WirelessMessage): string {
+  return message.logged_reference === 'new-york' ? 'New York time' : 'GMT';
+}
+
+/** Minutes by which ship's time differs from the clock of the log of a message, for one offset. */
+function shipMinusLogMinutes(message: WirelessMessage, offset: ClockOffset): number {
+  return message.logged_reference === 'new-york'
+    ? offset.ship_minus_new_york_min
+    : offset.ship_minus_gmt_min;
+}
+
+/**
+ * The other clock offsets of the dataset, each as a position on the ship's time of a message:
+ * the offset as its holder states it, and the time at which it puts the log entry.
+ */
+function offsetAlternatives(
+  message: WirelessMessage,
+  timeReference: TimeReferenceFile,
+): Alternative[] {
+  const t = shipTimeToSeconds(message.ats);
+  const adopted = shipMinusLogMinutes(message, timeReference.adopted_offset);
+  return timeReference.alternative_offsets.map((offset) => {
+    const minutes = shipMinusLogMinutes(message, offset);
+    const difference = formatElapsed(Math.abs(minutes) * SECONDS_PER_MINUTE);
+    const side = minutes >= 0 ? 'ahead of' : 'behind';
+    const clock = formatShipClock(t + (minutes - adopted) * SECONDS_PER_MINUTE);
+    return {
+      holder: offset.holder,
+      position: `With ship's time ${difference} ${side} ${logClockName(message)}, this log entry falls at ${clock}`,
+      source_ids: offset.source_ids,
+    };
+  });
+}
+
+/**
+ * Provenance of the ship's time of a message: the log entry, the adopted clock offset with which
+ * it is converted, and the other offsets as competing positions.
+ */
+function wirelessRecords(message: WirelessMessage, timeReference: TimeReferenceFile): Provenance[] {
+  const offset = timeReference.adopted_offset;
+  return [
+    message,
+    {
+      source_ids: offset.source_ids,
+      certainty: offset.certainty,
+      note: offset.note,
+      alternatives: offsetAlternatives(message, timeReference),
+    },
+  ];
+}
+
 function wirelessEvents(dataset: Dataset): TimelineEvent[] {
-  const offset = dataset.timeReference.adopted_offset;
+  const { timeReference } = dataset;
   return dataset.signals.wireless.messages.map((message) => {
     const t = shipTimeToSeconds(message.ats);
-    const reference = message.logged_reference === 'new-york' ? 'New York time' : 'GMT';
-    const shipMinusLog =
-      message.logged_reference === 'new-york'
-        ? offset.ship_minus_new_york_min
-        : offset.ship_minus_gmt_min;
-    const logged = formatOffsetClock(t, shipMinusLog);
+    const logged = formatOffsetClock(t, shipMinusLogMinutes(message, timeReference.adopted_offset));
     return {
       id: `wireless-${message.id}`,
       t,
-      uncertaintyBeforeSeconds: 3 * SECONDS_PER_MINUTE,
-      uncertaintyAfterSeconds: 3 * SECONDS_PER_MINUTE,
+      uncertaintyBeforeSeconds: (message.uncertainty?.before_min ?? 0) * SECONDS_PER_MINUTE,
+      uncertaintyAfterSeconds: (message.uncertainty?.after_min ?? 0) * SECONDS_PER_MINUTE,
       kind: 'wireless',
       category: 'wireless',
       title: `Wireless: ${message.sender}`,
-      description: `${message.summary} Logged at ${logged} ${reference} by ${message.heard_by.join(', ')}.`,
+      description: `${message.summary} Logged at ${logged} ${logClockName(message)} by ${message.heard_by.join(', ')}.`,
       location: 'Marconi room',
       keyEvent: KEY_MESSAGE_IDS.has(message.id),
-      certainty: message.certainty,
-      sourceIds: message.source_ids,
-      note: message.note,
-      alternatives: message.alternatives ?? [],
+      ...eventProvenance(wirelessRecords(message, timeReference)),
     };
   });
 }

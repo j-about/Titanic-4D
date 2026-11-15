@@ -21,7 +21,7 @@
     {
       "id": "launch-sequence-debate",
       "title": "The launching sequence is a reconstruction",
-      "summary": "No one recorded launch times during the night. Three modern reconstructions and the 1912 table disagree on the order and times of several boats. They agree that No. 7 left first at about 12:40, that the starboard forward boats left in the order 7, 5, 3, 1, and that collapsibles C and D left at about 2:00 and 2:05. Every time is approximate to about five minutes.",
+      "summary": "No one recorded launch times during the night. Three modern reconstructions and the 1912 table disagree on the order and times of several boats. All four agree that No. 7 left first, at 12:40 to 12:45, and that the starboard forward boats left in the order 7, 5, 3, 1. The three modern reconstructions put collapsible C at 2:00 and collapsible D at 2:05 to 2:10; the 1912 table puts C at 1:40 and D at 2:05. Every time is approximate to about five minutes.",
       "source_ids": [
         "flw-new-study-2026",
         "wfb-lifeboat-sequence",
@@ -142,12 +142,18 @@
           }
         ]
       },
-      "in_charge": "Lookout George Hogg",
+      "in_charge": {
+        "value": "Lookout George Hogg",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
       "occupancy": {
         "persons": 28,
+        "basis": "attributed",
         "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
         "certainty": "estimated",
-        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to the number of survivors, so they are not uniformly counts at launch.",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
         "alternatives": [
           {
             "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
@@ -156,7 +162,17 @@
           }
         ]
       },
-      "remark": "First boat away."
+      "remark": {
+        "value": "First boat away.",
+        "source_ids": [
+          "flw-new-study-2026",
+          "wfb-lifeboat-sequence",
+          "halpern-list-trim-2023",
+          "brit-inquiry-report"
+        ],
+        "certainty": "established",
+        "note": "The three modern reconstructions and the 1912 table all put No. 7 first."
+      }
     },
     {
       "id": "5",
@@ -197,12 +213,18 @@
           }
         ]
       },
-      "in_charge": "Third Officer Herbert Pitman",
+      "in_charge": {
+        "value": "Third Officer Herbert Pitman",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
       "occupancy": {
         "persons": 36,
+        "basis": "attributed",
         "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
         "certainty": "estimated",
-        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to the number of survivors, so they are not uniformly counts at launch.",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
         "alternatives": [
           {
             "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
@@ -211,7 +233,12 @@
           }
         ]
       },
-      "remark": "The first distress signal went up while it was being lowered."
+      "remark": {
+        "value": "The first distress signal went up while it was being lowered.",
+        "source_ids": ["wfb-lifeboat-sequence", "flw-new-study-2026", "halpern-dozen-rockets"],
+        "certainty": "estimated",
+        "note": "Wormstedt, Fitch and Behe place the first signal after No. 5 had started down and before No. 3; both times are reconstructions."
+      }
     },
     {
       "id": "3",
@@ -252,12 +279,18 @@
           }
         ]
       },
-      "in_charge": "Able Seaman George Moore",
+      "in_charge": {
+        "value": "Able Seaman George Moore",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
       "occupancy": {
         "persons": 32,
+        "basis": "attributed",
         "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
         "certainty": "estimated",
-        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to the number of survivors, so they are not uniformly counts at launch.",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
         "alternatives": [
           {
             "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
@@ -307,12 +340,18 @@
           }
         ]
       },
-      "in_charge": "Able Seaman Thomas Jones",
+      "in_charge": {
+        "value": "Able Seaman Thomas Jones",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
       "occupancy": {
         "persons": 27,
+        "basis": "attributed",
         "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
         "certainty": "estimated",
-        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to the number of survivors, so they are not uniformly counts at launch.",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
         "alternatives": [
           {
             "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
@@ -321,7 +360,12 @@
           }
         ]
       },
-      "remark": "Told to row for the light seen on the horizon."
+      "remark": {
+        "value": "Told to row for the light seen on the horizon.",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence", "halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Recorded in the project's research notes on the boats, which were compiled from the lifeboat studies and from Halpern's chronology and do not say which of them states it; not checked against the testimony."
+      }
     },
     {
       "id": "1",
@@ -363,12 +407,18 @@
           }
         ]
       },
-      "in_charge": "Lookout George Symons",
+      "in_charge": {
+        "value": "Lookout George Symons",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
       "occupancy": {
         "persons": 12,
+        "basis": "attributed",
         "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
         "certainty": "estimated",
-        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to the number of survivors, so they are not uniformly counts at launch.",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
         "alternatives": [
           {
             "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
@@ -377,7 +427,12 @@
           }
         ]
       },
-      "remark": "Caught on a wire guy while lowering; reached the water about ten minutes later."
+      "remark": {
+        "value": "Caught on a wire guy while lowering; reached the water about ten minutes later.",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence", "halpern-list-trim-2023"],
+        "certainty": "estimated",
+        "note": "As stated by the lifeboat studies and by Halpern; the ten minutes are the difference between the two times of the launch record."
+      }
     },
     {
       "id": "6",
@@ -419,12 +474,18 @@
           }
         ]
       },
-      "in_charge": "Quartermaster Robert Hichens",
+      "in_charge": {
+        "value": "Quartermaster Robert Hichens",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
       "occupancy": {
         "persons": 24,
+        "basis": "attributed",
         "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
         "certainty": "estimated",
-        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to the number of survivors, so they are not uniformly counts at launch.",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
         "alternatives": [
           {
             "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
@@ -433,7 +494,12 @@
           }
         ]
       },
-      "remark": "Halted on the way down while a passenger climbed down the falls to help man it."
+      "remark": {
+        "value": "Halted on the way down while a passenger climbed down the falls to help man it.",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "estimated",
+        "note": "As stated by the lifeboat studies of Wormstedt, Fitch and Behe and of Fitch, Layton and Wormstedt; not checked against the testimony."
+      }
     },
     {
       "id": "16",
@@ -474,12 +540,18 @@
           }
         ]
       },
-      "in_charge": "Master-at-Arms Joseph Bailey",
+      "in_charge": {
+        "value": "Master-at-Arms Joseph Bailey",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
       "occupancy": {
         "persons": 53,
+        "basis": "attributed",
         "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
         "certainty": "estimated",
-        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to the number of survivors, so they are not uniformly counts at launch.",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
         "alternatives": [
           {
             "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
@@ -529,12 +601,18 @@
           }
         ]
       },
-      "in_charge": "Fifth Officer Harold Lowe",
+      "in_charge": {
+        "value": "Fifth Officer Harold Lowe",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
       "occupancy": {
         "persons": 40,
+        "basis": "attributed",
         "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
         "certainty": "estimated",
-        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to the number of survivors, so they are not uniformly counts at launch.",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
         "alternatives": [
           {
             "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
@@ -543,7 +621,12 @@
           }
         ]
       },
-      "remark": "The after falls hung up and the boat dropped the last few feet."
+      "remark": {
+        "value": "The after falls hung up and the boat dropped the last few feet.",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence", "halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Recorded in the project's research notes on the boats, which were compiled from the lifeboat studies and from Halpern's chronology and do not say which of them states it; not checked against the testimony."
+      }
     },
     {
       "id": "12",
@@ -584,12 +667,25 @@
           }
         ]
       },
-      "in_charge": "Able Seaman John Poingdestre",
+      "in_charge": {
+        "value": "Able Seaman John Poingdestre",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "debated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read.",
+        "alternatives": [
+          {
+            "holder": "Wikipedia, \"Lifeboats of the Titanic\"",
+            "position": "Able Seaman Clench at first, then Poingdestre.",
+            "source_ids": ["wikipedia-titanic"]
+          }
+        ]
+      },
       "occupancy": {
         "persons": 41,
+        "basis": "attributed",
         "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
         "certainty": "estimated",
-        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to the number of survivors, so they are not uniformly counts at launch.",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
         "alternatives": [
           {
             "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
@@ -598,7 +694,12 @@
           }
         ]
       },
-      "remark": "Last boat to reach the Carpathia."
+      "remark": {
+        "value": "Last boat to reach the Carpathia.",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Halpern's chronology has No. 12 arrive last, at about 8:15 a.m. by Carpathia's time."
+      }
     },
     {
       "id": "9",
@@ -639,12 +740,18 @@
           }
         ]
       },
-      "in_charge": "Boatswain's Mate Albert Haines",
+      "in_charge": {
+        "value": "Boatswain's Mate Albert Haines",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
       "occupancy": {
         "persons": 40,
+        "basis": "attributed",
         "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
         "certainty": "estimated",
-        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to the number of survivors, so they are not uniformly counts at launch.",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
         "alternatives": [
           {
             "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
@@ -694,12 +801,18 @@
           }
         ]
       },
-      "in_charge": "Able Seaman Sidney Humphreys",
+      "in_charge": {
+        "value": "Able Seaman Sidney Humphreys",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
       "occupancy": {
         "persons": 50,
+        "basis": "attributed",
         "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
         "certainty": "estimated",
-        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to the number of survivors, so they are not uniformly counts at launch.",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
         "alternatives": [
           {
             "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
@@ -708,7 +821,12 @@
           }
         ]
       },
-      "remark": "Loaded from A deck."
+      "remark": {
+        "value": "Loaded from A deck.",
+        "source_ids": ["flw-new-study-2026"],
+        "certainty": "estimated",
+        "note": "From the 2026 chart of Fitch, Layton and Wormstedt, which marks the loading on A deck with a question mark."
+      }
     },
     {
       "id": "13",
@@ -749,12 +867,18 @@
           }
         ]
       },
-      "in_charge": "Leading Fireman Frederick Barrett",
+      "in_charge": {
+        "value": "Leading Fireman Frederick Barrett",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
       "occupancy": {
         "persons": 55,
+        "basis": "attributed",
         "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
         "certainty": "estimated",
-        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to the number of survivors, so they are not uniformly counts at launch.",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
         "alternatives": [
           {
             "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
@@ -763,7 +887,12 @@
           }
         ]
       },
-      "remark": "Loaded from A deck; carried aft by a pump discharge under the descending No. 15."
+      "remark": {
+        "value": "Loaded from A deck; carried aft by a pump discharge under the descending No. 15.",
+        "source_ids": ["flw-new-study-2026", "halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "The loading on A deck is from the 2026 chart of Fitch, Layton and Wormstedt; the pump discharge and the descent of No. 15 are from Halpern's chronology."
+      }
     },
     {
       "id": "15",
@@ -804,12 +933,18 @@
           }
         ]
       },
-      "in_charge": "Fireman Frank Dymond",
+      "in_charge": {
+        "value": "Fireman Frank Dymond",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
       "occupancy": {
         "persons": 66,
+        "basis": "attributed",
         "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
         "certainty": "estimated",
-        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to the number of survivors, so they are not uniformly counts at launch.",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
         "alternatives": [
           {
             "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
@@ -818,7 +953,12 @@
           }
         ]
       },
-      "remark": "Started down about half a minute after No. 13."
+      "remark": {
+        "value": "Started down about half a minute after No. 13.",
+        "source_ids": ["flw-new-study-2026", "halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "From the 2026 study of Fitch, Layton and Wormstedt and from Halpern's chronology."
+      }
     },
     {
       "id": "2",
@@ -859,12 +999,18 @@
           }
         ]
       },
-      "in_charge": "Fourth Officer Joseph Boxhall",
+      "in_charge": {
+        "value": "Fourth Officer Joseph Boxhall",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
       "occupancy": {
         "persons": 18,
+        "basis": "attributed",
         "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
         "certainty": "estimated",
-        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to the number of survivors, so they are not uniformly counts at launch.",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
         "alternatives": [
           {
             "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
@@ -873,7 +1019,12 @@
           }
         ]
       },
-      "remark": "First boat picked up by the Carpathia."
+      "remark": {
+        "value": "First boat picked up by the Carpathia.",
+        "source_ids": ["us-inquiry-testimony", "brit-inquiry-report", "halpern-chronology-2023"],
+        "certainty": "established",
+        "note": "Rostron: \"At 4:10 I got the first boat alongside\" (US Inquiry, Day 1); the boat was No. 2."
+      }
     },
     {
       "id": "10",
@@ -914,12 +1065,18 @@
           }
         ]
       },
-      "in_charge": "Able Seaman Edward Buley",
+      "in_charge": {
+        "value": "Able Seaman Edward Buley",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
       "occupancy": {
         "persons": 57,
+        "basis": "attributed",
         "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
         "certainty": "estimated",
-        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to the number of survivors, so they are not uniformly counts at launch.",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
         "alternatives": [
           {
             "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
@@ -969,12 +1126,18 @@
           }
         ]
       },
-      "in_charge": "Quartermaster Walter Perkis",
+      "in_charge": {
+        "value": "Quartermaster Walter Perkis",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
       "occupancy": {
         "persons": 30,
+        "basis": "attributed",
         "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
         "certainty": "estimated",
-        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to the number of survivors, so they are not uniformly counts at launch.",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
         "alternatives": [
           {
             "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
@@ -983,7 +1146,12 @@
           }
         ]
       },
-      "remark": "Lowered to A deck early in the night and loaded there through the promenade windows."
+      "remark": {
+        "value": "Lowered to A deck early in the night and loaded there through the promenade windows.",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "estimated",
+        "note": "As stated by the lifeboat studies of Wormstedt, Fitch and Behe and of Fitch, Layton and Wormstedt; not checked against the testimony."
+      }
     },
     {
       "id": "c",
@@ -1024,12 +1192,18 @@
           }
         ]
       },
-      "in_charge": "Quartermaster George Rowe",
+      "in_charge": {
+        "value": "Quartermaster George Rowe",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
       "occupancy": {
         "persons": 43,
+        "basis": "attributed",
         "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
         "certainty": "estimated",
-        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to the number of survivors, so they are not uniformly counts at launch.",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
         "alternatives": [
           {
             "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
@@ -1038,7 +1212,12 @@
           }
         ]
       },
-      "remark": "Launched from the davits of boat No. 1."
+      "remark": {
+        "value": "Launched from the davits of boat No. 1.",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "estimated",
+        "note": "As stated by the lifeboat studies of Wormstedt, Fitch and Behe and of Fitch, Layton and Wormstedt; not checked against the testimony."
+      }
     },
     {
       "id": "d",
@@ -1079,12 +1258,18 @@
           }
         ]
       },
-      "in_charge": "Quartermaster Arthur Bright",
+      "in_charge": {
+        "value": "Quartermaster Arthur Bright",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
       "occupancy": {
         "persons": 20,
+        "basis": "attributed",
         "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
         "certainty": "estimated",
-        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to the number of survivors, so they are not uniformly counts at launch.",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
         "alternatives": [
           {
             "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
@@ -1093,7 +1278,12 @@
           }
         ]
       },
-      "remark": "Last boat lowered from the davits, those of boat No. 2; the water was by then only a few metres below the Boat deck."
+      "remark": {
+        "value": "Last boat lowered from the davits, those of boat No. 2; the water was by then only a few metres below the Boat deck.",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "estimated",
+        "note": "As stated by the lifeboat studies; the project's research notes record the water 10 to 15 ft below the port side of the Boat deck."
+      }
     },
     {
       "id": "a",
@@ -1137,11 +1327,17 @@
       "in_charge": null,
       "occupancy": {
         "persons": 13,
+        "basis": "reached-from-water",
         "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
         "certainty": "estimated",
         "note": "Number of people who reached the boat from the water, attributed to Wormstedt and Fitch (2011) through Wikipedia; not counted by the British report."
       },
-      "remark": "Floated off partly swamped as the forward Boat deck went under, while being attached to the falls."
+      "remark": {
+        "value": "Floated off partly swamped as the forward Boat deck went under, while being attached to the falls.",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence", "halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "As stated by the lifeboat studies and by Halpern's chronology; not checked against the testimony."
+      }
     },
     {
       "id": "b",
@@ -1185,11 +1381,22 @@
       "in_charge": null,
       "occupancy": {
         "persons": 28,
+        "basis": "reached-from-water",
         "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
         "certainty": "estimated",
         "note": "Number of people who reached the boat from the water, attributed to Wormstedt and Fitch (2011) through Wikipedia; not counted by the British report."
       },
-      "remark": "Floated off upside down; men stood on its upturned hull through the night."
+      "remark": {
+        "value": "Floated off upside down; men stood on its upturned hull through the night.",
+        "source_ids": [
+          "flw-new-study-2026",
+          "wfb-lifeboat-sequence",
+          "halpern-chronology-2023",
+          "us-inquiry-report"
+        ],
+        "certainty": "estimated",
+        "note": "As stated by the lifeboat studies and by Halpern's chronology; the US report speaks of about thirty men standing on it."
+      }
     }
   ]
 }

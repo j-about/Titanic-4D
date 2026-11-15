@@ -79,8 +79,8 @@
       "saved": 712,
       "lost": 1496,
       "source_ids": ["encyclopedia-titanica-statistics"],
-      "certainty": "established",
-      "note": "1,317 passengers (324 first class, 284 second class, 709 third class) and 891 crew. Established as that source's count, read through an extract of its table."
+      "certainty": "estimated",
+      "note": "1,317 passengers (324 first class, 284 second class, 709 third class) and 891 crew. That source's count, read only through a search-result extract of its table: the site refused direct requests, so the table itself was not opened."
     },
     {
       "id": "board-of-trade-1503",

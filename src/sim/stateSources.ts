@@ -1,4 +1,4 @@
-import type { Provenance } from '../data/provenance.ts';
+import { combineProvenance, type Provenance } from '../data/provenance.ts';
 import type { Alternative, Certainty } from '../data/schema/common.ts';
 import type { Dataset } from '../data/schema/dataset.ts';
 import { formatShipClock, shipTimeToSeconds } from '../time/shipTime.ts';
@@ -15,8 +15,10 @@ export type SourceTopic =
   | 'Distress signals'
   | 'Lighting'
   | 'Break-up'
+  | 'Funnels'
   | 'Events'
-  | 'Surroundings';
+  | 'Surroundings'
+  | 'Sky';
 
 /** One statement about the current state, with the records of the dataset it derives from. */
 export interface SourceEntry {
@@ -37,43 +39,18 @@ const MAX_RECENT_EVENTS = 4;
 /** A distress signal is listed until the next one is due. */
 const RECENT_ROCKET_SECONDS = 360;
 
-const CERTAINTY_WEAKNESS: Readonly<Record<Certainty, number>> = {
-  established: 0,
-  estimated: 1,
-  debated: 2,
-};
-
-/** The least certain of several levels: a statement is no stronger than its weakest record. */
-function weakest(levels: readonly Certainty[]): Certainty {
-  return levels.reduce<Certainty>(
-    (current, level) => (CERTAINTY_WEAKNESS[level] > CERTAINTY_WEAKNESS[current] ? level : current),
-    'established',
-  );
-}
-
 function unique<T>(values: readonly T[]): T[] {
   return [...new Set(values)];
 }
 
+/** A statement and the combined provenance of the records it rests on. */
 function entry(
   id: string,
   topic: SourceTopic,
   statement: string,
   records: readonly Provenance[],
 ): SourceEntry {
-  const alternatives = new Map<string, Alternative>();
-  for (const alternative of records.flatMap((record) => record.alternatives ?? [])) {
-    alternatives.set(`${alternative.holder}|${alternative.position}`, alternative);
-  }
-  return {
-    id,
-    topic,
-    statement,
-    certainty: weakest(records.map((record) => record.certainty)),
-    sourceIds: unique(records.flatMap((record) => record.source_ids)),
-    notes: unique(records.map((record) => record.note)),
-    alternatives: [...alternatives.values()],
-  };
+  return { id, topic, statement, ...combineProvenance(records) };
 }
 
 interface Keyframe extends Provenance {
@@ -254,6 +231,29 @@ function breakupEntries(dataset: Dataset, model: TimelineModel, state: ShipState
   return entries;
 }
 
+/** One entry for each funnel that the scene no longer shows, with the record of its fall. */
+function funnelEntries(dataset: Dataset, state: ShipState): SourceEntry[] {
+  const { ship, breakup } = dataset;
+  const entries: SourceEntry[] = [];
+  ship.funnels.forEach((funnel, index) => {
+    const fall = breakup.funnel_falls.find((candidate) => candidate.funnel_id === funnel.id);
+    if (fall === undefined || state.funnelsStanding[index] !== false) {
+      return;
+    }
+    const seconds = shipTimeToSeconds(fall.ats);
+    const clock = formatShipClock(seconds, { seconds: seconds % 60 !== 0 });
+    entries.push(
+      entry(
+        `funnel-${funnel.id}`,
+        'Funnels',
+        `From ${clock} the scene no longer shows funnel No. ${funnel.id}, counted from forward.`,
+        [fall],
+      ),
+    );
+  });
+  return entries;
+}
+
 function eventEntries(model: TimelineModel, state: ShipState): SourceEntry[] {
   return model.events
     .filter((event) => event.kind !== 'lifeboat' && event.kind !== 'rocket')
@@ -324,6 +324,81 @@ function wreckEntries(dataset: Dataset, state: ShipState): SourceEntry[] {
   return entries;
 }
 
+/** The light of the Californian, listed until the ship has foundered. */
+function californianEntries(
+  dataset: Dataset,
+  model: TimelineModel,
+  state: ShipState,
+): SourceEntry[] {
+  if (state.t >= model.founderingSeconds) {
+    return [];
+  }
+  const find = (id: string) => dataset.site.californian.find((fact) => fact.id === id);
+  const distance = find('californian-distance');
+  const bearing = find('californian-bearing');
+  return distance === undefined || bearing === undefined
+    ? []
+    : [
+        entry('californian-light', 'Surroundings', `${distance.summary} ${bearing.summary}`, [
+          distance,
+          bearing,
+        ]),
+      ];
+}
+
+/**
+ * The computed sky and the haze at the horizon. The sky rests on the adopted clock offset and
+ * on the foundering position as well as on its own records.
+ */
+function skyEntries(dataset: Dataset): SourceEntry[] {
+  const { site, timeReference } = dataset;
+  const find = (id: string) => site.environment.find((fact) => fact.id === id);
+  const sky = find('sky-computation');
+  const moon = find('moon');
+  const haze = find('haze');
+  const place = site.positions.find((position) => position.id === 'wreck-boiler-field');
+  const entries: SourceEntry[] = [];
+  if (sky !== undefined && moon !== undefined && place !== undefined) {
+    entries.push(
+      entry('sky', 'Sky', `${sky.summary} ${moon.summary}`, [
+        sky,
+        moon,
+        timeReference.adopted_offset,
+        place,
+      ]),
+    );
+  }
+  if (haze !== undefined) {
+    entries.push(
+      entry(
+        'haze',
+        'Sky',
+        `${haze.summary} The scene shows a faint band at the horizon, into which the stars fade.`,
+        [haze],
+      ),
+    );
+  }
+  return entries;
+}
+
+const wholeNumber = new Intl.NumberFormat('en-GB', { maximumFractionDigits: 0 });
+
+/** The depth of the seabed, listed once the ship has foundered and the sections are on their way down. */
+function seabedEntries(dataset: Dataset, model: TimelineModel, state: ShipState): SourceEntry[] {
+  const depth = dataset.site.environment.find((fact) => fact.id === 'depth');
+  if (state.t < model.founderingSeconds || depth?.value === undefined) {
+    return [];
+  }
+  return [
+    entry(
+      'seabed',
+      'Surroundings',
+      `The seabed is shown ${wholeNumber.format(depth.value)} m below the surface.`,
+      [depth],
+    ),
+  ];
+}
+
 function surroundingsEntries(dataset: Dataset): SourceEntry[] {
   const { site, timeReference } = dataset;
   const find = (id: string) => site.environment.find((fact) => fact.id === id);
@@ -360,12 +435,16 @@ export function describeSources(
     ...intactEntries,
     ...breakupEntries(dataset, model, state),
     ...wreckEntries(dataset, state),
+    ...funnelEntries(dataset, state),
     ...floodingEntries(dataset, state),
     ...boatEntries(dataset, state),
     ...rocketEntries(dataset, state),
     ...lightingEntries(dataset, state),
     ...eventEntries(model, state),
     ...icebergEntries(dataset, state),
+    ...californianEntries(dataset, model, state),
     ...surroundingsEntries(dataset).slice(1),
+    ...seabedEntries(dataset, model, state),
+    ...skyEntries(dataset),
   ];
 }

@@ -1,13 +1,20 @@
 import { z } from 'zod';
-import { idSchema, provenanceShape, shipTimeSchema } from './common.ts';
+import { idSchema, provenanceShape, shipTimeSchema, timeUncertaintySchema } from './common.ts';
 import { factSchema } from './facts.ts';
 
 export const rocketFiringSchema = z.strictObject({
   id: idSchema,
   ats: shipTimeSchema,
+  uncertainty: timeUncertaintySchema.meta({
+    description: 'Margin on the firing time; the note of the record states where it comes from.',
+  }),
   ...provenanceShape,
 });
 
+/**
+ * A message as entered in a station log. The provenance fields describe the log entry; the ship's
+ * time is a conversion and is never more certain than the adopted clock offset.
+ */
 export const wirelessMessageSchema = z.strictObject({
   id: idSchema,
   logged_time: z.string().regex(/^(?:[01]\d|2[0-3]):[0-5]\d$/),
@@ -16,7 +23,12 @@ export const wirelessMessageSchema = z.strictObject({
       'Clock of the station log (procès-verbal): New York time (GMT − 5 h) or Greenwich Mean Time.',
   }),
   ats: shipTimeSchema.meta({
-    description: "Ship's time obtained from the logged time with the adopted clock offset.",
+    description:
+      "Ship's time obtained from the logged time with the adopted clock offset; it is never more certain than that offset.",
+  }),
+  uncertainty: timeUncertaintySchema.optional().meta({
+    description:
+      'Margin on the logged time, stated in the note; absent when none is recorded. It does not cover the choice of clock offset, whose other values are recorded in time-reference.json.',
   }),
   sender: z.string().min(1),
   summary: z.string().min(1),

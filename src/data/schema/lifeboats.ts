@@ -38,6 +38,12 @@ export const boatTypeSchema = z.strictObject({
   ...provenanceShape,
 });
 
+/** A statement in words about a boat, with its own provenance. */
+export const boatStatementSchema = z.strictObject({
+  value: z.string().min(1),
+  ...provenanceShape,
+});
+
 export const boatSchema = z.strictObject({
   id: boatIdSchema,
   type: boatTypeIdSchema,
@@ -56,12 +62,20 @@ export const boatSchema = z.strictObject({
     reached_water_ats: shipTimeSchema.optional(),
     ...provenanceShape,
   }),
-  in_charge: z.string().min(1).nullable(),
+  in_charge: boatStatementSchema.nullable().meta({
+    description: 'Rank and name of the person in charge in the boat; null when nobody was.',
+  }),
   occupancy: z.strictObject({
     persons: z.number().int().min(0).nullable(),
+    basis: z.enum(['attributed', 'reached-from-water']).meta({
+      description:
+        'attributed: people attributed to the boat by the source, not uniformly a count at launch; reached-from-water: people who reached the boat from the water after it floated off.',
+    }),
     ...provenanceShape,
   }),
-  remark: z.string().min(1).nullable(),
+  remark: boatStatementSchema.nullable().meta({
+    description: 'A circumstance of the launch, as one sentence; null when none is recorded.',
+  }),
 });
 
 export const lifeboatsFileSchema = z.strictObject({

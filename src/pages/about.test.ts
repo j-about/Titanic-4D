@@ -62,4 +62,34 @@ describe('About page', () => {
   it('states the number of sources of the dataset', () => {
     expect(textOf(page)).toContain(`draws on ${dataset.sources.sources.length} sources`);
   });
+
+  it('gives the number of people who died as the range of the counts of the dataset', () => {
+    expect(textOf(page)).toContain(
+      'Between 1,490 and 1,517 people died that night, depending on the source. The count of each source is given in "The night in words".',
+    );
+    expect(page.markup).toContain('<a href="/narrative/#lives-lost">The count of each source</a>');
+  });
+
+  it('states no count of lives that the dataset does not hold', () => {
+    const recorded = new Set(
+      dataset.people.casualty_counts.map((count) =>
+        new Intl.NumberFormat('en-GB').format(count.lost),
+      ),
+    );
+    const figures = textOf(page).match(/\d{1,3}(?:,\d{3})+/g) ?? [];
+    expect(figures.length).toBeGreaterThan(0);
+    for (const figure of figures) {
+      expect(recorded.has(figure), figure).toBe(true);
+    }
+  });
+
+  it('says where each kind of competing position is shown', () => {
+    const text = textOf(page);
+    expect(text).toContain(
+      'the counts of lives lost are given source by source in "The night in words"',
+    );
+    expect(text).toContain(
+      'the distance of the SS Californian, like the times of the boats, in the "Sources" tab of the reconstruction as well',
+    );
+  });
 });

@@ -24,8 +24,8 @@
       "latitude_deg": 41.7325,
       "longitude_deg": -49.9469,
       "source_ids": ["britannica-titanic"],
-      "certainty": "established",
-      "note": "41°43′57″N, 49°56′49″W, as given by Britannica."
+      "certainty": "estimated",
+      "note": "41°43′57″N, 49°56′49″W, a commonly quoted figure. Britannica's page refused direct requests: the figure was read only in search-result extracts and was not verified on a page opened by the project. Its longitude is that of the boiler field."
     },
     {
       "id": "wreck-boiler-field",
@@ -188,9 +188,14 @@
       "summary": "About 3,800 m (12,500 ft).",
       "value": 3800,
       "unit": "m",
-      "source_ids": ["bbc-2023-scan", "press-2025-digital-resurrection", "britannica-titanic"],
-      "certainty": "established",
-      "note": "Britannica gives 3,810 m; a figure of 3,795 m is also quoted."
+      "source_ids": [
+        "bbc-2023-scan",
+        "press-2025-digital-resurrection",
+        "britannica-titanic",
+        "wikipedia-titanic"
+      ],
+      "certainty": "estimated",
+      "note": "Round figure given by the BBC. Britannica's 3,810 m was read only in a search-result extract; Wikipedia quotes 3,795 m. The depths of the two sections were not found separately in the sources read."
     },
     {
       "id": "sky-computation",
@@ -284,12 +289,30 @@
     {
       "id": "californian-bearing",
       "title": "Bearing from Titanic",
-      "summary": "About north-north-west of the true position of Titanic.",
+      "summary": "The scene places the light about north-west by north of Titanic, 326° true.",
       "value": 326,
       "unit": "deg",
-      "source_ids": ["halpern-dozen-rockets", "maib-1992-reappraisal", "project-derivation"],
+      "source_ids": [
+        "maib-1992-reappraisal",
+        "halpern-dozen-rockets",
+        "brit-inquiry-report",
+        "us-inquiry-report",
+        "project-derivation"
+      ],
       "certainty": "debated",
-      "note": "Halpern: about 315° true; MAIB (de Coverly): about north-west by north. The reported position of the Californian bears 341° true from the boiler field by the project's great-circle computation."
+      "note": "MAIB (de Coverly): about north-west by north, taken by the project as 326° true. The other bearings recorded are listed as alternatives.",
+      "alternatives": [
+        {
+          "holder": "Samuel Halpern",
+          "position": "About 315° true.",
+          "source_ids": ["halpern-dozen-rockets"]
+        },
+        {
+          "holder": "Position reported by the Californian's master",
+          "position": "341° true from the boiler field, by the project's great-circle computation from that position.",
+          "source_ids": ["brit-inquiry-report", "us-inquiry-report", "project-derivation"]
+        }
+      ]
     },
     {
       "id": "mystery-ship",

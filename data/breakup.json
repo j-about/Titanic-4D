@@ -326,7 +326,7 @@
       },
       {
         "ats": "1912-04-15T02:22",
-        "pitch_deg": 50,
+        "pitch_deg": -20,
         "heel_deg": 0,
         "yaw_deg": 60,
         "forward_m": -10,
@@ -334,11 +334,11 @@
         "up_m": -1150,
         "source_ids": ["mengot-wreck-site", "wikipedia-titanic", "project-derivation"],
         "certainty": "estimated",
-        "note": "Near-vertical fall, probably rotating. Speed assumed equal to the published five to six minutes for the whole descent."
+        "note": "Near-vertical fall, probably rotating (Mengot). Speed assumed equal to the published five to six minutes for the whole descent. No source gives the attitude during the fall: the project shows the section pitched 20° with the after end down, so that it arrives rudder first as Mengot describes."
       },
       {
         "ats": "1912-04-15T02:24",
-        "pitch_deg": 50,
+        "pitch_deg": -20,
         "heel_deg": 0,
         "yaw_deg": 130,
         "forward_m": 20,
@@ -346,11 +346,11 @@
         "up_m": -2500,
         "source_ids": ["mengot-wreck-site", "wikipedia-titanic", "project-derivation"],
         "certainty": "estimated",
-        "note": "Descent, computed as above."
+        "note": "Descent, computed as above, in the attitude chosen by the project."
       },
       {
         "ats": "1912-04-15T02:25:50",
-        "pitch_deg": 10,
+        "pitch_deg": -10,
         "heel_deg": 0,
         "yaw_deg": 175,
         "forward_m": 38,
@@ -358,7 +358,7 @@
         "up_m": -3700,
         "source_ids": ["mengot-wreck-site", "project-derivation"],
         "certainty": "estimated",
-        "note": "Approach to the seabed."
+        "note": "Approach to the seabed with the after end lower, so that the rudder strikes first (Mengot). The angle is the project's choice."
       },
       {
         "ats": "1912-04-15T02:26",
