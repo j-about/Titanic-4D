@@ -12,6 +12,7 @@ code, comments, commits and documentation are in English only.
 4. `docs/DECISIONS.md` — architecture decision records (ADR).
 5. `docs/SKY.md` — how the sky, the sea and the night lighting are computed and tested.
 6. `docs/DEPLOY.md` — deployment procedure, verification and going back.
+7. `docs/ASSETS.md` — the pipeline that builds the detailed model of the ship.
 
 Update STATUS.md at the end of every task. A change of behaviour updates the affected
 documentation in the same commit series.
@@ -29,6 +30,8 @@ documentation in the same commit series.
 | Build and precompress             | `pnpm build`                                 |
 | Performance budgets (after build) | `pnpm budgets`                               |
 | All of the above                  | `pnpm check`                                 |
+| Rebuild the model of the ship     | `pnpm assets:build`                          |
+| Test the asset pipeline           | `pnpm assets:test`                           |
 | End-to-end tests (pinned image)   | `pnpm test:e2e:container`                    |
 | Verify a running container        | `node tools/verify-server.ts --origin <url>` |
 | Verify the deployed site          | `node tools/verify-server.ts --live`         |
@@ -55,7 +58,8 @@ Run `pnpm check` and the end-to-end suite before every commit.
 | `src/time/`                             | Ship's time conversions and formatting                                  |
 | `src/config/`                           | Typed configuration (site identity, later support links and legal data) |
 | `src/styles/`                           | Design tokens, base styles and layout                                   |
-| `public/`                               | Files served unchanged, including `.well-known/security.txt`            |
+| `public/`                               | Files served unchanged: `.well-known/security.txt`, `models/` (built)   |
+| `assets/`                               | Asset pipeline: Python project run by uv, Blender, glTF-Transform       |
 | `tools/`                                | Build and verification scripts, run by Node.js as TypeScript            |
 | `tests/e2e/`                            | Playwright tests (accessibility, behaviour, visual regression)          |
 | `docs/`                                 | Plan, status, decisions, data, sky and accessibility documentation      |
@@ -76,7 +80,9 @@ Run `pnpm check` and the end-to-end suite before every commit.
   across files are guarded by `tools/consistency.test.ts`.
 - For every dependency hosted on GitHub, consult both Context7 and DeepWiki before implementing
   a task that uses it (at most three searches per item).
-- Python (asset pipeline): use uv, ruff and ty through the `/astral:*` skills.
+- Python (asset pipeline, `assets/`): use uv, ruff and ty through the `/astral:*` skills.
+  `public/models/ship-lod1.glb` is built by `pnpm assets:build`, never edited by hand; CI
+  rebuilds it and fails when the committed file differs. See `docs/ASSETS.md`.
 - Historical data: never invent a fact, time or figure. Every record carries `source_ids`,
   `certainty` (`established`, `estimated`, `debated`) and `note`. Data keys are snake_case.
 - The state of the scene is a pure function of `t` (seconds since the collision). Nothing in

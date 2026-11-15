@@ -12,7 +12,7 @@ Milestones and acceptance criteria are defined in [PLAN.md](PLAN.md).
 | M2 — LOD0 scene and complete timeline             | Done                                |
 | M3 — Ocean, exact sky, lighting                   | Done                                |
 | M4 — Flooding, boats, rockets, break-up, wreck    | Done                                |
-| M5 — LOD1/LOD2, post-processing, quality settings | In progress                         |
+| M5 — LOD1/LOD2, post-processing, quality settings | Done                                |
 | M6 — Accessibility, UX, support, legal notice     | Done                                |
 | M7 — Deployment                                   | Artefacts ready; deployment not run |
 
@@ -226,6 +226,63 @@ both sections of the wreck:
   in the 3D view (M5); the hull parts along clean planes (M5).
 - Both backends give visually identical images.
 
+## M5 — Detailed model, post-processing, levels of detail (done, 2026-11-15)
+
+Completed after M6 (see ADR 0011 and ADR 0012).
+
+Delivered:
+
+- **Asset pipeline** (`assets/`, `docs/ASSETS.md`): Python project run by uv; offsets exported
+  from the application's own hull form; geometry in NumPy; assembly and glTF export in headless
+  Blender; Meshopt compression and validation with glTF-Transform and the Khronos validator.
+  One command, `pnpm assets:build`, rebuilds `public/models/ship-lod1.glb`.
+- **Detailed model**: smooth hull on the same analytic form, paint bands, decks, upper works
+  with recessed windows, bridge, deckhouses, funnels with rims and pipes, masts with the crow's
+  nest, davits, rudder and propellers; the same parts and frame as the generated model.
+- **In the application**: the detailed model replaces the generated one once loaded, at the
+  medium and high levels; the generated model remains the start-up and fallback model.
+- **Post-processing**: bloom on what is brighter than scene white.
+- **Levels of detail**: "Detail" control in the view toolbar and `quality=` in the address.
+- **Gamepad**: standard mapping, for every camera that can be steered.
+- **Windows of the upper works** now lit: 914 lamps instead of 716.
+- **CI**: `assets` job (lint, types, tests, rebuild, comparison with the committed model);
+  first-frame time and transfer budget under an emulated 50 Mb/s connection.
+
+Verified:
+
+| Check                                                                   | Command                                                             | Result                                                                                    |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Type checking, lint, dataset, build                                     | `pnpm check`                                                        | Pass                                                                                      |
+| Unit tests                                                              | `pnpm test`                                                         | 316 of 316 pass                                                                           |
+| Pipeline lint, format, types                                            | `uv run ruff check`, `ruff format --check`, `ty check` in `assets/` | Pass, no finding                                                                          |
+| Pipeline tests                                                          | `pnpm assets:test`                                                  | 26 of 26 pass                                                                             |
+| Reproducible build                                                      | `pnpm assets:build` twice                                           | Same SHA-256 (`781b3edc…9392`); 3.3 s                                                     |
+| Model budgets                                                           | pipeline tests                                                      | 94,204 triangles of 250,000; 452 kB of 1.5 MB (125 kB with Brotli); 39 draw calls of 60   |
+| Model against the hull form and the lamps                               | pipeline tests                                                      | Plating within 3.8 cm of the form; every lamp on the plating or in front of a window pane |
+| glTF validity                                                           | Khronos validator in the build                                      | 0 errors, 0 warnings                                                                      |
+| Budgets                                                                 | `pnpm budgets`                                                      | JavaScript 348 kB of 400 kB, CSS 3.7 kB, HTML 1.4 kB (gzip)                               |
+| End-to-end, WebGL 2 and WebGPU                                          | Playwright in the official image                                    | 117 pass, 1 skipped by design (timing on the test-only WebGPU presenter)                  |
+| Detailed model drawn; generated model kept when the file is unavailable | `tests/e2e/scene.spec.ts`                                           | Pass on both backends                                                                     |
+| Whole suite under the production CSP                                    | suite run against the Caddy container                               | 117 pass, same baselines; WebAssembly decoding allowed, nothing else                      |
+| Container image                                                         | `node tools/verify-server.ts`                                       | 144 of 144                                                                                |
+| First frame at 50 Mb/s, cache empty                                     | `tests/e2e/performance.spec.ts`                                     | 2.6 s at 1280 × 720; 3.4 to 3.8 s at 1920 × 1080, on a software rasteriser                |
+
+Visual review of the six re-recorded baselines (12 images) and of close-ups at 12:45 a.m.,
+1:40 a.m. and on the seabed, against the renders of the pipeline and the description of the
+ship:
+
+- Agrees: smooth hull with the sheer line; rows of lit windows on B deck and the promenade
+  above the rows of ports; soft glow around the lights; davits, deckhouses and bridge readable;
+  the lamps sit on the plating and in the window openings; fallen foremast and stern gear on
+  the seabed. Both backends give visually identical images.
+- Differs, and is left as a known limit: the wrecked stern is intact plating; no debris field;
+  no rigging or railings; the hull parts along clean planes; the upper works are lit more evenly
+  than lamps would light them; no cut-away view of the water inside the hull in 3D (the diagram
+  of the "Now" tab shows it).
+
+Not verified here: the `assets` job has not yet run on GitHub at the time of writing; frame rate
+on real graphics hardware (the software rasteriser of this environment is not representative).
+
 ## M6 — Accessibility, UX, support, legal notice (done, 2026-11-15)
 
 Carried out before the end of M5 (see ADR 0011).
@@ -295,7 +352,7 @@ live verification and of the end-to-end suite against the canonical URL, recorde
 
 - Context7 and DeepWiki MCP servers: both available and consulted for Vite, Biome, Vitest,
   Playwright, Caddy, TypeScript, Zod, three.js and Astronomy Engine.
-- Astral skills (`uv`, `ty`, `ruff`): available; they apply from M5 (Python pipeline).
+- Astral skills (`uv`, `ty`, `ruff`): available and used for the asset pipeline (M5).
 - Dokploy MCP server: not available in the session that produced M0. M7 must be run from a
   session that has it.
 

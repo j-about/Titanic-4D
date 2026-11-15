@@ -348,3 +348,48 @@ project, with no third-party script and an unchanged content security policy.
 **Consequences.** Four documents are built instead of one; the application chunk is unchanged.
 `tools/verify-server.ts` checks the pages, the Legal Notice values, the payment links, the site
 map and `security.txt` on the running server (144 checks).
+
+## ADR 0012 — Detailed model, post-processing and levels of detail
+
+**Status:** accepted (2026-11-15)
+
+**Context.** M5 replaces the generated ship by a detailed model, adds post-processing and gives
+the user a choice of detail, without giving up determinism, the generated model as a fallback,
+or the strictness of the content security policy more than necessary.
+
+**Decision.**
+
+- **Pipeline.** `assets/` is a Python project run by uv. It reads only a table of offsets that
+  `tools/export-hull-offsets.ts` exports from the dataset and from the same analytic hull form
+  as the application, builds the geometry with NumPy, assembles and exports it with Blender
+  (`bpy`) and compresses it with glTF-Transform (Meshopt, quantised normals). The output,
+  `public/models/ship-lod1.glb`, is committed; the build is byte-for-byte reproducible and a CI
+  job rebuilds it and fails when the committed file differs. What comes from the dataset and
+  what is a modelling value is listed in `docs/ASSETS.md`.
+- **Same parts, same frame.** The model has the parts of the generated one (three sections,
+  funnels, masts, wrecked stern) under the same names and in the same coordinates, so the scene
+  swaps one for the other (`src/render/detailedShip.ts`, `ShipObject.useDetailedModel`). The
+  scene starts with the generated model and replaces it when the file has loaded; if loading
+  fails, the generated model stays. The lamps are still computed by the application.
+- **No texture.** Materials only: a deck texture would need a Basis transcoder in the browser
+  for little gain at night.
+- **Content security policy.** The Meshopt decoder is WebAssembly and has no JavaScript
+  fallback, so `script-src` gains `'wasm-unsafe-eval'`, which allows compiling WebAssembly and
+  nothing else: no `eval`, no inline or remote script. This amends ADR 0005.
+- **Levels of detail.** `low`: generated model, analytic waves, quarter-resolution reflection,
+  no bloom, pixel ratio 1. `medium` (default): detailed model, FFT waves, half-resolution
+  reflection, bloom, pixel ratio up to 1.5. `high`: as medium with a full-resolution reflection
+  and a pixel ratio up to 2. The level is chosen in the view toolbar ("Detail") or with
+  `quality=` in the address; changing it restarts the scene on a fresh canvas.
+- **Bloom.** Only what is brighter than scene white glows: lamps, stars, distress signals.
+- **Gamepad.** A gamepad with the standard mapping drives the camera
+  (`src/render/camera/gamepad.ts`); the Permissions-Policy already allowed it for the site.
+- **Windows of the upper works.** The rows of lamps of B deck and of the enclosed promenade
+  produced no lamp, because they were looked up on the hull form above the top of its plating.
+  They are now placed on the wall that carries the ship's side upward, where the detailed model
+  has its windows.
+
+**Consequences.** The initial JavaScript is 348 kB gzip of the 400 kB budget; the model adds a
+0.45 MB file (0.13 MB with Brotli) fetched after the first frame. Tests wait for the model
+through `data-assets` and `data-ship-model` on the canvas, and one of them checks that the
+detailed model is the one drawn under the production policy.

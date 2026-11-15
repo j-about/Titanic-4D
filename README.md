@@ -24,6 +24,8 @@ milestones in [docs/PLAN.md](docs/PLAN.md) and the architectural decisions in
   3D view: drag or arrow keys to turn, wheel, pinch or plus and minus to zoom, Space to play or
   pause, comma and full stop to step by one minute; in the free camera, W, A, S, D, Q and E to
   move.
+- **Gamepad.** With a standard gamepad, the right stick turns the view, the triggers zoom, and
+  the left stick and the bumpers move the free camera.
 - **Description.** The "Now" tab states the instant in words and figures and draws the water in
   each watertight compartment, with the same values as a table; "Sources" lists the
   records behind it with their level of certainty and the competing positions, and "Narrative"
@@ -33,7 +35,9 @@ milestones in [docs/PLAN.md](docs/PLAN.md) and the architectural decisions in
   plain HTML: they need neither JavaScript nor a graphics card.
 - **Links.** The address carries the instant, the view and the speed, for example
   `?t=01:40&camera=orbit&rate=60` (ship's time on a 24-hour clock). `quality=low`, `medium`
-  (the default) or `high` sets the level of detail of the sea and of its reflections.
+  (the default) or `high` sets the level of detail, also offered as "Detail" in the view
+  toolbar: the sea and its reflections, the glow of the lights, and the detailed model of the
+  ship, which the low level replaces by one generated from the dataset.
   `renderer=webgl2` selects the WebGL 2 backend; `renderer=webgpu-readback` is a test mode
   described in [docs/DECISIONS.md](docs/DECISIONS.md).
 
@@ -104,6 +108,18 @@ precompressed files, security headers and the redirect of the secondary hosts
 (`titanic-4d.org`, `www.titanic-4d.com`, `titanic-4d.com`) to the canonical origin. The last
 command runs the end-to-end suite against the running image, under its content security
 policy.
+
+## Model of the ship
+
+The detailed model, `public/models/ship-lod1.glb`, is built from the dataset by a headless
+Blender pipeline in [`assets/`](assets/), documented in [docs/ASSETS.md](docs/ASSETS.md):
+
+```bash
+pnpm assets:build
+```
+
+It needs [uv](https://docs.astral.sh/uv/); the build is reproducible and CI checks that the
+committed file is the one the pipeline produces.
 
 ## Deployment
 
