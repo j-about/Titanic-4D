@@ -36,6 +36,12 @@ export interface LampInstance {
 
 export interface Lod0Model {
   readonly sections: Readonly<Record<SectionId, MeshData>>;
+  /**
+   * The after section as it lies on the seabed: the hull without the upper works, whose decks
+   * collapsed on one another (record `stern-condition` of `data/site.json`). A massing, not a
+   * survey of the wreck.
+   */
+  readonly sternWreck: MeshData;
   readonly funnels: readonly {
     readonly id: number;
     readonly section: SectionId;
@@ -603,7 +609,7 @@ export function buildLod0Model(ship: ShipFile, bowEndX: number, sternStartX: num
   const hullEnd = ranges.at(-1)?.xEnd ?? form.lengthBetweenPerpendiculars;
   const blocks = superstructureBlocks(ship, form);
 
-  const buildSection = (range: SectionRange): MeshData => {
+  const buildSection = (range: SectionRange, upperWorks = true): MeshData => {
     const builder = createMeshBuilder();
     addHullShell(builder, form, ship, range, hullStart, hullEnd);
     if (range.xStart > hullStart + 1) {
@@ -612,20 +618,22 @@ export function buildLod0Model(ship: ShipFile, bowEndX: number, sternStartX: num
     if (range.xEnd < hullEnd - 1) {
       addSectionCap(builder, form, range.xEnd, true);
     }
-    for (const block of blocks) {
+    for (const block of upperWorks ? blocks : []) {
       addClippedBlock(builder, range, block);
     }
     return builder.build();
   };
+  const sternRange = ranges[2] ?? { id: 'stern', xStart: sternStartX, xEnd: hullEnd };
 
   const sections = {
     bow: buildSection(ranges[0] ?? { id: 'bow', xStart: hullStart, xEnd: bowEndX }),
     middle: buildSection(ranges[1] ?? { id: 'middle', xStart: bowEndX, xEnd: sternStartX }),
-    stern: buildSection(ranges[2] ?? { id: 'stern', xStart: sternStartX, xEnd: hullEnd }),
+    stern: buildSection(sternRange),
   };
 
   return {
     sections,
+    sternWreck: buildSection(sternRange, false),
     funnels: ship.funnels.map((funnel) => ({
       id: funnel.id,
       section: sectionOf(ranges, funnel.x_m),

@@ -88,7 +88,7 @@ const timelinePanel = createTimelinePanel(model, {
 });
 requireElement('timeline-root').replaceChildren(timelinePanel.element);
 
-const nowPanel = createNowPanel(model, seek);
+const nowPanel = createNowPanel(dataset, model, seek);
 const sourcesPanel = createSourcesPanel(dataset, model);
 const narrativePanel = createNarrativePanel(model, seek);
 const tabs = createTabs<PanelTab>(
@@ -267,6 +267,7 @@ const frame = (nowMs: number): void => {
         state: renderedState,
         cameraMode: current.cameraMode,
         deltaSeconds: elapsedSeconds,
+        timeScale: current.playing ? current.rate : 1,
         reducedMotion: current.reducedMotion,
       })
       .then(() => {

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { dataset } from '../../data/dataset.ts';
+import { ROCKET_ASCENT_SECONDS, ROCKET_BURST_HEIGHT_M } from '../../sim/rocketAppearance.ts';
+import { bodyPointToScene } from '../../sim/sceneFrame.ts';
 import { createTimelineModel } from '../../sim/timelineModel.ts';
 import {
   adjustLook,
@@ -118,6 +120,23 @@ describe('guided camera', () => {
     expect(
       guidedCameraPose(model.evaluate(model.endSeconds), bounds, seabed, false).position[1],
     ).toBeLessThan(-3600);
+  });
+
+  it('keeps the burst of every distress signal in frame', () => {
+    const halfFieldOfViewDeg = 21;
+    for (const firing of model.rocketFirings) {
+      const state = model.evaluate(firing.seconds + ROCKET_ASCENT_SECONDS + 1);
+      const pose = guidedCameraPose(state, bounds, seabed, false);
+      const bridge = bodyPointToScene(state.bow, { x: 59, y: 13.6, z: 29.4 });
+      const burst = [bridge[0], bridge[1] + ROCKET_BURST_HEIGHT_M, bridge[2]];
+      const view = pose.target.map((value, axis) => value - (pose.position[axis] ?? 0));
+      const toBurst = burst.map((value, axis) => value - (pose.position[axis] ?? 0));
+      const cosine =
+        view.reduce((sum, value, axis) => sum + value * (toBurst[axis] ?? 0), 0) /
+        (Math.hypot(...view) * Math.hypot(...toBurst));
+      const angleDeg = (Math.acos(cosine) * 180) / Math.PI;
+      expect(angleDeg, `signal at ${firing.seconds}`).toBeLessThan(halfFieldOfViewDeg * 0.9);
+    }
   });
 
   it('holds still within a shot when motion is reduced', () => {

@@ -195,19 +195,23 @@ export function freeCameraPose(parameters: FreeParameters): CameraPose {
  * Shots of the guided camera: orbit parameters at chosen times after the collision. They are a
  * matter of presentation, not of history, and are interpolated smoothly between the entries.
  */
-const GUIDED_SHOTS: readonly (OrbitParameters & { readonly seconds: number })[] = [
-  { seconds: 0, azimuthDeg: 38, elevationDeg: 9, distanceM: 430 },
-  { seconds: 1200, azimuthDeg: 62, elevationDeg: 8, distanceM: 340 },
-  { seconds: 3600, azimuthDeg: 108, elevationDeg: 13, distanceM: 300 },
-  { seconds: 4080, azimuthDeg: 124, elevationDeg: 6, distanceM: 400 },
-  { seconds: 6000, azimuthDeg: 205, elevationDeg: 12, distanceM: 360 },
-  { seconds: 7800, azimuthDeg: 298, elevationDeg: 9, distanceM: 330 },
-  { seconds: 8700, azimuthDeg: 332, elevationDeg: 7, distanceM: 300 },
-  { seconds: 9300, azimuthDeg: 378, elevationDeg: 9, distanceM: 380 },
-  { seconds: 9420, azimuthDeg: 418, elevationDeg: 10, distanceM: 440 },
-  { seconds: 9600, azimuthDeg: 440, elevationDeg: 12, distanceM: 480 },
-  { seconds: 9660, azimuthDeg: 425, elevationDeg: 14, distanceM: 300 },
-  { seconds: 9960, azimuthDeg: 400, elevationDeg: 18, distanceM: 240 },
+const GUIDED_SHOTS: readonly (OrbitParameters & {
+  readonly seconds: number;
+  /** Height by which the view is raised above the ship, to keep the distress signals in frame. */
+  readonly liftM: number;
+})[] = [
+  { seconds: 0, azimuthDeg: 38, elevationDeg: 9, distanceM: 430, liftM: 0 },
+  { seconds: 1200, azimuthDeg: 62, elevationDeg: 8, distanceM: 340, liftM: 0 },
+  { seconds: 3600, azimuthDeg: 108, elevationDeg: 13, distanceM: 300, liftM: 0 },
+  { seconds: 4020, azimuthDeg: 124, elevationDeg: 5, distanceM: 520, liftM: 62 },
+  { seconds: 6000, azimuthDeg: 205, elevationDeg: 8, distanceM: 500, liftM: 62 },
+  { seconds: 7980, azimuthDeg: 298, elevationDeg: 7, distanceM: 480, liftM: 62 },
+  { seconds: 8700, azimuthDeg: 332, elevationDeg: 7, distanceM: 300, liftM: 0 },
+  { seconds: 9300, azimuthDeg: 378, elevationDeg: 9, distanceM: 380, liftM: 0 },
+  { seconds: 9420, azimuthDeg: 418, elevationDeg: 10, distanceM: 440, liftM: 0 },
+  { seconds: 9600, azimuthDeg: 440, elevationDeg: 12, distanceM: 480, liftM: 0 },
+  { seconds: 9660, azimuthDeg: 425, elevationDeg: 14, distanceM: 300, liftM: 0 },
+  { seconds: 9960, azimuthDeg: 400, elevationDeg: 18, distanceM: 240, liftM: 0 },
 ];
 
 const shotTimes = GUIDED_SHOTS.map((shot) => shot.seconds);
@@ -222,6 +226,10 @@ const guidedElevation = createMonotoneCurve(
 const guidedDistance = createMonotoneCurve(
   shotTimes,
   GUIDED_SHOTS.map((shot) => shot.distanceM),
+);
+const guidedLift = createMonotoneCurve(
+  shotTimes,
+  GUIDED_SHOTS.map((shot) => shot.liftM),
 );
 const stepToShotStart = createLinearCurve(shotTimes, shotTimes);
 
@@ -271,7 +279,7 @@ export function guidedCameraPose(
     bounds.founderingSeconds + DESCENT_BLEND_SECONDS,
     state.t,
   );
-  const surfaceHeight = Math.max(focus[1], MIN_SURFACE_FOCUS_HEIGHT_M);
+  const surfaceHeight = Math.max(focus[1], MIN_SURFACE_FOCUS_HEIGHT_M) + guidedLift(shotTime);
   const target: SceneVector = [
     focus[0],
     surfaceHeight + (focus[1] - surfaceHeight) * submerging,

@@ -13,6 +13,8 @@ import {
 } from 'three/webgpu';
 import type { Dataset } from '../data/schema/dataset.ts';
 import { buildLod0Model, type LampInstance, type SectionId } from '../ship/lod0.ts';
+import { factValue } from '../ship/particulars.ts';
+import { deckHeightAt } from '../ship/sheer.ts';
 import type { Pose } from '../sim/pose.ts';
 import { poseToMatrix } from '../sim/sceneFrame.ts';
 import type { ShipState } from '../sim/timelineModel.ts';
@@ -43,6 +45,9 @@ const GLOW_OUTBOARD_M = 9;
 const GLOW_HEIGHT_M = 23;
 const GLOW_INTENSITY_CD = 650;
 const GLOW_REACH_M = 140;
+/** Where the fallen foremast rests: height above the Boat deck and distance to port of the centre line, as a fraction of the breadth. */
+const FALLEN_MAST_REST_HEIGHT_M = 1.5;
+const FALLEN_MAST_PORT_RATIO = 0.3;
 
 function applyPose(group: Group, pose: Pose): void {
   group.matrix.fromArray(poseToMatrix(pose));
@@ -76,6 +81,36 @@ function createLamps(
   return mesh;
 }
 
+/**
+ * Transform that lays the foremast down from its step, aft and to port, so that it rests across
+ * the port side of the bridge (record `foremast-condition` of `data/site.json`). It is expressed
+ * in the frame of the forward section, whose axes are X forward, Y up and Z to starboard.
+ */
+function fallenForemastMatrix(dataset: Dataset): Matrix4 {
+  const { ship } = dataset;
+  const mast = ship.masts.find((candidate) => candidate.id === 'foremast');
+  const bridge = ship.zones.find((zone) => zone.id === 'navigating-bridge');
+  if (mast === undefined || bridge === undefined) {
+    throw new RangeError('The dataset has no foremast or no navigating bridge.');
+  }
+  const rake = (mast.rake_deg * Math.PI) / 180;
+  const step = new Vector3(-mast.x_m, mast.base_above_keel_m, 0);
+  const upright = new Vector3(-Math.sin(rake), Math.cos(rake), 0);
+  const restingPoint = new Vector3(
+    -bridge.x_start_m,
+    deckHeightAt(ship, 'boat', bridge.x_start_m) + FALLEN_MAST_REST_HEIGHT_M,
+    -factValue(ship.particulars, 'breadth') * FALLEN_MAST_PORT_RATIO,
+  );
+  const lying = restingPoint.sub(step).normalize();
+  const rotation = new Matrix4().makeRotationFromQuaternion(
+    new Quaternion().setFromUnitVectors(upright, lying),
+  );
+  return new Matrix4()
+    .makeTranslation(step.x, step.y, step.z)
+    .multiply(rotation)
+    .multiply(new Matrix4().makeTranslation(-step.x, -step.y, -step.z));
+}
+
 /** Creates the level-of-detail 0 ship: three hull parts, four funnels, two masts and the lamps. */
 export function createShipObject(dataset: Dataset): ShipObject {
   const { ship, breakup } = dataset;
@@ -103,20 +138,29 @@ export function createShipObject(dataset: Dataset): ShipObject {
   };
   const disposables: { dispose(): void }[] = [paint, lampMaterial, lampGeometry];
 
+  const hulls = {} as Record<SectionId, Mesh>;
+  const lampMeshes: Partial<Record<SectionId, InstancedMesh>> = {};
   for (const id of ['bow', 'middle', 'stern'] as const) {
     const group = groups[id];
     group.matrixAutoUpdate = false;
     const geometry = geometryFromMeshData(model.sections[id]);
     disposables.push(geometry);
-    group.add(new Mesh(geometry, paint));
+    hulls[id] = new Mesh(geometry, paint);
+    group.add(hulls[id]);
     const lamps = model.lamps.filter((lamp) => lamp.section === id);
     if (lamps.length > 0) {
       const lampMesh = createLamps(lamps, lampMaterial, lampGeometry);
       disposables.push(lampMesh);
+      lampMeshes[id] = lampMesh;
       group.add(lampMesh);
     }
     root.add(group);
   }
+  const sternWreckGeometry = geometryFromMeshData(model.sternWreck);
+  disposables.push(sternWreckGeometry);
+  const sternWreck = new Mesh(sternWreckGeometry, paint);
+  sternWreck.visible = false;
+  groups.stern.add(sternWreck);
 
   const funnels = model.funnels.map((funnel) => {
     const geometry = geometryFromMeshData(funnel.mesh);
@@ -125,11 +169,19 @@ export function createShipObject(dataset: Dataset): ShipObject {
     groups[funnel.section].add(mesh);
     return mesh;
   });
+  const masts = new Map<string, Mesh>();
   for (const mast of model.masts) {
     const geometry = geometryFromMeshData(mast.mesh);
     disposables.push(geometry);
-    groups[mast.section].add(new Mesh(geometry, paint));
+    const mesh = new Mesh(geometry, paint);
+    mesh.matrixAutoUpdate = false;
+    masts.set(mast.id, mesh);
+    groups[mast.section].add(mesh);
   }
+  const foremast = masts.get('foremast');
+  const mainmast = masts.get('mainmast');
+  const standing = new Matrix4();
+  const fallen = fallenForemastMatrix(dataset);
 
   const halfBreadth = Math.max(...model.lamps.map((lamp) => Math.abs(lamp.position.y)));
   const glowLights = GLOW_STATIONS_M.flatMap((x) =>
@@ -155,7 +207,18 @@ export function createShipObject(dataset: Dataset): ShipObject {
       funnel.visible = state.funnelsStanding[index] ?? false;
     });
     lightingOutput.value = state.lightingOutput;
-    root.updateMatrixWorld();
+    // On the seabed the foremast lies across the bridge and the after section has lost its
+    // upper works, its mast and its lamps.
+    foremast?.matrix.copy(state.wreck.bowAtRest ? fallen : standing);
+    hulls.stern.visible = !state.wreck.sternAtRest;
+    sternWreck.visible = state.wreck.sternAtRest;
+    if (mainmast !== undefined) {
+      mainmast.visible = !state.wreck.sternAtRest;
+    }
+    if (lampMeshes.stern !== undefined) {
+      lampMeshes.stern.visible = !state.wreck.sternAtRest;
+    }
+    root.updateMatrixWorld(true);
     for (const light of glowLights) {
       const height = light.getWorldPosition(glowPosition).y;
       const aboveWater = Math.min(Math.max(height / LAMP_FADE_DEPTH_M + 1, 0), 1);

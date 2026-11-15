@@ -18,6 +18,7 @@ import { createCameraInput } from './camera/cameraInput.ts';
 import type { CameraMode } from './camera/cameraPose.ts';
 import { createCameraRig } from './camera/cameraRig.ts';
 import { createEnvironment } from './environment.ts';
+import { createIcebergObject } from './icebergObject.ts';
 import { createOceanObject } from './oceanObject.ts';
 import { createCanvasPresenter, createReadbackPresenter } from './presenter.ts';
 import { QUALITY_SETTINGS, type QualityLevel } from './quality.ts';
@@ -49,6 +50,8 @@ export interface SceneFrame {
   readonly cameraMode: CameraMode;
   /** Wall-clock time since the previous frame, in seconds. */
   readonly deltaSeconds: number;
+  /** How many times faster than real time the simulation is running; 1 when it is paused. */
+  readonly timeScale: number;
   readonly reducedMotion: boolean;
 }
 
@@ -102,8 +105,17 @@ export async function createSceneView(options: SceneViewOptions): Promise<SceneV
   const ocean = createOceanObject(QUALITY_SETTINGS[options.quality]);
   const ship = createShipObject(dataset);
   const boats = createBoatsObject(dataset, createBoatPlacer(dataset, model));
-  const rockets = createRocketsObject(dataset);
-  scene.add(environment.root, sky.root, ocean.root, ship.root, boats.root, rockets.root);
+  const rockets = createRocketsObject(dataset, model.rocketFirings);
+  const iceberg = createIcebergObject();
+  scene.add(
+    environment.root,
+    sky.root,
+    ocean.root,
+    ship.root,
+    boats.root,
+    rockets.root,
+    iceberg.root,
+  );
 
   const site = dataset.site.positions.find((position) => position.id === 'wreck-boiler-field');
   if (site === undefined) {
@@ -149,7 +161,8 @@ export async function createSceneView(options: SceneViewOptions): Promise<SceneV
   const render = (frame: SceneFrame): Promise<void> => {
     ship.update(frame.state);
     boats.update(frame.state);
-    rockets.update(frame.state);
+    rockets.update(frame.state, frame.timeScale);
+    iceberg.update(frame.state);
     const pose = rig.update({
       state: frame.state,
       mode: frame.cameraMode,
@@ -192,6 +205,7 @@ export async function createSceneView(options: SceneViewOptions): Promise<SceneV
     ship.dispose();
     boats.dispose();
     rockets.dispose();
+    iceberg.dispose();
     environment.dispose();
     sky.dispose();
     ocean.dispose();
