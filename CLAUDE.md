@@ -36,28 +36,30 @@ Run `pnpm check` and the end-to-end suite before every commit.
 
 ## Repository map
 
-| Path           | Content                                                                 |
-| -------------- | ----------------------------------------------------------------------- |
-| `index.html`   | Application document                                                    |
-| `data/`        | Historical dataset (JSON) and its exported JSON Schemas                 |
-| `src/data/`    | Zod schemas, typed loader and validation of the dataset                 |
-| `src/sim/`     | Pure simulation: timeline model, poses, events, waterline               |
-| `src/ship/`    | Pure geometry of the ship: hull form, mesh data, lamps                  |
-| `src/sky/`     | Star catalogue codec, sky orientation (ephemerides), star appearance    |
-| `src/ocean/`   | Wave spectrum, FFT field and analytic waves                             |
-| `src/render/`  | three.js scene, objects, cameras, quality levels (separate chunk)       |
-| `src/app/`     | Store, playback, address state                                          |
-| `src/ui/`      | Timeline, panels, camera controls, announcements                        |
-| `src/time/`    | Ship's time conversions and formatting                                  |
-| `src/config/`  | Typed configuration (site identity, later support links and legal data) |
-| `src/styles/`  | Design tokens, base styles and layout                                   |
-| `public/`      | Files served unchanged                                                  |
-| `tools/`       | Build and verification scripts, run by Node.js as TypeScript            |
-| `tests/e2e/`   | Playwright tests (accessibility, behaviour, visual regression)          |
-| `docs/`        | Plan, status, decisions, data and sky documentation                     |
-| `Dockerfile`   | Build with Node.js, serve with Caddy as an unprivileged user            |
-| `Caddyfile`    | Headers, caching, fallback, host redirects                              |
-| `budgets.json` | Performance budgets checked by `tools/check-budgets.ts`                 |
+| Path                                    | Content                                                                 |
+| --------------------------------------- | ----------------------------------------------------------------------- |
+| `index.html`                            | Application document                                                    |
+| `about/`, `legal-notice/`, `narrative/` | Documents of the static pages; their content is generated               |
+| `src/pages/`                            | Static pages rendered to HTML at build time, shared header and footer   |
+| `data/`                                 | Historical dataset (JSON) and its exported JSON Schemas                 |
+| `src/data/`                             | Zod schemas, typed loader and validation of the dataset                 |
+| `src/sim/`                              | Pure simulation: timeline model, poses, events, waterline               |
+| `src/ship/`                             | Pure geometry of the ship: hull form, mesh data, lamps                  |
+| `src/sky/`                              | Star catalogue codec, sky orientation (ephemerides), star appearance    |
+| `src/ocean/`                            | Wave spectrum, FFT field and analytic waves                             |
+| `src/render/`                           | three.js scene, objects, cameras, quality levels (separate chunk)       |
+| `src/app/`                              | Store, playback, address state                                          |
+| `src/ui/`                               | Timeline, panels, camera controls, announcements                        |
+| `src/time/`                             | Ship's time conversions and formatting                                  |
+| `src/config/`                           | Typed configuration (site identity, later support links and legal data) |
+| `src/styles/`                           | Design tokens, base styles and layout                                   |
+| `public/`                               | Files served unchanged, including `.well-known/security.txt`            |
+| `tools/`                                | Build and verification scripts, run by Node.js as TypeScript            |
+| `tests/e2e/`                            | Playwright tests (accessibility, behaviour, visual regression)          |
+| `docs/`                                 | Plan, status, decisions, data, sky and accessibility documentation      |
+| `Dockerfile`                            | Build with Node.js, serve with Caddy as an unprivileged user            |
+| `Caddyfile`                             | Headers, caching, fallback, host redirects                              |
+| `budgets.json`                          | Performance budgets checked by `tools/check-budgets.ts`                 |
 
 ## Conventions
 
@@ -85,6 +87,10 @@ Run `pnpm check` and the end-to-end suite before every commit.
   re-recording them, and assert new content directly (see `tests/e2e/pixels.ts`).
 - Tests must work under the production content security policy: no injected style or script
   (`hideOverlays` in `tests/e2e/app.ts` uses the CSS object model).
+- Legal, support and contact content is written once in `src/config/` and tested; the Legal
+  Notice text is the owner's and is never completed or rephrased.
+- Static pages contain no script. The header, the menu and the footer of every document come
+  from `src/pages/layout.ts` through `tools/vite-static-pages.ts`.
 - Tone: sober and informative. No depiction of victims, no sensational wording or sound.
 - Accessibility: WCAG 2.2 level AA on every view.
 

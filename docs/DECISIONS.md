@@ -308,3 +308,43 @@ height, and describe the wreck in words.
 **Consequences.** Every animated element is a function of the instant, plus the playback speed
 for the display of the signals. The image of a paused instant is the same whatever speed was in
 use before the pause.
+
+## ADR 0011 — Static pages, Legal Notice and support
+
+**Status:** accepted (2026-11-15)
+
+**Context.** The Legal Notice must be readable without WebGL and without waiting for the scene,
+be linked from every view, reproduce the owner's text exactly and have a single source. The
+site also needs an About page, a complete text alternative and a discreet way to support the
+project, with no third-party script and an unchanged content security policy.
+
+**Decision.**
+
+- The pages `/narrative/`, `/about/` and `/legal-notice/` are separate HTML documents generated
+  at build time. `src/pages/` renders them to HTML text with a small escaping builder;
+  `tools/vite-static-pages.ts` fills the slots of each document (head, header, content, footer)
+  and writes `sitemap.xml`. They contain no script, so they work without JavaScript and under
+  the strictest policy. The header, the menu and the footer of the reconstruction come from the
+  same functions.
+- The content of the Legal Notice lives in `src/config/legal.ts`. Each line of the owner's text
+  is a label and a value: the label is a level-three heading and the value follows it, as a
+  paragraph, a link or an `address` element. Headings cannot be nested inside `address` in
+  HTML, so this is the arrangement that keeps the heading hierarchy, the `address` elements and
+  the exact text at once. A unit test and an end-to-end test compare the text of the page with
+  the owner's, value for value.
+- The four payment links live in `src/config/support.ts` and are rendered in one section of the
+  About page, reached from the menu entry "Support Titanic 4D". They are plain links with
+  `target="_blank"` and `rel="noopener"`, whose accessible name says that they open a new tab.
+  Nothing about support appears in the reconstruction itself. `.github/FUNDING.yml` points to
+  that section rather than repeating the links.
+- `public/.well-known/security.txt` gives the contact address and an expiry date within a year;
+  `tools/verify-server.ts` fails once it has expired, so the date is renewed with a deployment.
+- The line about the dead in the footer and the documentation reads "about 1,500": the counts
+  of the sources run from 1,490 to 1,517 and are given separately in "The night in words".
+- M6 was carried out before the end of M5, whose asset pipeline was being built in parallel:
+  the legal and accessibility requirements gate the first public deployment, the detailed model
+  does not.
+
+**Consequences.** Four documents are built instead of one; the application chunk is unchanged.
+`tools/verify-server.ts` checks the pages, the Legal Notice values, the payment links, the site
+map and `security.txt` on the running server (144 checks).

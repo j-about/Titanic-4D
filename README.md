@@ -5,7 +5,7 @@ built on sourced historical data.
 
 Live site: <https://www.titanic-4d.org>
 
-The project treats its subject as what it is — a disaster in which more than 1,500 people died.
+The project treats its subject as what it is — a disaster in which about 1,500 people died.
 The tone is sober and informative; every state shown on screen is tied to a documented source
 and a stated level of certainty.
 
@@ -28,6 +28,9 @@ milestones in [docs/PLAN.md](docs/PLAN.md) and the architectural decisions in
   each watertight compartment, with the same values as a table; "Sources" lists the
   records behind it with their level of certainty and the competing positions, and "Narrative"
   tells the whole night in order. The page is complete without the 3D scene.
+- **Pages.** "The night in words" tells every event in text with its sources, "About" explains
+  the method and its limits, and the Legal Notice names the owner and the host. These pages are
+  plain HTML: they need neither JavaScript nor a graphics card.
 - **Links.** The address carries the instant, the view and the speed, for example
   `?t=01:40&camera=orbit&rate=60` (ship's time on a 24-hour clock). `quality=low`, `medium`
   (the default) or `high` sets the level of detail of the sea and of its reflections.
@@ -101,6 +104,19 @@ precompressed files, security headers and the redirect of the secondary hosts
 (`titanic-4d.org`, `www.titanic-4d.com`, `titanic-4d.com`) to the canonical origin. The last
 command runs the end-to-end suite against the running image, under its content security
 policy.
+
+## Support Titanic 4D
+
+Titanic 4D is free to use and carries no advertising. A donation helps to pay for its hosting
+and its further development; it is not a charitable gift and no part of it goes to the families
+of those who died. The payment links are on the
+[About page](https://www.titanic-4d.org/about/#support): €3, €5, €10 or a custom amount, each
+on a page hosted by Stripe.
+
+## Security
+
+See [SECURITY.md](SECURITY.md). The site publishes its contact for security reports at
+<https://www.titanic-4d.org/.well-known/security.txt>.
 
 ## Contact
 

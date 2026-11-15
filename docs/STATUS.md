@@ -12,8 +12,8 @@ Milestones and acceptance criteria are defined in [PLAN.md](PLAN.md).
 | M2 — LOD0 scene and complete timeline             | Done        |
 | M3 — Ocean, exact sky, lighting                   | Done        |
 | M4 — Flooding, boats, rockets, break-up, wreck    | Done        |
-| M5 — LOD1/LOD2, post-processing, quality settings | Not started |
-| M6 — Accessibility, UX, support, legal notice     | Not started |
+| M5 — LOD1/LOD2, post-processing, quality settings | In progress |
+| M6 — Accessibility, UX, support, legal notice     | Done        |
 | M7 — Deployment                                   | Not started |
 
 ## M0 — Skeleton (done, 2026-11-14)
@@ -225,6 +225,45 @@ both sections of the wreck:
   iceberg is a smooth massing (M5); the water inside the hull is shown in the diagram only, not
   in the 3D view (M5); the hull parts along clean planes (M5).
 - Both backends give visually identical images.
+
+## M6 — Accessibility, UX, support, legal notice (done, 2026-11-15)
+
+Carried out before the end of M5 (see ADR 0011).
+
+Delivered:
+
+- **Static pages.** "The night in words" (every event with its time, certainty, differing
+  positions and sources, and the counts of each source), "About" and the Legal Notice, generated
+  at build time, without any script; shared header, menu and footer on every view; site map.
+- **Legal Notice.** The owner's text from `src/config/legal.ts`, with headings, `address`
+  elements, `mailto:` and `tel:` links; linked from the footer and the menu of every view.
+- **Support.** Section "Support Titanic 4D" of the About page with the four payment links from
+  `src/config/support.ts`, menu entry, README section, `.github/FUNDING.yml`.
+- **Security contact.** `public/.well-known/security.txt` (RFC 9116) and `SECURITY.md`.
+- **Accessibility.** `docs/ACCESSIBILITY.md`: how each criterion is met, automated checks, a
+  scripted audit, and what still needs a person.
+
+Verified:
+
+| Check                                            | Command                                                    | Result                                                      |
+| ------------------------------------------------ | ---------------------------------------------------------- | ----------------------------------------------------------- |
+| Type checking, lint, dataset, build              | `pnpm check`                                               | Pass                                                        |
+| Unit tests                                       | `pnpm test`                                                | 305 of 305 pass                                             |
+| Legal Notice text equals the owner's             | `src/pages/legalNotice.test.ts`, `tests/e2e/pages.spec.ts` | Pass, with and without JavaScript                           |
+| Payment links: URLs, labels, new tab, `noopener` | `src/pages/about.test.ts`, `tests/e2e/pages.spec.ts`       | Pass                                                        |
+| One published address, funding file, site map    | `tools/consistency.test.ts`                                | Pass                                                        |
+| End-to-end, WebGL 2 and WebGPU                   | Playwright in the official image                           | 110 of 110 pass; no axe-core violation on any view          |
+| Whole suite under the production CSP             | suite run against the Caddy container                      | 110 of 110 pass, same baselines                             |
+| Container image, pages, security.txt, site map   | `node tools/verify-server.ts`                              | 144 of 144                                                  |
+| Budgets                                          | `pnpm budgets`                                             | JavaScript 318 kB of 400 kB, CSS 3.7 kB, HTML 1.4 kB (gzip) |
+
+Not verified here, and why:
+
+- Screen readers, voice control and forced colours need a person (`docs/ACCESSIBILITY.md`).
+- Sixty frames per second on an integrated GPU and first render under five seconds at 50 Mb/s
+  cannot be measured on the software rasteriser of this environment. The page weighs about
+  0.4 MB compressed before the 3D scene starts, which is a fraction of a second at that speed;
+  the frame rate remains to be measured on real hardware.
 
 ## Tooling availability in the authoring session
 
