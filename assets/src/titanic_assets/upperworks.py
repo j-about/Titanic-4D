@@ -129,6 +129,9 @@ def _add_a_deck_level(mesh: MeshBuilder, half: MeshBuilder, site: _Site) -> None
         x = deck.x_end
         heights = (site.deck_a(x), site.boat(x))
         add_wall(mesh, cross_wall(x, (-inner, inner), heights, facing_aft=True))
+        bulwark = (site.side(x) - m.BULWARK_THICKNESS_M, site.side(x))
+        heights = (site.deck_a(x), site.deck_a(x) + m.PROMENADE_BULWARK_HEIGHT_M)
+        add_wall(half, cross_wall(x, bulwark, heights, facing_aft=True))
 
 
 def _add_stanchions(
@@ -142,7 +145,7 @@ def _add_stanchions(
     size = m.STANCHION_SIZE_M
     for index in range(1, count + 1):
         x = promenade[0] + index * m.STANCHION_SPACING_M
-        if clipped[0] + size < x < clipped[1] - size:
+        if clipped[0] <= x - size / 2 and x + size / 2 <= clipped[1]:
             outboard = site.side(x)
             half.add_box(
                 WHITE,

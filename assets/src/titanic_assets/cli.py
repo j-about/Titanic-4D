@@ -50,7 +50,7 @@ def export_offsets(root: Path, work_directory: Path) -> Path:
 
 def build(root: Path, work_directory: Path, output: Path) -> None:
     """Build the model: offsets, geometry, Blender export, optimisation and validation."""
-    # Blender is imported here so that the other commands and the geometry tests start quickly.
+    # Blender is loaded when a build starts, not when this module is imported.
     from titanic_assets.blender import build_scene, export_glb  # noqa: PLC0415
 
     started = time.monotonic()

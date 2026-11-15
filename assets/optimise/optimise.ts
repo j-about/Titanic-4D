@@ -8,10 +8,10 @@ import { MeshoptEncoder } from 'meshoptimizer';
 /**
  * Optimises a model exported by Blender: `node optimise.ts <input.glb> <output.glb>`.
  *
- * Positions are rounded to a grid and kept as floating-point numbers, so that no node needs a
- * transform; normals are rounded to eight bits per component. Identical vertices are then merged,
+ * Positions are rounded to a grid and stay floating-point numbers: every node keeps the identity
+ * transform. Normals are rounded to eight bits per component. Identical vertices are then merged,
  * triangles and vertices are reordered for compression, and the buffers are written with
- * EXT_meshopt_compression.
+ * EXT_meshopt_compression, normals through its octahedral filter.
  */
 
 /** Number of grid steps per metre to which positions are rounded. */
@@ -22,7 +22,7 @@ const NORMAL_STEPS = 127;
 /** Rounds every position to the grid. */
 function snapPositions(): Transform {
   return (document: Document): void => {
-    for (const accessor of positionAccessors(document, 'POSITION')) {
+    for (const accessor of attributeAccessors(document, 'POSITION')) {
       const array = accessor.getArray();
       if (array === null) {
         continue;
@@ -39,7 +39,7 @@ function snapPositions(): Transform {
 /** Rounds every normal to the values that eight bits per component can hold. */
 function snapNormals(): Transform {
   return (document: Document): void => {
-    for (const accessor of positionAccessors(document, 'NORMAL')) {
+    for (const accessor of attributeAccessors(document, 'NORMAL')) {
       const array = accessor.getArray();
       if (array === null) {
         continue;
@@ -54,7 +54,7 @@ function snapNormals(): Transform {
 }
 
 /** Lists the accessors used for one vertex attribute, each once. */
-function positionAccessors(document: Document, semantic: 'POSITION' | 'NORMAL') {
+function attributeAccessors(document: Document, semantic: 'POSITION' | 'NORMAL') {
   const accessors = new Set(
     document
       .getRoot()
