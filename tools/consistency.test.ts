@@ -1,7 +1,8 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { site } from '../src/config/site.ts';
+import { canonicalUrl, site } from '../src/config/site.ts';
+import { SUPPORT_PATH } from '../src/config/support.ts';
 
 const rootDir = join(import.meta.dirname, '..');
 
@@ -60,5 +61,38 @@ describe('Caddyfile host redirects', () => {
       [...site.secondaryHosts].toSorted(byName),
     );
     expect(caddyfile).toContain(`redir @secondaryHost ${site.canonicalOrigin}{uri} permanent`);
+  });
+});
+
+describe('published contact and support addresses', () => {
+  it('gives the contact address and the canonical location in security.txt', async () => {
+    const securityTxt = await read('public/.well-known/security.txt');
+    expect(securityTxt).toContain(`Contact: mailto:${site.contactEmail}\n`);
+    expect(securityTxt).toContain(`Canonical: ${canonicalUrl('/.well-known/security.txt')}\n`);
+    const expires = firstMatch(securityTxt, /^Expires: (.+)$/m, 'the Expires field');
+    expect(expires).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/);
+    expect(Number.isNaN(Date.parse(expires))).toBe(false);
+  });
+
+  it('publishes no other address than the contact address', async () => {
+    const documents = await Promise.all(
+      ['README.md', 'SECURITY.md', 'public/.well-known/security.txt'].map(read),
+    );
+    for (const document of documents) {
+      const addresses = document.match(/[\w.+-]+@[\w-]+\.[\w.-]+/g) ?? [];
+      expect(addresses.length).toBeGreaterThan(0);
+      for (const address of addresses) {
+        expect(address).toBe(site.contactEmail);
+      }
+    }
+  });
+
+  it('points the funding file of the repository to the support section of the site', async () => {
+    const funding = await read('.github/FUNDING.yml');
+    expect(funding.trim()).toBe(`custom: ["${canonicalUrl(SUPPORT_PATH)}"]`);
+  });
+
+  it('declares the site map of the canonical origin in robots.txt', async () => {
+    expect(await read('public/robots.txt')).toContain(`Sitemap: ${canonicalUrl('/sitemap.xml')}`);
   });
 });

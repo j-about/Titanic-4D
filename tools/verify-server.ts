@@ -1,6 +1,9 @@
 import { request as httpRequest, type IncomingHttpHeaders } from 'node:http';
 import { parseArgs } from 'node:util';
-import { site } from '../src/config/site.ts';
+import { legalNotice } from '../src/config/legal.ts';
+import { canonicalUrl, site } from '../src/config/site.ts';
+import { supportLinks } from '../src/config/support.ts';
+import { sitePaths, staticPages } from '../src/pages/registry.ts';
 
 interface Response {
   readonly status: number;
@@ -179,10 +182,81 @@ async function verifyRedirects(): Promise<void> {
   }
 }
 
+/** Checks the pages generated at build time, the site map and the security contact file. */
+async function verifyStaticPages(): Promise<void> {
+  for (const page of staticPages) {
+    const response = await get(page.path);
+    const html = response.body.toString('utf8');
+    check(`${page.path} responds 200`, response.status === 200, String(response.status));
+    check(`${page.path} is HTML`, header(response, 'content-type').startsWith('text/html'));
+    check(
+      `${page.path} is revalidated on every use`,
+      header(response, 'cache-control') === 'no-cache',
+    );
+    check(`${page.path} carries its title`, html.includes(`<title>${page.title} — ${site.name}`));
+    check(`${page.path} declares its canonical address`, html.includes(canonicalUrl(page.path)));
+    check(`${page.path} loads no script`, !html.includes('<script'));
+    check(`${page.path} links the Legal Notice`, html.includes('href="/legal-notice/"'));
+    checkSecurityHeaders(page.path, response);
+  }
+
+  const notice = (await get('/legal-notice/')).body.toString('utf8');
+  for (const value of [
+    legalNotice.owner.name,
+    legalNotice.owner.address,
+    legalNotice.owner.rcs,
+    legalNotice.host.company,
+    legalNotice.host.address,
+    `tel:${legalNotice.owner.phone.dial}`,
+    `tel:${legalNotice.host.phone.dial}`,
+    `mailto:${legalNotice.owner.email}`,
+  ]) {
+    check(`Legal Notice contains "${value}"`, notice.includes(value));
+  }
+
+  const about = (await get('/about/')).body.toString('utf8');
+  for (const link of supportLinks) {
+    check(`About page offers the ${link.label} payment link`, about.includes(`href="${link.url}"`));
+  }
+
+  const sitemap = await get('/sitemap.xml');
+  check('/sitemap.xml responds 200', sitemap.status === 200, String(sitemap.status));
+  for (const path of sitePaths) {
+    check(
+      `/sitemap.xml lists ${path}`,
+      sitemap.body.toString('utf8').includes(`<loc>${canonicalUrl(path)}</loc>`),
+    );
+  }
+
+  const security = await get('/.well-known/security.txt');
+  const securityText = security.body.toString('utf8');
+  check('/.well-known/security.txt responds 200', security.status === 200, String(security.status));
+  check(
+    '/.well-known/security.txt is plain text',
+    header(security, 'content-type').startsWith('text/plain'),
+    header(security, 'content-type'),
+  );
+  check(
+    '/.well-known/security.txt gives the contact address',
+    securityText.includes(`Contact: mailto:${site.contactEmail}`),
+  );
+  const expires = Date.parse(/^Expires: (.+)$/m.exec(securityText)?.[1] ?? '');
+  check(
+    '/.well-known/security.txt has not expired',
+    expires > Date.now(),
+    new Date(expires).toString(),
+  );
+  check(
+    '/.well-known/security.txt expires within a year, as RFC 9116 recommends',
+    expires - Date.now() < 366 * 86_400_000,
+  );
+}
+
 await verifyHealth();
 const documentHtml = await verifyDocument();
 await verifyFingerprintedAsset(documentHtml);
 await verifyFallbacks(documentHtml);
+await verifyStaticPages();
 await verifyRedirects();
 
 console.log(`${checkCount - failures.length}/${checkCount} checks passed against ${origin.href}`);
