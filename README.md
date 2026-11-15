@@ -24,7 +24,8 @@ milestones in [docs/PLAN.md](docs/PLAN.md) and the architectural decisions in
   3D view: drag or arrow keys to turn, wheel, pinch or plus and minus to zoom, Space to play or
   pause, comma and full stop to step by one minute; in the free camera, W, A, S, D, Q and E to
   move.
-- **Description.** The "Now" tab states the instant in words and figures, "Sources" lists the
+- **Description.** The "Now" tab states the instant in words and figures and draws the water in
+  each watertight compartment, with the same values as a table; "Sources" lists the
   records behind it with their level of certainty and the competing positions, and "Narrative"
   tells the whole night in order. The page is complete without the 3D scene.
 - **Links.** The address carries the instant, the view and the speed, for example
@@ -92,14 +93,14 @@ node tools/verify-server.ts --origin http://127.0.0.1:8080
 ```
 
 ```bash
-E2E_BASE_URL=http://127.0.0.1:8080 tools/e2e-container.sh scene.spec.ts home.spec.ts
+E2E_BASE_URL=http://127.0.0.1:8080 tools/e2e-container.sh
 ```
 
 The image serves the static build with Caddy as an unprivileged user on port 8080, with
 precompressed files, security headers and the redirect of the secondary hosts
 (`titanic-4d.org`, `www.titanic-4d.com`, `titanic-4d.com`) to the canonical origin. The last
-command runs the scene and accessibility tests against the running image, under its content
-security policy.
+command runs the end-to-end suite against the running image, under its content security
+policy.
 
 ## Contact
 

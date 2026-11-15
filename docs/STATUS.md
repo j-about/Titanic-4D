@@ -11,7 +11,7 @@ Milestones and acceptance criteria are defined in [PLAN.md](PLAN.md).
 | M1 — Data and TimelineModel                       | Done        |
 | M2 — LOD0 scene and complete timeline             | Done        |
 | M3 — Ocean, exact sky, lighting                   | Done        |
-| M4 — Flooding, boats, rockets, break-up, wreck    | Not started |
+| M4 — Flooding, boats, rockets, break-up, wreck    | Done        |
 | M5 — LOD1/LOD2, post-processing, quality settings | Not started |
 | M6 — Accessibility, UX, support, legal notice     | Not started |
 | M7 — Deployment                                   | Not started |
@@ -179,6 +179,52 @@ Findings, both recorded in the second amendment to ADR 0004:
 - Under the production content security policy the style sheet that hid the controls for
   screenshots was refused, so the controls stayed in the picture; the tests now hide them
   through the CSS object model and CI runs them against the container image.
+
+## M4 — Flooding, boats, rockets, break-up, descent, wreck (done, 2026-11-15)
+
+Delivered:
+
+- **Iceberg.** Generic dark shape within the reported size, abreast of the starboard bow at the
+  collision and left astern as the ship runs on (`src/sim/iceberg.ts`,
+  `src/render/icebergObject.ts`); new record `iceberg-passage`.
+- **Flooding.** Longitudinal section of the hull in the "Now" tab with the water in each of the
+  sixteen compartments, the bulkheads and the sea outside, followed by a table of the same
+  values (`src/sim/floodingProfile.ts`, `src/ui/floodingDiagram.ts`).
+- **Distress signals.** Clusters of white stars; steady clusters during fast playback, so that
+  nothing blinks; guided view raised and widened between the first and the last signal.
+- **Wreck.** Foremast laid across the bridge and after section without upper works once each
+  section is at rest; new records `foremast-condition` and `funnels-lost`; the iceberg and the
+  state of the wreck are listed in the "Sources" tab.
+- **Already driven by the model since M2:** trim and heel, lifeboat launches with their
+  margins, parting of the hull at the recorded trim, fall of the funnels, descent of both
+  sections. Nothing depends on the history of frames.
+
+Verified:
+
+| Check                                     | Command                                                                 | Result                                                           |
+| ----------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Type checking, lint, dataset, build       | `pnpm check`                                                            | Pass                                                             |
+| Unit tests                                | `pnpm test`                                                             | 277 of 277 pass                                                  |
+| Flashes of the signals at every speed     | `src/sim/rocketDisplay.test.ts`                                         | At most two in any second at ×1, ×10, ×60, ×300 and ×600         |
+| Every signal in frame in the guided view  | `src/render/camera/cameraPose.test.ts`                                  | Pass for the twelve signals                                      |
+| Iceberg within 50 to 100 ft, about 400 ft | `src/sim/iceberg.test.ts`                                               | Pass                                                             |
+| Flooding profile and diagram              | `src/sim/floodingProfile.test.ts`, `src/ui/floodingDiagram.dom.test.ts` | Pass                                                             |
+| Budgets                                   | `pnpm budgets`                                                          | JavaScript 318 kB of 400 kB, CSS 3.6 kB, HTML 1.3 kB (gzip)      |
+| End-to-end, WebGL 2 and WebGPU            | Playwright in the official image                                        | 84 of 84 pass; no axe-core violation, diagram and table included |
+| Whole suite under the production CSP      | suite run against the Caddy container                                   | 84 of 84 pass, same baselines                                    |
+| Container image                           | `node tools/verify-server.ts`                                           | 77 of 77                                                         |
+
+Visual review of the six re-recorded baselines (12 images), of the signal at 12:47 a.m. and of
+both sections of the wreck:
+
+- Agrees: a dark mass of ice about as high as the Boat deck beside the bow at 11:40 p.m.; white
+  stars bursting high above the bridge, inside the frame; hull without funnels on the seabed,
+  foremast lying aft across the bridge, after section reduced to its hull.
+- Differs, to be addressed in the milestones shown: the wrecked stern is intact plating, not
+  the torn and collapsed structure of the surveys, and there is no debris field (M5); the
+  iceberg is a smooth massing (M5); the water inside the hull is shown in the diagram only, not
+  in the 3D view (M5); the hull parts along clean planes (M5).
+- Both backends give visually identical images.
 
 ## Tooling availability in the authoring session
 

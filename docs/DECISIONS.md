@@ -265,6 +265,46 @@ for screenshots by a style sheet that Playwright injects into the page; the cont
 policy of the production server (`style-src 'self'`) rightly refuses it, so against the
 container image the controls stayed in the picture, unnoticed under the old tolerance. The tests
 now hide them through the CSS object model, which the policy allows, and the `container` job of
-CI runs the scene and accessibility tests against the built image
-(`E2E_BASE_URL=http://127.0.0.1:8080 tools/e2e-container.sh scene.spec.ts home.spec.ts`), with
-the same baselines as the preview server.
+CI runs the end-to-end suite against the built image
+(`E2E_BASE_URL=http://127.0.0.1:8080 tools/e2e-container.sh`), with the same baselines as the
+preview server.
+
+## ADR 0010 — Iceberg, distress signals, flooding diagram and wreck
+
+**Status:** accepted (2026-11-15)
+
+**Context.** M4 completes what the scene shows: the iceberg, the water inside the hull, the
+distress signals at every playback speed, and the two sections on the seabed. The sources give
+the size and appearance of the iceberg but not its path, describe the signals but not their
+height, and describe the wreck in words.
+
+**Decision.**
+
+- **Iceberg.** A generic shape within the reported size (`src/sim/iceberg.ts`), dark, placed
+  abreast of the starboard bow at the collision. The ship is drawn at rest, so the iceberg moves
+  aft by the distance she runs, her speed falling evenly from the recorded 22 knots to nothing
+  over four minutes. That duration is a modelling value, recorded as such in `data/site.json`
+  (`iceberg-passage`).
+- **Distress signals.** Each is a cluster of small white stars. Up to the speed at which the
+  14-second sequence still lasts 0.9 s on screen, it is drawn as it happened. Faster, it would
+  be a blink: it is drawn instead as a steady cluster at the height of the burst that comes up
+  and fades over 0.9 s of real time. The scene therefore receives the playback speed as a
+  display parameter (1 when paused); the simulation state itself still depends on time alone.
+  `src/sim/rocketDisplay.test.ts` counts the flashes on screen at every speed offered: at most
+  two in any second, under the limit of three of WCAG 2.3.1.
+- **Guided camera.** Between the first and the last signal the view is wider and raised, so
+  that the bursts stay in frame; a unit test checks it for each signal.
+- **Flooding.** The "Now" tab draws a longitudinal section of the hull with the water in each
+  of the sixteen compartments and the sea outside (`src/sim/floodingProfile.ts`,
+  `src/ui/floodingDiagram.ts`). The drawing is an image named by its caption and is followed by
+  a table of the same values. A cut-away view of the hull in the 3D scene is left to the
+  detailed model of M5.
+- **Wreck.** When the bow section comes to rest its foremast is laid across the bridge; when
+  the stern section comes to rest it is drawn without its upper works, its mast and its lamps.
+  Both follow records added to `data/site.json` from a tertiary source and are marked
+  `estimated`. The stern is a massing: its real state, with decks collapsed and plating peeled
+  away, is stated in the "Sources" tab.
+
+**Consequences.** Every animated element is a function of the instant, plus the playback speed
+for the display of the signals. The image of a paused instant is the same whatever speed was in
+use before the pause.
