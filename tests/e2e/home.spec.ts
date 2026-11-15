@@ -34,6 +34,33 @@ test.describe('document', () => {
   });
 });
 
+test.describe('document without JavaScript', () => {
+  test.use({ javaScriptEnabled: false });
+
+  test('announces no loading, offers no 3D view to operate and points to the night in words', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    const status = page.locator('#scene-status');
+    await expect(status).toBeHidden();
+    await expect(status).toBeEmpty();
+    await expect(page.getByText('Loading the 3D scene')).toHaveCount(0);
+    const canvas = page.locator('#scene-canvas');
+    await expect(canvas).not.toHaveAttribute('tabindex', /.*/);
+    await expect(canvas).not.toHaveAttribute('role', /.*/);
+    await expect(canvas).not.toHaveAttribute('aria-describedby', /.*/);
+    await expect(page.getByRole('application')).toHaveCount(0);
+    await expect(page.locator('#camera-root')).toBeHidden();
+    const notice = page.locator('.notice');
+    await expect(notice).toBeVisible();
+    await expect(notice).toContainText('needs JavaScript');
+    await expect(notice.getByRole('link', { name: 'The night in words' })).toHaveAttribute(
+      'href',
+      '/narrative/',
+    );
+  });
+});
+
 test.describe('accessibility', () => {
   for (const tab of ['Now', 'Sources', 'Narrative'] as const) {
     test(`has no detectable WCAG 2.2 AA violation with the ${tab} tab open`, async ({
@@ -55,7 +82,10 @@ test.describe('accessibility', () => {
   test('describes the scene in words for assistive technology', async ({ page }, testInfo) => {
     await openAt(page, testInfo, '01:50');
     const canvas = page.locator('#scene-canvas');
-    await expect(canvas).toHaveAttribute('aria-describedby', /scene-description/);
+    await expect(canvas).toHaveAttribute('role', 'application');
+    await expect(canvas).toHaveAttribute('tabindex', '0');
+    await expect(canvas).toHaveAttribute('aria-label', '3D view of the ship');
+    await expect(canvas).toHaveAttribute('aria-describedby', 'scene-description camera-help');
     await expect(page.locator('#scene-description')).toContainText('down by the head');
     await expect(page.locator('#scene-description')).toContainText('to port');
   });

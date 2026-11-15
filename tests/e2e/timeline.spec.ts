@@ -1,8 +1,23 @@
 import { expect, test } from '@playwright/test';
-import { narrativeEventCount, openAt, waitForFrame } from './app.ts';
+import { hideOverlays, narrativeEventCount, openAt, showOverlays, waitForFrame } from './app.ts';
 import { findAccessibilityViolations } from './axe.ts';
 
 const clock = (page: import('@playwright/test').Page) => page.locator('.clock__time');
+
+/** Smallest side of a target that the application gives to its buttons, in CSS pixels. */
+const TARGET_MIN_PX = 44;
+
+/** Image of the canvas alone, without the controls and messages laid over it. */
+async function sceneImage(page: import('@playwright/test').Page): Promise<Buffer> {
+  await hideOverlays(page);
+  const image = await page.locator('#scene-canvas').screenshot();
+  await showOverlays(page);
+  return image;
+}
+
+/** True when the page is no wider than its window. */
+const fitsTheWindow = (page: import('@playwright/test').Page): Promise<boolean> =>
+  page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth);
 
 test.describe('timeline', () => {
   test('opens at the moment given in the address', async ({ page }, testInfo) => {
@@ -57,6 +72,46 @@ test.describe('timeline', () => {
     await expect(clock(page)).toHaveText('2:20 a.m.');
     await expect(bookmark).toHaveAttribute('aria-current', 'true');
     await expect(page).toHaveURL(/t=02:20:00/);
+  });
+
+  test('shows the title of every key moment in full, also with the spacing of WCAG 1.4.12', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await expect(page.locator('.bookmark').first()).toBeVisible();
+    /**
+     * Titles cut off in their box and bookmarks whose content is wider than they are, beyond
+     * the pixel by which the two rounded widths can differ.
+     */
+    const cutOff = (): Promise<string[]> =>
+      page.evaluate(() => [
+        ...[...document.querySelectorAll<HTMLElement>('.bookmark__title')]
+          .filter((title) => title.scrollWidth > title.clientWidth + 1)
+          .map((title) => `title: ${title.textContent}`),
+        ...[...document.querySelectorAll<HTMLElement>('.bookmark')]
+          .filter((bookmark) => bookmark.scrollWidth > bookmark.clientWidth + 1)
+          .map((bookmark) => `bookmark: ${bookmark.textContent}`),
+      ]);
+    expect(await cutOff()).toEqual([]);
+    expect(
+      await page.evaluate(() =>
+        [...document.querySelectorAll<HTMLElement>('.bookmark__title')].map(
+          (title) => getComputedStyle(title).textOverflow,
+        ),
+      ),
+    ).not.toContain('ellipsis');
+    // Set through the CSS object model, which the content security policy allows.
+    await page.evaluate(() => {
+      for (const element of document.querySelectorAll<HTMLElement>('.bookmark, .bookmark *')) {
+        element.style.lineHeight = '1.5';
+        element.style.letterSpacing = '0.12em';
+        element.style.wordSpacing = '0.16em';
+      }
+    });
+    expect(await cutOff()).toEqual([]);
+    await expect(
+      page.getByRole('button', { name: 'Go to 2:20 a.m. The ship founders' }),
+    ).toContainText('The ship founders');
   });
 
   test('plays forward and backward and pauses', async ({ page }, testInfo) => {
@@ -157,6 +212,21 @@ test.describe('description panels', () => {
     await expect(list.getByRole('link').first()).toHaveAttribute('href', /^https?:\/\//);
   });
 
+  test('states what the levels of certainty mean in words, not in a tooltip', async ({
+    page,
+  }, testInfo) => {
+    await openAt(page, testInfo, '02:00');
+    await page.getByRole('tab', { name: 'Sources' }).click();
+    const panel = page.getByRole('tabpanel', { name: 'Sources' });
+    await expect(panel.locator('.certainty[title]')).toHaveCount(0);
+    const legend = panel.locator('details.certainty-legend');
+    await legend.locator('summary').click();
+    await expect(legend.getByText('Primary evidence and broad agreement.')).toBeVisible();
+    await expect(legend.getByText('Derived or approximate.')).toBeVisible();
+    await expect(legend.getByText('Sources disagree.')).toBeVisible();
+    expect(await findAccessibilityViolations(page)).toEqual([]);
+  });
+
   test('shows lifeboat times with their margin', async ({ page }, testInfo) => {
     await openAt(page, testInfo, '00:44');
     await page.getByRole('tab', { name: 'Sources' }).click();
@@ -208,6 +278,133 @@ test.describe('views', () => {
     await page.getByLabel('Detail', { exact: true }).selectOption('medium');
     await expect(page).not.toHaveURL(/quality=/);
     await waitForFrame(page, '01:00');
+  });
+
+  test('turns, tilts and zooms the view one step per click', async ({ page }, testInfo) => {
+    await openAt(page, testInfo, '01:00', 'orbit');
+    const group = page.getByRole('group', { name: 'Move the camera' });
+    await expect(group.getByRole('button')).toHaveText([
+      'Turn left',
+      'Turn right',
+      'Tilt up',
+      'Tilt down',
+      'Zoom in',
+      'Zoom out',
+    ]);
+    const start = await sceneImage(page);
+    let previous = start;
+    for (const name of ['Turn right', 'Tilt up', 'Zoom in', 'Zoom out', 'Tilt down']) {
+      const button = group.getByRole('button', { name, exact: true });
+      const box = await button.boundingBox();
+      expect(box?.width).toBeGreaterThanOrEqual(TARGET_MIN_PX);
+      expect(box?.height).toBeGreaterThanOrEqual(TARGET_MIN_PX);
+      await button.click();
+      const before = previous;
+      await expect
+        .poll(async () => (await sceneImage(page)).equals(before), { timeout: 20_000 })
+        .toBe(false);
+      previous = await sceneImage(page);
+    }
+    // Turning back by the same step returns to the first view, tilt and distance being restored.
+    await group.getByRole('button', { name: 'Turn left', exact: true }).click();
+    await expect
+      .poll(async () => (await sceneImage(page)).equals(start), { timeout: 20_000 })
+      .toBe(true);
+  });
+
+  test('offers the step buttons of each view and none for the guided tour', async ({
+    page,
+  }, testInfo) => {
+    await openAt(page, testInfo, '01:00');
+    const group = page.getByRole('group', { name: 'Move the camera' });
+    await expect(group).toBeHidden();
+    const view = page.getByLabel('View', { exact: true });
+    await view.selectOption('deck');
+    await expect(group.getByRole('button')).toHaveText([
+      'Turn left',
+      'Turn right',
+      'Tilt up',
+      'Tilt down',
+    ]);
+    await view.selectOption('free');
+    await expect(group.getByRole('button')).toHaveText([
+      'Turn left',
+      'Turn right',
+      'Tilt up',
+      'Tilt down',
+      'Move forward',
+      'Move back',
+    ]);
+    await waitForFrame(page, '01:00');
+    const before = await sceneImage(page);
+    await group.getByRole('button', { name: 'Move forward', exact: true }).click();
+    await expect
+      .poll(async () => (await sceneImage(page)).equals(before), { timeout: 20_000 })
+      .toBe(false);
+    expect(await findAccessibilityViolations(page)).toEqual([]);
+  });
+
+  test('shows how to operate the 3D view, the keys that move time included', async ({
+    page,
+  }, testInfo) => {
+    await openAt(page, testInfo, '01:00', 'orbit');
+    const help = page.locator('#camera-help');
+    await expect(help).toBeHidden();
+    await page.getByText('Controls of the 3D view').click();
+    await expect(help).toBeVisible();
+    await expect(help).toContainText('arrow keys');
+    await expect(help).toContainText('The Turn, Tilt and Zoom buttons');
+    await expect(help).toContainText('Space plays or pauses');
+    await expect(help).toContainText('comma and full stop step one minute');
+  });
+
+  test('keeps the view controls usable on a 320 px screen, below the canvas', async ({
+    page,
+  }, testInfo) => {
+    await page.setViewportSize({ width: 320, height: 640 });
+    await openAt(page, testInfo, '01:00', 'orbit');
+    expect(await fitsTheWindow(page)).toBe(true);
+    const canvas = page.locator('#scene-canvas');
+    const canvasBox = await canvas.boundingBox();
+    const toolbarBox = await page.locator('#camera-root').boundingBox();
+    expect(canvasBox).not.toBeNull();
+    expect(toolbarBox).not.toBeNull();
+    expect(toolbarBox?.y ?? 0).toBeGreaterThanOrEqual(
+      (canvasBox?.y ?? 0) + (canvasBox?.height ?? 0) - 1,
+    );
+    const group = page.getByRole('group', { name: 'Move the camera' });
+    for (const button of await group.getByRole('button').all()) {
+      const box = await button.boundingBox();
+      expect(box?.width).toBeGreaterThanOrEqual(TARGET_MIN_PX);
+      expect(box?.height).toBeGreaterThanOrEqual(TARGET_MIN_PX);
+      expect(box?.x ?? -1).toBeGreaterThanOrEqual(0);
+      expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(320);
+    }
+    const before = await canvas.screenshot();
+    await group.getByRole('button', { name: 'Zoom in', exact: true }).click();
+    await expect
+      .poll(async () => (await canvas.screenshot()).equals(before), { timeout: 20_000 })
+      .toBe(false);
+    expect(await findAccessibilityViolations(page)).toEqual([]);
+  });
+
+  test('keeps the operating instructions available at 200 % zoom, in a disclosure', async ({
+    page,
+  }, testInfo) => {
+    // A 1280 × 800 window zoomed to 200 % lays the page out in 640 × 400 CSS pixels.
+    await page.setViewportSize({ width: 640, height: 400 });
+    await openAt(page, testInfo, '01:00', 'orbit');
+    const help = page.locator('#camera-help');
+    await expect(help).toBeHidden();
+    await page.getByText('Controls of the 3D view').click();
+    await expect(help).toBeVisible();
+    await expect(help).toContainText('arrow keys');
+    await expect(help).toContainText('Space plays or pauses');
+    const box = await help.boundingBox();
+    expect(box?.width).toBeGreaterThan(200);
+    expect(box?.height).toBeGreaterThan(20);
+    expect(await fitsTheWindow(page)).toBe(true);
+    expect(await findAccessibilityViolations(page)).toEqual([]);
   });
 
   test('turns the view from the keyboard', async ({ page }, testInfo) => {

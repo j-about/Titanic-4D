@@ -46,8 +46,26 @@ export async function waitForFrame(page: Page, clock: string): Promise<void> {
 }
 
 /**
- * Opens the application at a ship's clock time with the renderer of the current project.
+ * Address of the application at a ship's clock time with the renderer of the current project.
  * `extraQuery` adds parameters to the address, for example `quality=low`.
+ */
+export function addressAt(
+  testInfo: TestInfo,
+  clock: string,
+  camera = 'guided',
+  extraQuery = '',
+): string {
+  const renderer = RENDERER_BY_PROJECT[testInfo.project.name];
+  if (renderer === undefined) {
+    throw new Error(`No renderer is defined for project "${testInfo.project.name}".`);
+  }
+  const suffix = extraQuery === '' ? '' : `&${extraQuery}`;
+  return `/?t=${clock}&camera=${camera}&renderer=${renderer}${suffix}`;
+}
+
+/**
+ * Opens the application at a ship's clock time with the renderer of the current project and
+ * waits for the frame of that time. `extraQuery` adds parameters to the address.
  */
 export async function openAt(
   page: Page,
@@ -56,13 +74,34 @@ export async function openAt(
   camera = 'guided',
   extraQuery = '',
 ): Promise<void> {
-  const renderer = RENDERER_BY_PROJECT[testInfo.project.name];
-  if (renderer === undefined) {
-    throw new Error(`No renderer is defined for project "${testInfo.project.name}".`);
-  }
-  const suffix = extraQuery === '' ? '' : `&${extraQuery}`;
-  await page.goto(`/?t=${clock}&camera=${camera}&renderer=${renderer}${suffix}`);
+  await page.goto(addressAt(testInfo, clock, camera, extraQuery));
   await waitForFrame(page, clock);
+}
+
+/** Files of the star catalogue, which every start of the scene fetches before anything else. */
+const STAR_CATALOGUE_PATTERN = '**/bright-stars*.bin';
+
+/**
+ * Holds back every request for the star catalogue, and with it every start of the scene, until
+ * the returned function is called.
+ */
+export async function holdSceneStarts(page: Page): Promise<() => void> {
+  let release: () => void = () => undefined;
+  const released = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route(STAR_CATALOGUE_PATTERN, async (route) => {
+    await released;
+    await route.continue();
+  });
+  return release;
+}
+
+/** Waits until the canvas shows everything that has been asked of the scene so far. */
+export async function waitForSceneUpToDate(page: Page): Promise<void> {
+  await expect(page.locator('#scene-frame')).toHaveAttribute('data-up-to-date', 'true', {
+    timeout: 45_000,
+  });
 }
 
 /** Controls and messages laid over the canvas. */
@@ -77,6 +116,15 @@ export async function hideOverlays(page: Page): Promise<void> {
   await page.evaluate((selector) => {
     for (const element of document.querySelectorAll<HTMLElement>(selector)) {
       element.style.visibility = 'hidden';
+    }
+  }, OVERLAY_SELECTOR);
+}
+
+/** Shows again what `hideOverlays` has hidden. */
+export async function showOverlays(page: Page): Promise<void> {
+  await page.evaluate((selector) => {
+    for (const element of document.querySelectorAll<HTMLElement>(selector)) {
+      element.style.visibility = '';
     }
   }, OVERLAY_SELECTOR);
 }
