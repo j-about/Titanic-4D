@@ -32,7 +32,9 @@
     "check": "pnpm typecheck && pnpm lint && pnpm data:schema:check && pnpm test && pnpm build && pnpm budgets",
     "data:validate": "node tools/validate-data.ts",
     "data:schema": "node tools/export-json-schema.ts",
-    "data:schema:check": "node tools/export-json-schema.ts --check"
+    "data:schema:check": "node tools/export-json-schema.ts --check",
+    "assets:build": "uv run --project assets --locked titanic-assets build",
+    "assets:test": "uv run --project assets --locked pytest assets/tests"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",

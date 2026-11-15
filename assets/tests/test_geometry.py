@@ -6,7 +6,9 @@ import pytest
 
 from titanic_assets import modelling as m
 from titanic_assets.boats import stowed_boat_box
+from titanic_assets.hull import build_hull_grid
 from titanic_assets.materials import MATERIAL_ORDER, SHADOW
+from titanic_assets.mesh import grid_triangles
 from titanic_assets.model import STERN_WRECK, Node, build_model
 from titanic_assets.offsets import Offsets
 
@@ -168,7 +170,8 @@ def test_the_plating_carries_the_lamps_of_the_application(
     offsets: Offsets,
 ) -> None:
     all_triangles = {name: triangles(nodes[name]) for name in SECTIONS}
-    assert len(offsets.lamps) > 600
+    assert len(offsets.lamps) > 800
+    behind_glass = 0
     for lamp in offsets.lamps:
         position = np.asarray(lamp.position)
         candidates = all_triangles[lamp.section]
@@ -177,8 +180,42 @@ def test_the_plating_carries_the_lamps_of_the_application(
         normal = np.asarray(lamp.normal) / np.linalg.norm(lamp.normal)
         on_plating = distance_to_triangles(position, candidates[near])
         proud = distance_to_triangles(position + normal * LAMP_OFFSET_M, candidates[near])
-        assert on_plating < 0.02
+        if on_plating >= 0.02:
+            behind_glass += 1
+            assert abs(on_plating - m.GLASS_RECESS_M) < 0.015
         assert proud > LAMP_OFFSET_M - 0.01
+    assert behind_glass > 150
+
+
+def test_the_plating_follows_the_hull_form(offsets: Offsets) -> None:
+    hull = offsets.hull
+    grid = build_hull_grid(offsets)
+    row_count = grid.points.shape[1]
+    cell = grid_triangles(2, row_count)
+    worst = 0.0
+    for index in range(0, len(hull.stations), 4):
+        x = float(hull.stations[index])
+        after = int(np.clip(np.searchsorted(grid.stations, x), 1, len(grid.stations) - 1))
+        columns = [
+            column
+            for column in (after - 1, after, after + 1)
+            if 1 <= column < len(grid.stations)
+            and grid.stations[column] - grid.stations[column - 1] > 1e-9
+        ]
+        candidates = np.concatenate(
+            [grid.points[column - 1 : column + 1].reshape(-1, 3)[cell] for column in columns],
+        )
+        doubled = np.cross(
+            candidates[:, 1] - candidates[:, 0],
+            candidates[:, 2] - candidates[:, 0],
+        )
+        candidates = candidates[np.linalg.norm(doubled, axis=1) > 1e-12]
+        top = max(grid.points[column, -1, 2] for column in columns)
+        heights, half_breadths = hull.profile(index)
+        for z, y in zip(heights.tolist(), half_breadths.tolist(), strict=True):
+            if z <= top:
+                worst = max(worst, distance_to_triangles(np.asarray([x, y, z]), candidates))
+    assert worst < 0.04
 
 
 def test_the_stowed_boats_have_their_space(nodes: dict[str, Node], offsets: Offsets) -> None:

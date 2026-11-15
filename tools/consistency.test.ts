@@ -96,3 +96,39 @@ describe('published contact and support addresses', () => {
     expect(await read('public/robots.txt')).toContain(`Sitemap: ${canonicalUrl('/sitemap.xml')}`);
   });
 });
+
+describe('asset pipeline', () => {
+  interface OptimiserManifest {
+    readonly packageManager: string;
+    readonly engines: Readonly<Record<string, string>>;
+    readonly devDependencies: Readonly<Record<string, string>>;
+  }
+
+  it('uses the same pnpm, Node.js range, TypeScript and Node.js types as the application', async () => {
+    const optimiser = JSON.parse(await read('assets/optimise/package.json')) as OptimiserManifest;
+    const root = JSON.parse(await read('package.json')) as OptimiserManifest;
+    expect(optimiser.packageManager).toBe(root.packageManager);
+    expect(optimiser.engines).toEqual(root.engines);
+    for (const name of ['typescript', '@types/node']) {
+      expect(optimiser.devDependencies[name], name).toBe(root.devDependencies[name]);
+    }
+  });
+
+  it('is rebuilt in CI with the uv version that the project requires', async () => {
+    const workflow = await read('.github/workflows/ci.yml');
+    const project = await read('assets/pyproject.toml');
+    const ciVersion = firstMatch(
+      workflow,
+      /setup-uv@[0-9a-f]{40}[^\n]*\n\s+with:\n\s+version: ([\d.]+)/,
+      'the uv version in CI',
+    );
+    const minimum = firstMatch(project, /uv_build>=([\d.]+)/, 'the uv_build requirement');
+    expect(ciVersion).toBe(minimum);
+  });
+
+  it('keeps the model out of the image build context only through its sources', async () => {
+    const dockerignore = await read('.dockerignore');
+    expect(dockerignore.split('\n')).toContain('assets');
+    expect(dockerignore).not.toMatch(/^public/m);
+  });
+});

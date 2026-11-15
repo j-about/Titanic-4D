@@ -87,9 +87,9 @@ STATION_SPACING_M = 1.0
 END_SQUARED_STEPS = 15
 END_SQUARED_UNIT_M = 0.1
 """Stations are added at the squares of multiples of this unit from each end of the hull."""
-BILGE_ROW_OFFSETS_M = (0.02, 0.15, 0.6, 1.3, 2.2, 3.3, 4.4)
+BILGE_ROW_OFFSETS_M = (0.02, 0.15, 0.3, 0.6, 0.9, 1.3, 1.7, 2.2, 2.7, 3.3, 3.8, 4.4)
 """Heights above the bottom of the hull of the rows of the mesh in the turn of the bilge."""
-LOWER_SIDE_ROWS = 6
+LOWER_SIDE_ROWS = 8
 """Rows of the mesh between the bilge and the top of the antifouling paint."""
 BLACK_ROWS_BELOW_KNUCKLE = 10
 BLACK_ROWS_ABOVE_KNUCKLE = 2

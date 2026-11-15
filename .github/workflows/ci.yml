@@ -89,3 +89,47 @@ jobs:
           retention-days: 14
       - if: ${{ always() }}
         run: docker rm --force titanic-4d
+
+  assets:
+    name: Asset pipeline and reproducibility of the ship model
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            assets/optimise/pnpm-lock.yaml
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: 0.11.32
+          enable-cache: true
+          cache-dependency-glob: assets/uv.lock
+      - name: Install the system libraries that Blender loads
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends \
+            libgl1 libice6 libsm6 libx11-6 libxext6 libxfixes3 libxi6 libxkbcommon0 libxrender1
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile
+        working-directory: assets/optimise
+      - run: pnpm exec tsc --noEmit
+        working-directory: assets/optimise
+      - run: uv sync --locked
+        working-directory: assets
+      - run: uv run --locked ruff check
+        working-directory: assets
+      - run: uv run --locked ruff format --check
+        working-directory: assets
+      - run: uv run --locked ty check
+        working-directory: assets
+      - run: uv run --locked pytest
+        working-directory: assets
+      - name: Rebuild the model
+        run: uv run --project assets --locked titanic-assets build
+      - name: Fail when the committed model differs from the rebuilt one
+        run: test -z "$(git status --porcelain -- public/models/ship-lod1.glb)"
