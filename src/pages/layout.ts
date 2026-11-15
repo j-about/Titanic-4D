@@ -1,0 +1,52 @@
+import { LEGAL_NOTICE_PATH, navigation } from '../config/navigation.ts';
+import { site } from '../config/site.ts';
+import type { Dataset } from '../data/schema/dataset.ts';
+import { CASUALTY_COUNTS_PATH, casualtySentence } from './casualties.ts';
+import { h, type Markup } from './html.ts';
+
+/**
+ * Header shared by every page: the name of the site and the menu. `currentPath` is the
+ * root-relative address of the page being rendered; its menu entry is marked as current.
+ */
+export function renderSiteHeader(currentPath: string): Markup {
+  const current = (href: string): 'page' | undefined => (href === currentPath ? 'page' : undefined);
+  return h(
+    'header',
+    { class: 'app-header' },
+    h('p', { class: 'site-title' }, h('a', { href: '/', 'aria-current': current('/') }, site.name)),
+    h('p', { class: 'site-tagline' }, 'The sinking of RMS Titanic, 14–15 April 1912'),
+    h(
+      'nav',
+      { class: 'site-nav', 'aria-label': 'Site' },
+      h(
+        'ul',
+        { class: 'site-nav__list' },
+        navigation.map((item) =>
+          h('li', {}, h('a', { href: item.href, 'aria-current': current(item.href) }, item.label)),
+        ),
+      ),
+    ),
+  );
+}
+
+/**
+ * Footer shared by every page: a line on the subject, with the number of people who died as the
+ * sources of the dataset count it, then the links to those counts, to the Legal Notice and to
+ * the contact address.
+ */
+export function renderSiteFooter(dataset: Dataset): Markup {
+  return h(
+    'footer',
+    { class: 'app-footer' },
+    h(
+      'p',
+      {},
+      `A sober, source-backed reconstruction. ${casualtySentence(dataset)} `,
+      h('a', { href: CASUALTY_COUNTS_PATH }, 'Counts by source'),
+      ' · ',
+      h('a', { href: LEGAL_NOTICE_PATH }, 'Legal Notice'),
+      ' · ',
+      h('a', { href: `mailto:${site.contactEmail}` }, site.contactEmail),
+    ),
+  );
+}

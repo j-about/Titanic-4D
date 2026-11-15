@@ -1,0 +1,60 @@
+[project]
+name = "titanic-assets"
+version = "0.1.0"
+description = "Asset pipeline of Titanic 4D: builds the level-of-detail 1 model of the ship with Blender."
+license = "MIT"
+requires-python = "==3.13.*"
+dependencies = [
+    "bpy==5.3.0",
+    "numpy==2.5.4",
+]
+
+[project.scripts]
+titanic-assets = "titanic_assets.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.11.32,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest==9.2.0",
+    "ruff==0.17.5",
+    "ty==0.0.104",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    # The formatter already enforces what these two rules check, and conflicts with them.
+    "COM812",
+    "ISC001",
+    # The licence of the repository is stated once, in LICENSE; files carry no notice.
+    "CPY001",
+    # Of each pair of incompatible docstring rules, keep D211 and D212.
+    "D203",
+    "D213",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests assert, compare with literal values and need no docstring on every test.
+"tests/**" = ["S101", "PLR2004", "D103"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ty.environment]
+python-version = "3.13"
+# Declarations of the part of the Blender API that the pipeline uses: the wheel has none.
+extra-paths = ["typings"]
+
+[tool.ty.terminal]
+error-on-warning = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["--strict-markers", "--strict-config", "-ra"]

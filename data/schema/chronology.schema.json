@@ -1,0 +1,161 @@
+{
+  "$id": "https://www.titanic-4d.org/schema/chronology.schema.json",
+  "title": "Titanic 4D dataset: chronology.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "events": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema0"
+      }
+    }
+  },
+  "required": [
+    "events"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "__schema0": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "ats": {
+          "type": "string",
+          "pattern": "^1912-04-1[45]T(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d)?$",
+          "description": "Titanic ship's time (Apparent Time Ship), ISO 8601 local date-time."
+        },
+        "uncertainty": {
+          "type": "object",
+          "properties": {
+            "before_min": {
+              "type": "number",
+              "minimum": 0
+            },
+            "after_min": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "before_min",
+            "after_min"
+          ],
+          "additionalProperties": false
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "navigation",
+            "flooding",
+            "command",
+            "lifeboat",
+            "signal",
+            "wireless",
+            "power",
+            "structure",
+            "rescue"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "location": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "key_event": {
+          "type": "boolean",
+          "description": "Key events are offered as bookmarks on the timeline."
+        },
+        "source_ids": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema1"
+          }
+        },
+        "certainty": {
+          "type": "string",
+          "enum": [
+            "established",
+            "estimated",
+            "debated"
+          ],
+          "description": "established: primary evidence and broad consensus; estimated: derived or approximate, with the method stated in the note; debated: competing positions exist and are listed."
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1
+        },
+        "alternatives": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema2"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "ats",
+        "uncertainty",
+        "category",
+        "title",
+        "description",
+        "location",
+        "key_event",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "__schema1": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "__schema2": {
+      "type": "object",
+      "properties": {
+        "holder": {
+          "type": "string",
+          "minLength": 1
+        },
+        "position": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_ids": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema1"
+          }
+        }
+      },
+      "required": [
+        "holder",
+        "position",
+        "source_ids"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

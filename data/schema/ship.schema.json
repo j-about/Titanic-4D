@@ -1,0 +1,528 @@
+{
+  "$id": "https://www.titanic-4d.org/schema/ship.schema.json",
+  "title": "Titanic 4D dataset: ship.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "reference_frame": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema4"
+        }
+      },
+      "required": [
+        "description",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "particulars": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema6"
+      }
+    },
+    "sheer": {
+      "type": "object",
+      "properties": {
+        "rise_at_bow_m": {
+          "type": "number"
+        },
+        "rise_at_stern_m": {
+          "type": "number"
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema4"
+        }
+      },
+      "required": [
+        "rise_at_bow_m",
+        "rise_at_stern_m",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "decks": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema7"
+      }
+    },
+    "bulkheads": {
+      "minItems": 15,
+      "maxItems": 15,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema11"
+      }
+    },
+    "compartments": {
+      "minItems": 16,
+      "maxItems": 16,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema12"
+      }
+    },
+    "funnels": {
+      "minItems": 4,
+      "maxItems": 4,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema13"
+      }
+    },
+    "masts": {
+      "minItems": 2,
+      "maxItems": 2,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema14"
+      }
+    },
+    "zones": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema15"
+      }
+    }
+  },
+  "required": [
+    "reference_frame",
+    "particulars",
+    "sheer",
+    "decks",
+    "bulkheads",
+    "compartments",
+    "funnels",
+    "masts",
+    "zones"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "__schema0": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema1"
+      }
+    },
+    "__schema1": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "__schema2": {
+      "type": "string",
+      "enum": [
+        "established",
+        "estimated",
+        "debated"
+      ],
+      "description": "established: primary evidence and broad consensus; estimated: derived or approximate, with the method stated in the note; debated: competing positions exist and are listed."
+    },
+    "__schema3": {
+      "type": "string",
+      "minLength": 1
+    },
+    "__schema4": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema5"
+      }
+    },
+    "__schema5": {
+      "type": "object",
+      "properties": {
+        "holder": {
+          "type": "string",
+          "minLength": 1
+        },
+        "position": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_ids": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema1"
+          }
+        }
+      },
+      "required": [
+        "holder",
+        "position",
+        "source_ids"
+      ],
+      "additionalProperties": false
+    },
+    "__schema6": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema4"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "summary",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "__schema7": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/__schema8"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "height_amidships_m": {
+          "$ref": "#/$defs/__schema9"
+        },
+        "x_start_m": {
+          "$ref": "#/$defs/__schema10"
+        },
+        "x_end_m": {
+          "$ref": "#/$defs/__schema10"
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema4"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "height_amidships_m",
+        "x_start_m",
+        "x_end_m",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "__schema8": {
+      "type": "string",
+      "enum": [
+        "boat",
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "g",
+        "orlop",
+        "tank-top"
+      ]
+    },
+    "__schema9": {
+      "type": "number",
+      "description": "Height above the top of keel, in metres."
+    },
+    "__schema10": {
+      "type": "number",
+      "description": "Distance aft of the forward perpendicular, in metres (negative forward of it)."
+    },
+    "__schema11": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-hj-p]$"
+        },
+        "x_m": {
+          "$ref": "#/$defs/__schema10"
+        },
+        "watertight_to_deck": {
+          "$ref": "#/$defs/__schema8"
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema4"
+        }
+      },
+      "required": [
+        "id",
+        "x_m",
+        "watertight_to_deck",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "__schema12": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "x_start_m": {
+          "$ref": "#/$defs/__schema10"
+        },
+        "x_end_m": {
+          "$ref": "#/$defs/__schema10"
+        },
+        "breached_by_collision": {
+          "type": "boolean"
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema4"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "x_start_m",
+        "x_end_m",
+        "breached_by_collision",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "__schema13": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "x_m": {
+          "$ref": "#/$defs/__schema10"
+        },
+        "base_above_keel_m": {
+          "$ref": "#/$defs/__schema9"
+        },
+        "top_above_keel_m": {
+          "$ref": "#/$defs/__schema9"
+        },
+        "length_fore_aft_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "breadth_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "rake_deg": {
+          "type": "number"
+        },
+        "exhausts_boilers": {
+          "type": "boolean"
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema4"
+        }
+      },
+      "required": [
+        "id",
+        "x_m",
+        "base_above_keel_m",
+        "top_above_keel_m",
+        "length_fore_aft_m",
+        "breadth_m",
+        "rake_deg",
+        "exhausts_boilers",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "__schema14": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "enum": [
+            "foremast",
+            "mainmast"
+          ]
+        },
+        "x_m": {
+          "$ref": "#/$defs/__schema10"
+        },
+        "base_above_keel_m": {
+          "$ref": "#/$defs/__schema9"
+        },
+        "top_above_keel_m": {
+          "$ref": "#/$defs/__schema9"
+        },
+        "rake_deg": {
+          "type": "number"
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema4"
+        }
+      },
+      "required": [
+        "id",
+        "x_m",
+        "base_above_keel_m",
+        "top_above_keel_m",
+        "rake_deg",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "__schema15": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "x_start_m": {
+          "$ref": "#/$defs/__schema10"
+        },
+        "x_end_m": {
+          "$ref": "#/$defs/__schema10"
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema4"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "x_start_m",
+        "x_end_m",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

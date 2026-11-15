@@ -1,0 +1,93 @@
+{
+  "$id": "https://www.titanic-4d.org/schema/sources.schema.json",
+  "title": "Titanic 4D dataset: sources.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "sources": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema0"
+      }
+    }
+  },
+  "required": [
+    "sources"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "__schema0": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authors": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "year": {
+          "type": "string",
+          "minLength": 1
+        },
+        "publisher": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "inquiry-report",
+            "inquiry-testimony",
+            "analysis",
+            "book",
+            "survey",
+            "press",
+            "reference",
+            "catalogue",
+            "software",
+            "project"
+          ]
+        },
+        "access": {
+          "type": "string",
+          "enum": [
+            "read",
+            "read-in-part",
+            "cited-through",
+            "not-consulted"
+          ],
+          "description": "read: consulted in full for the cited parts; read-in-part: partly consulted or through a summary; cited-through: known only through another listed source; not-consulted: reference work not opened."
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "authors",
+        "year",
+        "publisher",
+        "kind",
+        "access",
+        "note"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

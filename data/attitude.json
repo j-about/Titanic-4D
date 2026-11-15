@@ -1,0 +1,209 @@
+{
+  "initial_draught": {
+    "forward_m": 9.37,
+    "aft_m": 10.29,
+    "source_ids": ["halpern-stability-trim", "halpern-afpp-2011", "hackett-bedford-1996"],
+    "certainty": "estimated",
+    "note": "30 ft 9 in forward and 33 ft 9 in aft at the time of the collision: Wilding's 1912 working estimate, used by Hackett and Bedford and by Halpern. The ship was thus trimmed about 0.2° by the stern."
+  },
+  "waterline_pivot": {
+    "x_m": 178.31,
+    "source_ids": ["halpern-afpp-2011", "halpern-list-205-2026"],
+    "certainty": "estimated",
+    "note": "While the trim stays below about 10°, the waterline appears to rotate about a fixed point of the original waterline 578 to 590 ft aft of the forward perpendicular; Halpern uses 585 ft. The Hackett and Bedford condition C7 (16.25° of trim) remains consistent with it. Fitch, Layton and Wormstedt argue that the point moves aft once boiler room 5 floods.",
+    "alternatives": [
+      {
+        "holder": "Tad Fitch, J. Kent Layton and Bill Wormstedt (as reported by Halpern)",
+        "position": "The pivot point moves aft after boiler room 5 has flooded.",
+        "source_ids": ["halpern-list-205-2026"]
+      }
+    ]
+  },
+  "trim": [
+    {
+      "ats": "1912-04-14T23:40",
+      "trim_deg": -0.2,
+      "source_ids": ["halpern-list-trim-2023", "halpern-afpp-2011"],
+      "certainty": "estimated",
+      "note": "Intact condition: 3 ft by the stern over 850 ft."
+    },
+    {
+      "ats": "1912-04-14T23:55",
+      "trim_deg": 0.8,
+      "source_ids": ["halpern-list-trim-2023"],
+      "certainty": "estimated",
+      "note": "Water at G deck by No. 1 hatch (Symons), matched by Halpern to a waterline on the ship's profile."
+    },
+    {
+      "ats": "1912-04-15T00:10",
+      "trim_deg": 1.8,
+      "source_ids": ["halpern-list-trim-2023"],
+      "certainty": "estimated",
+      "note": "Water six steps below E deck on the mail-room stairs (Robinson)."
+    },
+    {
+      "ats": "1912-04-15T00:25",
+      "trim_deg": 2.6,
+      "source_ids": ["halpern-list-trim-2023"],
+      "certainty": "estimated",
+      "note": "Three feet of water on E deck in the seamen's quarters (Poingdestre).",
+      "alternatives": [
+        {
+          "holder": "Hackett and Bedford flooding model (1996), as tabulated by Halpern",
+          "position": "About 4.5° of trim by 12:40 a.m., against about 3° from observations.",
+          "source_ids": ["halpern-afpp-2011", "hackett-bedford-1996"]
+        }
+      ]
+    },
+    {
+      "ats": "1912-04-15T00:55",
+      "trim_deg": 3.2,
+      "source_ids": ["halpern-list-trim-2023"],
+      "certainty": "estimated",
+      "note": "Water flowing down the first-class stairs from E deck (Wheat)."
+    },
+    {
+      "ats": "1912-04-15T01:20",
+      "trim_deg": 4.0,
+      "source_ids": ["halpern-list-trim-2023"],
+      "certainty": "estimated",
+      "note": "Second row of portholes at the bow under water (Symons)."
+    },
+    {
+      "ats": "1912-04-15T01:45",
+      "trim_deg": 5.0,
+      "source_ids": ["halpern-list-trim-2023"],
+      "certainty": "estimated",
+      "note": "Read from Halpern's trend line; propellers about half exposed (Nichols)."
+    },
+    {
+      "ats": "1912-04-15T01:50",
+      "trim_deg": 5.5,
+      "source_ids": ["halpern-list-trim-2023"],
+      "certainty": "estimated",
+      "note": "Forward well deck awash (Phillips, reported by Bride)."
+    },
+    {
+      "ats": "1912-04-15T02:05",
+      "trim_deg": 6.5,
+      "source_ids": ["halpern-list-trim-2023", "halpern-trim-heel-2017"],
+      "certainty": "estimated",
+      "note": "Forecastle head going under as collapsible D is lowered (Bright). Halpern writes \"over 6°\" in 2023 and 2026 and \"about 7°\" in 2017; the mid-value is used."
+    },
+    {
+      "ats": "1912-04-15T02:15",
+      "trim_deg": 10,
+      "source_ids": ["halpern-list-trim-2023", "halpern-trim-heel-2017"],
+      "certainty": "debated",
+      "note": "Crow's nest level with the sea as the bridge goes under (Lightoller), measured by Halpern on the plans.",
+      "alternatives": [
+        {
+          "holder": "Tad Fitch, J. Kent Layton and Bill Wormstedt (as reported by Halpern)",
+          "position": "About 9° when Lightoller left the ship.",
+          "source_ids": ["halpern-list-205-2026"]
+        },
+        {
+          "holder": "Hackett and Bedford flooding model (1996), as read by Halpern",
+          "position": "About 17° at 2:15 a.m.",
+          "source_ids": ["halpern-trim-heel-2017", "hackett-bedford-1996"]
+        }
+      ]
+    },
+    {
+      "ats": "1912-04-15T02:17",
+      "trim_deg": 16,
+      "source_ids": ["sname-mfp-2009-breakup", "project-derivation"],
+      "certainty": "estimated",
+      "note": "The Marine Forensics Panel places the first structural failure at a trim of about 15 to 17°; the mid-value is taken at the time the lights went out. No measured trim exists after 2:15."
+    }
+  ],
+  "heel": [
+    {
+      "ats": "1912-04-14T23:40",
+      "heel_deg": 0,
+      "source_ids": ["halpern-list-trim-2023"],
+      "certainty": "estimated",
+      "note": "No list was reported at the moment of impact. Halpern assumes a slight pre-existing port list of about 2° and notes that using zero barely changes his curve."
+    },
+    {
+      "ats": "1912-04-14T23:50",
+      "heel_deg": 5,
+      "source_ids": ["halpern-list-trim-2023", "halpern-initial-list"],
+      "certainty": "estimated",
+      "note": "Wheelhouse inclinometer five to ten minutes after impact (Hichens); 5.15° by Halpern's heeling-moment calculation."
+    },
+    {
+      "ats": "1912-04-15T00:55",
+      "heel_deg": 3,
+      "source_ids": ["halpern-list-trim-2023"],
+      "certainty": "estimated",
+      "note": "Halpern's trend line; boat 6 lay against the ship's side."
+    },
+    {
+      "ats": "1912-04-15T01:05",
+      "heel_deg": 2,
+      "source_ids": ["halpern-list-trim-2023"],
+      "certainty": "estimated",
+      "note": "Boat 8 cleared the side (Crawford); slight starboard list at boat 1 (Symons)."
+    },
+    {
+      "ats": "1912-04-15T01:20",
+      "heel_deg": 0,
+      "source_ids": ["halpern-list-trim-2023"],
+      "certainty": "estimated",
+      "note": "\"She was not listing at all\" when boat 9 reached the water (Ward)."
+    },
+    {
+      "ats": "1912-04-15T01:30",
+      "heel_deg": -2.5,
+      "source_ids": ["halpern-list-trim-2023"],
+      "certainty": "estimated",
+      "note": "Halpern's trend line; a port list was noted at boat 14."
+    },
+    {
+      "ats": "1912-04-15T01:34",
+      "heel_deg": -3.75,
+      "source_ids": ["halpern-list-trim-2023"],
+      "certainty": "estimated",
+      "note": "Halpern's trend line (3½ to 4° to port); boats 13 and 15 lay against the starboard side."
+    },
+    {
+      "ats": "1912-04-15T01:50",
+      "heel_deg": -10,
+      "source_ids": ["halpern-list-trim-2023", "halpern-trim-heel-2017"],
+      "certainty": "estimated",
+      "note": "A gap of two and a half feet at boat 10 (Evans); \"heavy list to port\" (Bride)."
+    },
+    {
+      "ats": "1912-04-15T02:05",
+      "heel_deg": -10,
+      "source_ids": ["halpern-list-205-2026", "halpern-trim-heel-2017", "wfb-lifeboat-sequence"],
+      "certainty": "debated",
+      "note": "The value shown is the one common to the published ranges: about 10° to port for Fitch, Layton and Wormstedt and for Halpern in 2017, and the lower bound of Halpern's 2026 range.",
+      "alternatives": [
+        {
+          "holder": "Samuel Halpern (2023)",
+          "position": "15° to port at 2:05 a.m., from the geometry of the water at A deck when collapsible D was lowered.",
+          "source_ids": ["halpern-list-trim-2023"]
+        },
+        {
+          "holder": "Samuel Halpern (2026)",
+          "position": "Somewhere from about 10° to 15° to port.",
+          "source_ids": ["halpern-list-205-2026"]
+        },
+        {
+          "holder": "Quartermaster Rowe (1912)",
+          "position": "About 6° to port when collapsible C left (Q17678).",
+          "source_ids": ["brit-inquiry-testimony"]
+        }
+      ]
+    },
+    {
+      "ats": "1912-04-15T02:17",
+      "heel_deg": -10,
+      "source_ids": ["mengot-wreck-site"],
+      "certainty": "estimated",
+      "note": "Mengot gives a list of \"upwards of 10 degrees to port\" at the break-up."
+    }
+  ]
+}

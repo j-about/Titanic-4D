@@ -1,0 +1,88 @@
+{
+	admin off
+	auto_https off
+	persist_config off
+	servers {
+		trusted_proxies static private_ranges
+	}
+}
+
+# Response headers shared by the main routes and the error routes. The Server header is removed by
+# a separate directive: a deletion defers its whole block until the response is written, and deferred
+# operations do not reach responses produced by handle_errors.
+(security_headers) {
+	header {
+		Strict-Transport-Security "max-age=63072000"
+		Content-Security-Policy "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' blob: data:; worker-src 'self' blob:; manifest-src 'self'; media-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+		Permissions-Policy "accelerometer=(), ambient-light-sensor=(), autoplay=(), bluetooth=(), browsing-topics=(), camera=(), display-capture=(), encrypted-media=(), fullscreen=(self), gamepad=(self), geolocation=(), gyroscope=(), hid=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), serial=(), usb=(), xr-spatial-tracking=()"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+	}
+	header -Server
+}
+
+:8080 {
+	root * /srv
+
+	log {
+		output stdout
+		format json
+	}
+	log_skip /healthz
+
+	import security_headers
+
+	# Secondary hosts serve no content: they redirect to the canonical origin, keeping path and query.
+	@secondaryHost host titanic-4d.org www.titanic-4d.com titanic-4d.com
+	redir @secondaryHost https://www.titanic-4d.org{uri} permanent
+
+	handle /healthz {
+		header Cache-Control "no-store"
+		respond "ok" 200
+	}
+
+	handle {
+		route {
+			# Extensionless paths are navigations: serve the matching page, else the application shell.
+			@navigation {
+				not path *.*
+				file {
+					try_files {path} {path}/index.html /index.html
+				}
+			}
+			rewrite @navigation {file_match.relative}
+
+			@document path / */ *.html
+			header @document Cache-Control "no-cache"
+
+			@fingerprinted path /assets/*
+			header @fingerprinted Cache-Control "public, max-age=31536000, immutable"
+
+			# Models are revalidated on every use: the stored copy is checked against the entity tag
+			# of the file, and an unchanged file is answered with a 304.
+			@model path /models/*
+			header @model Cache-Control "no-cache"
+
+			@unversioned not path / */ *.html /assets/* /models/*
+			header @unversioned Cache-Control "public, max-age=3600"
+
+			@glb path *.glb
+			header @glb Content-Type "model/gltf-binary"
+			@ktx2 path *.ktx2
+			header @ktx2 Content-Type "image/ktx2"
+			@wasm path *.wasm
+			header @wasm Content-Type "application/wasm"
+
+			file_server {
+				precompressed br gzip
+			}
+		}
+	}
+
+	handle_errors {
+		import security_headers
+		header Cache-Control "no-store"
+		respond "{err.status_code} {err.status_text}"
+	}
+}

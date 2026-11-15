@@ -1,0 +1,301 @@
+{
+  "$id": "https://www.titanic-4d.org/schema/signals.schema.json",
+  "title": "Titanic 4D dataset: signals.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "rockets": {
+      "type": "object",
+      "properties": {
+        "facts": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema0"
+          }
+        },
+        "firings": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema7"
+          }
+        }
+      },
+      "required": [
+        "facts",
+        "firings"
+      ],
+      "additionalProperties": false
+    },
+    "wireless": {
+      "type": "object",
+      "properties": {
+        "facts": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema0"
+          }
+        },
+        "messages": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema12"
+          }
+        }
+      },
+      "required": [
+        "facts",
+        "messages"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "rockets",
+    "wireless"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "__schema0": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema4"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema5"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "summary",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "__schema1": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "__schema2": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema1"
+      }
+    },
+    "__schema3": {
+      "type": "string",
+      "enum": [
+        "established",
+        "estimated",
+        "debated"
+      ],
+      "description": "established: primary evidence and broad consensus; estimated: derived or approximate, with the method stated in the note; debated: competing positions exist and are listed."
+    },
+    "__schema4": {
+      "type": "string",
+      "minLength": 1
+    },
+    "__schema5": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema6"
+      }
+    },
+    "__schema6": {
+      "type": "object",
+      "properties": {
+        "holder": {
+          "type": "string",
+          "minLength": 1
+        },
+        "position": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_ids": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema1"
+          }
+        }
+      },
+      "required": [
+        "holder",
+        "position",
+        "source_ids"
+      ],
+      "additionalProperties": false
+    },
+    "__schema7": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "ats": {
+          "$ref": "#/$defs/__schema8"
+        },
+        "uncertainty": {
+          "description": "Margin on the firing time; the note of the record states where it comes from.",
+          "$ref": "#/$defs/__schema11"
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema4"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema5"
+        }
+      },
+      "required": [
+        "id",
+        "ats",
+        "uncertainty",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "__schema8": {
+      "type": "string",
+      "pattern": "^1912-04-1[45]T(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d)?$",
+      "description": "Titanic ship's time (Apparent Time Ship), ISO 8601 local date-time."
+    },
+    "__schema9": {
+      "type": "number",
+      "minimum": 0
+    },
+    "__schema10": {
+      "type": "number",
+      "minimum": 0
+    },
+    "__schema11": {
+      "type": "object",
+      "properties": {
+        "before_min": {
+          "$ref": "#/$defs/__schema9"
+        },
+        "after_min": {
+          "$ref": "#/$defs/__schema10"
+        }
+      },
+      "required": [
+        "before_min",
+        "after_min"
+      ],
+      "additionalProperties": false
+    },
+    "__schema12": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "logged_time": {
+          "type": "string",
+          "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d$"
+        },
+        "logged_reference": {
+          "type": "string",
+          "enum": [
+            "new-york",
+            "gmt"
+          ],
+          "description": "Clock of the station log (procès-verbal): New York time (GMT − 5 h) or Greenwich Mean Time."
+        },
+        "ats": {
+          "description": "Ship's time obtained from the logged time with the adopted clock offset; it is never more certain than that offset.",
+          "$ref": "#/$defs/__schema8"
+        },
+        "uncertainty": {
+          "description": "Margin on the logged time, stated in the note; absent when none is recorded. It does not cover the choice of clock offset, whose other values are recorded in time-reference.json.",
+          "$ref": "#/$defs/__schema11"
+        },
+        "sender": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "heard_by": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema13"
+          }
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema4"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema5"
+        }
+      },
+      "required": [
+        "id",
+        "logged_time",
+        "logged_reference",
+        "ats",
+        "sender",
+        "summary",
+        "heard_by",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "__schema13": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

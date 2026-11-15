@@ -1,0 +1,385 @@
+{
+  "reference_model": {
+    "id": "mfp-bottom-up",
+    "title": "Reference model: failure starting in the bottom structure",
+    "summary": "The reconstruction of the Marine Forensics Panel of the Society of Naval Architects and Marine Engineers. As the trim reached about 15 to 17°, the bottom structure failed in compression at or near the double bottom, most probably under No. 1 boiler room. The failure ran across the bottom, round the bilges and up the sides; the upper strakes and the strength deck parted last, near the after expansion joint. The stern settled back toward the water, then was tipped up again by the flooding bow before sinking within minutes.",
+    "source_ids": ["sname-mfp-2009-breakup", "mengot-wreck-site"],
+    "certainty": "debated",
+    "note": "The authors call their paper a progress report and state that they cannot prove the reconstruction. It is the best-supported engineering account and is the one shown in the scene. Physical evidence: two double-bottom pieces lying apart on the seabed, whose bar keel is bent in compression."
+  },
+  "competing_models": [
+    {
+      "id": "sank-intact-1912",
+      "title": "1912 inquiries: the ship sank intact",
+      "summary": "The British report concluded that the ship did not break in two and reached the perpendicular; the US report that she assumed an almost end-on position and sank intact.",
+      "source_ids": ["brit-inquiry-report", "us-inquiry-report"],
+      "certainty": "debated",
+      "note": "Contradicted by the wreck found in two main sections in 1985, and by the many survivors who had described a break."
+    },
+    {
+      "id": "top-down-high-angle",
+      "title": "Top-down break at a high angle",
+      "summary": "The account current in 1996–1997, shown in the 1997 film: the hull cracks from the top at the after expansion joint with the stern raised high, and tears downward.",
+      "source_ids": ["sname-mfp-2009-breakup", "mengot-wreck-site"],
+      "certainty": "debated",
+      "note": "Mengot and Woytowich argue that the stress analysis behind it treated the superstructure as part of the hull girder, making the expansion joint a false weak point, and that a top-down break cannot account for the state of the wreck. The steep angle is not supported and is not reproduced in the scene."
+    },
+    {
+      "id": "low-angle-long",
+      "title": "Low-angle break at the expansion joint",
+      "summary": "Roger Long (2005–2006) proposed that the hull failed at only 10 or 11° of trim, starting at the after expansion joint.",
+      "source_ids": ["wikipedia-titanic", "sname-mfp-2009-breakup"],
+      "certainty": "debated",
+      "note": "Known here through secondary reports. Mengot and Woytowich read the same keel pieces as compression failures."
+    },
+    {
+      "id": "stettler-thomas",
+      "title": "Both keel and strength deck critical",
+      "summary": "Stettler and Thomas (2012) found both the keel and the strength deck within the failure zone without identifying which failed first.",
+      "source_ids": ["mengot-wreck-site"],
+      "certainty": "debated",
+      "note": "As characterised by Mengot; the paper was not obtained."
+    }
+  ],
+  "facts": [
+    {
+      "id": "break-zone",
+      "title": "Where the hull parted",
+      "summary": "No single plane separates the two sections: some 70 ft of hull between them came apart, releasing the five boilers of No. 1 boiler room and parts of the engines. The after edge of the bow section lies at the uptake of the third funnel; the stern section begins at the reciprocating engine room.",
+      "value": 21.3,
+      "unit": "m",
+      "source_ids": ["archaeology-2012-delgado", "sname-mfp-2009-breakup", "mengot-wreck-site"],
+      "certainty": "established",
+      "note": "Delgado: about 70 ft of the ship's length disintegrated. The traditional wording \"between the third and fourth funnels\" describes the upper end of the failure."
+    },
+    {
+      "id": "double-bottom-pieces",
+      "title": "Double-bottom pieces",
+      "summary": "Two pieces of the double bottom, mainly from beneath boiler rooms 1 and 2, lie upside down on the seabed away from both sections. Their bar keel is bent into an S, consistent with compression.",
+      "source_ids": ["sname-mfp-2009-breakup", "mengot-wreck-site"],
+      "certainty": "established",
+      "note": "The observation is established; its interpretation is the authors'."
+    },
+    {
+      "id": "breakup-duration",
+      "title": "Duration",
+      "summary": "Mengot describes a break-up lasting 15 to 20 seconds, after which the stern stayed afloat for five minutes or less; one witness said two to three minutes.",
+      "value": 20,
+      "unit": "s",
+      "source_ids": ["mengot-wreck-site", "sname-mfp-2009-breakup", "halpern-collision-point"],
+      "certainty": "estimated",
+      "note": "Buley and Symons, as cited by the authors."
+    },
+    {
+      "id": "stern-angle",
+      "title": "Angle reached by the stern",
+      "summary": "The angle the stern reached after the break is not known. The Marine Forensics Panel states that it could have assumed almost any trim; published figures range from about 30° to perpendicular. The scene shows 30°, the low end of the range attributed to Ballard.",
+      "value": 30,
+      "unit": "deg",
+      "source_ids": [
+        "sname-mfp-2009-breakup",
+        "wikipedia-titanic",
+        "ballard-1987",
+        "brit-inquiry-report",
+        "us-inquiry-report"
+      ],
+      "certainty": "debated",
+      "note": "Ballard's range of 30 to 45° is known through Wikipedia's page reference.",
+      "alternatives": [
+        {
+          "holder": "British Inquiry report (1912)",
+          "position": "The ship attained the perpendicular.",
+          "source_ids": ["brit-inquiry-report"]
+        },
+        {
+          "holder": "US Senate report (1912)",
+          "position": "Almost perpendicular.",
+          "source_ids": ["us-inquiry-report"]
+        },
+        {
+          "holder": "Marine Forensics Panel (2009)",
+          "position": "Cannot be determined.",
+          "source_ids": ["sname-mfp-2009-breakup"]
+        }
+      ]
+    },
+    {
+      "id": "stern-rotation",
+      "title": "Rotation of the stern",
+      "summary": "Some testimony has the stern turning partly round before it sank, which uneven tearing of the two sides could explain. The scene does not show a rotation at the surface.",
+      "source_ids": ["sname-mfp-2009-breakup", "mengot-wreck-site"],
+      "certainty": "debated",
+      "note": "Mengot cites testimony that the stern rotated half way around."
+    },
+    {
+      "id": "scan-2022-findings",
+      "title": "What the 2022 scan adds",
+      "summary": "Analyses presented in 2025 with the digital model describe the ship as violently torn apart, boilers at the after end of the bow section deformed as if still under steam, and a steam valve on the stern in the open position.",
+      "source_ids": ["press-2025-digital-resurrection"],
+      "certainty": "estimated",
+      "note": "Interpretations reported by the press from a documentary; whether the scan supports or contradicts the bottom-up model was not found in the sources read."
+    },
+    {
+      "id": "bow-descent",
+      "title": "Descent of the bow section",
+      "summary": "The bow section took about five minutes to reach the bottom, moving forward as it fell, about one unit forward for six down. It struck stem first at an estimated 20 knots or more and buried its stem about 60 ft in the sediment.",
+      "value": 5,
+      "unit": "min",
+      "source_ids": ["mengot-wreck-site", "wikipedia-titanic", "halpern-collision-point"],
+      "certainty": "estimated",
+      "note": "Mengot; figures of Halpern and Weeks and of Ballard known through Wikipedia. Accounts differ on whether it struck at a shallow or a steep angle."
+    },
+    {
+      "id": "stern-descent",
+      "title": "Descent of the stern section",
+      "summary": "The stern section fell almost vertically, probably rotating, and struck rudder first. Its forward half was wrecked by the break-up, rapid flooding and the impact.",
+      "source_ids": ["mengot-wreck-site", "wikipedia-titanic", "bbc-2023-scan"],
+      "certainty": "estimated",
+      "note": "No source gives a speed or duration specific to the stern. Mengot limits true implosion damage to the area of the after well deck."
+    },
+    {
+      "id": "heavy-debris",
+      "title": "Boilers mark the surface position",
+      "summary": "The heavy items released by the break, such as the single-ended boilers, fell almost straight down, so the boiler field marks the point of the surface where the ship broke up.",
+      "source_ids": ["maib-1992-reappraisal", "halpern-collision-point"],
+      "certainty": "estimated",
+      "note": "Used by the MAIB and by Halpern to fix the foundering position."
+    }
+  ],
+  "break": {
+    "ats": "1912-04-15T02:17",
+    "trim_min_deg": 15,
+    "trim_max_deg": 17,
+    "source_ids": ["sname-mfp-2009-breakup", "halpern-collision-point", "halpern-chronology-2023"],
+    "certainty": "estimated",
+    "note": "The trim is the Marine Forensics Panel's figure for the first failure. No source states the minute of the break as such: it follows from the lights going out about three minutes before the end (Symons; the Californian's clock)."
+  },
+  "funnel_falls": [
+    {
+      "funnel_id": 1,
+      "ats": "1912-04-15T02:16",
+      "source_ids": ["sname-mfp-2009-breakup", "wfb-lifeboat-sequence", "project-derivation"],
+      "certainty": "estimated",
+      "note": "Fell as the bridge went under, close to collapsible B; no source gives the minute."
+    },
+    {
+      "funnel_id": 2,
+      "ats": "1912-04-15T02:17:15",
+      "source_ids": ["project-derivation"],
+      "certainty": "estimated",
+      "note": "No testimony on its fall was found in the sources read. No funnel remains on the wreck; the project removes it as the bow section goes under."
+    },
+    {
+      "funnel_id": 3,
+      "ats": "1912-04-15T02:17:05",
+      "source_ids": ["archaeology-2012-delgado", "project-derivation"],
+      "certainty": "estimated",
+      "note": "The base of its deckhouse lies among the debris of the break zone; the project removes it at the break."
+    },
+    {
+      "funnel_id": 4,
+      "ats": "1912-04-15T02:18",
+      "source_ids": ["halpern-chronology-2023"],
+      "certainty": "estimated",
+      "note": "Fell aft as the stern rose (Symons and Dillon, as cited by Halpern)."
+    }
+  ],
+  "bow_section": {
+    "x_start_m": -0.76,
+    "x_end_m": 143,
+    "reference_x_m": 70,
+    "keyframes": [
+      {
+        "ats": "1912-04-15T02:17:30",
+        "pitch_deg": 20,
+        "heel_deg": -10,
+        "yaw_deg": 0,
+        "forward_m": 104,
+        "starboard_m": 0,
+        "up_m": -36,
+        "source_ids": ["sname-mfp-2009-breakup", "project-derivation"],
+        "certainty": "estimated",
+        "note": "Freed from the stern, the flooded bow section goes under. Pose interpolated by the project."
+      },
+      {
+        "ats": "1912-04-15T02:18:30",
+        "pitch_deg": 24,
+        "heel_deg": -8,
+        "yaw_deg": 0,
+        "forward_m": 108,
+        "starboard_m": 0,
+        "up_m": -75,
+        "source_ids": ["project-derivation"],
+        "certainty": "estimated",
+        "note": "Section wholly submerged. Pose interpolated by the project."
+      },
+      {
+        "ats": "1912-04-15T02:20",
+        "pitch_deg": 24,
+        "heel_deg": -4,
+        "yaw_deg": 0,
+        "forward_m": 230,
+        "starboard_m": 0,
+        "up_m": -900,
+        "source_ids": ["mengot-wreck-site", "project-derivation"],
+        "certainty": "estimated",
+        "note": "Descent at a mean of about 11 to 12 m/s, moving forward about one unit for six down (Mengot). Positions computed by the project from those figures."
+      },
+      {
+        "ats": "1912-04-15T02:22",
+        "pitch_deg": 20,
+        "heel_deg": -1,
+        "yaw_deg": 0,
+        "forward_m": 460,
+        "starboard_m": 0,
+        "up_m": -2300,
+        "source_ids": ["mengot-wreck-site", "project-derivation"],
+        "certainty": "estimated",
+        "note": "Descent, computed as above."
+      },
+      {
+        "ats": "1912-04-15T02:23:40",
+        "pitch_deg": 12,
+        "heel_deg": 0,
+        "yaw_deg": 0,
+        "forward_m": 620,
+        "starboard_m": 0,
+        "up_m": -3650,
+        "source_ids": ["mengot-wreck-site", "project-derivation"],
+        "certainty": "estimated",
+        "note": "Approach to the seabed, computed as above."
+      },
+      {
+        "ats": "1912-04-15T02:24",
+        "pitch_deg": 4,
+        "heel_deg": 0,
+        "yaw_deg": 0,
+        "forward_m": 630,
+        "starboard_m": 0,
+        "up_m": -3795,
+        "source_ids": ["mengot-wreck-site", "wikipedia-titanic", "project-derivation"],
+        "certainty": "estimated",
+        "note": "At rest about 600 m from the centre of the site, stem buried about 18 m, sitting upright. The heading on the seabed was not verified in the sources read."
+      }
+    ],
+    "source_ids": ["mengot-wreck-site", "wikipedia-titanic", "project-derivation"],
+    "certainty": "estimated",
+    "note": "Section from the stem to the uptake of the third funnel, about 140 m long (Mengot gives about 450 ft, Wikipedia about 470 ft). The first pose, at the break, is computed by the model from the trim and list curves."
+  },
+  "stern_section": {
+    "x_start_m": 164,
+    "x_end_m": 268.3,
+    "reference_x_m": 215,
+    "keyframes": [
+      {
+        "ats": "1912-04-15T02:17:20",
+        "pitch_deg": 6,
+        "heel_deg": -10,
+        "yaw_deg": 0,
+        "forward_m": -36.5,
+        "starboard_m": 0,
+        "up_m": -1,
+        "source_ids": ["sname-mfp-2009-breakup", "mengot-wreck-site", "project-derivation"],
+        "certainty": "estimated",
+        "note": "The stern settles back toward the water as the hull parts, in 15 to 20 seconds. Angle chosen by the project to represent \"settles back\"."
+      },
+      {
+        "ats": "1912-04-15T02:18:30",
+        "pitch_deg": 20,
+        "heel_deg": -8,
+        "yaw_deg": 0,
+        "forward_m": -36,
+        "starboard_m": 0,
+        "up_m": -6,
+        "source_ids": ["sname-mfp-2009-breakup", "project-derivation"],
+        "certainty": "estimated",
+        "note": "The flooding bow and the opened forward end pull the front of the stern down; the stern tips up again."
+      },
+      {
+        "ats": "1912-04-15T02:19:15",
+        "pitch_deg": 30,
+        "heel_deg": -5,
+        "yaw_deg": 0,
+        "forward_m": -35,
+        "starboard_m": 0,
+        "up_m": -14,
+        "source_ids": [
+          "wikipedia-titanic",
+          "ballard-1987",
+          "sname-mfp-2009-breakup",
+          "project-derivation"
+        ],
+        "certainty": "debated",
+        "note": "Steepest angle shown. The true angle is unknown; 30° is the low end of the range attributed to Ballard."
+      },
+      {
+        "ats": "1912-04-15T02:20",
+        "pitch_deg": 30,
+        "heel_deg": -3,
+        "yaw_deg": 0,
+        "forward_m": -34,
+        "starboard_m": 0,
+        "up_m": -39,
+        "source_ids": ["brit-inquiry-report", "project-derivation"],
+        "certainty": "estimated",
+        "note": "The stern disappears at 2:20 a.m. (established); the depth of the reference point places the highest point of the stern at the surface."
+      },
+      {
+        "ats": "1912-04-15T02:22",
+        "pitch_deg": -20,
+        "heel_deg": 0,
+        "yaw_deg": 60,
+        "forward_m": -10,
+        "starboard_m": -10,
+        "up_m": -1150,
+        "source_ids": ["mengot-wreck-site", "wikipedia-titanic", "project-derivation"],
+        "certainty": "estimated",
+        "note": "Near-vertical fall, probably rotating (Mengot). Speed assumed equal to the published five to six minutes for the whole descent. No source gives the attitude during the fall: the project shows the section pitched 20° with the after end down, so that it arrives rudder first as Mengot describes."
+      },
+      {
+        "ats": "1912-04-15T02:24",
+        "pitch_deg": -20,
+        "heel_deg": 0,
+        "yaw_deg": 130,
+        "forward_m": 20,
+        "starboard_m": -30,
+        "up_m": -2500,
+        "source_ids": ["mengot-wreck-site", "wikipedia-titanic", "project-derivation"],
+        "certainty": "estimated",
+        "note": "Descent, computed as above, in the attitude chosen by the project."
+      },
+      {
+        "ats": "1912-04-15T02:25:50",
+        "pitch_deg": -10,
+        "heel_deg": 0,
+        "yaw_deg": 175,
+        "forward_m": 38,
+        "starboard_m": -40,
+        "up_m": -3700,
+        "source_ids": ["mengot-wreck-site", "project-derivation"],
+        "certainty": "estimated",
+        "note": "Approach to the seabed with the after end lower, so that the rudder strikes first (Mengot). The angle is the project's choice."
+      },
+      {
+        "ats": "1912-04-15T02:26",
+        "pitch_deg": 0,
+        "heel_deg": 0,
+        "yaw_deg": 180,
+        "forward_m": 40,
+        "starboard_m": -40,
+        "up_m": -3794,
+        "source_ids": [
+          "mengot-wreck-site",
+          "maib-1992-reappraisal",
+          "wikipedia-titanic",
+          "project-derivation"
+        ],
+        "certainty": "estimated",
+        "note": "At rest near the boiler field, about 600 m from the bow section. That it faces the opposite way to the bow is widely stated but was not verified in the sources read."
+      }
+    ],
+    "source_ids": ["mengot-wreck-site", "wikipedia-titanic", "project-derivation"],
+    "certainty": "estimated",
+    "note": "Section from the reciprocating engine room to the stern, about 105 m long (Wikipedia gives about 350 ft). The first pose, at the break, is computed by the model from the trim and list curves."
+  }
+}

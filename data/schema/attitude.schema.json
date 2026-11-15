@@ -1,0 +1,218 @@
+{
+  "$id": "https://www.titanic-4d.org/schema/attitude.schema.json",
+  "title": "Titanic 4D dataset: attitude.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "initial_draught": {
+      "type": "object",
+      "properties": {
+        "forward_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "aft_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema4"
+        }
+      },
+      "required": [
+        "forward_m",
+        "aft_m",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "waterline_pivot": {
+      "type": "object",
+      "properties": {
+        "x_m": {
+          "type": "number",
+          "description": "Station, in metres aft of the forward perpendicular, about which the waterline appears to rotate as the ship trims."
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema4"
+        }
+      },
+      "required": [
+        "x_m",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "trim": {
+      "minItems": 2,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema6"
+      }
+    },
+    "heel": {
+      "minItems": 2,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema8"
+      }
+    }
+  },
+  "required": [
+    "initial_draught",
+    "waterline_pivot",
+    "trim",
+    "heel"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "__schema0": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema1"
+      }
+    },
+    "__schema1": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "__schema2": {
+      "type": "string",
+      "enum": [
+        "established",
+        "estimated",
+        "debated"
+      ],
+      "description": "established: primary evidence and broad consensus; estimated: derived or approximate, with the method stated in the note; debated: competing positions exist and are listed."
+    },
+    "__schema3": {
+      "type": "string",
+      "minLength": 1
+    },
+    "__schema4": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema5"
+      }
+    },
+    "__schema5": {
+      "type": "object",
+      "properties": {
+        "holder": {
+          "type": "string",
+          "minLength": 1
+        },
+        "position": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_ids": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema1"
+          }
+        }
+      },
+      "required": [
+        "holder",
+        "position",
+        "source_ids"
+      ],
+      "additionalProperties": false
+    },
+    "__schema6": {
+      "type": "object",
+      "properties": {
+        "ats": {
+          "$ref": "#/$defs/__schema7"
+        },
+        "trim_deg": {
+          "type": "number",
+          "description": "Trim in degrees, positive down by the head."
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema4"
+        }
+      },
+      "required": [
+        "ats",
+        "trim_deg",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "__schema7": {
+      "type": "string",
+      "pattern": "^1912-04-1[45]T(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d)?$",
+      "description": "Titanic ship's time (Apparent Time Ship), ISO 8601 local date-time."
+    },
+    "__schema8": {
+      "type": "object",
+      "properties": {
+        "ats": {
+          "$ref": "#/$defs/__schema7"
+        },
+        "heel_deg": {
+          "type": "number",
+          "description": "List in degrees, positive to starboard."
+        },
+        "source_ids": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "certainty": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "note": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "alternatives": {
+          "$ref": "#/$defs/__schema4"
+        }
+      },
+      "required": [
+        "ats",
+        "heel_deg",
+        "source_ids",
+        "certainty",
+        "note"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

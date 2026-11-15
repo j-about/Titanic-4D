@@ -1,0 +1,427 @@
+{
+  "positions": [
+    {
+      "id": "first-distress-position",
+      "label": "First position transmitted",
+      "latitude_deg": 41.7333,
+      "longitude_deg": -50.4,
+      "source_ids": ["us-inquiry-report", "lee-desperate-dialogue"],
+      "certainty": "established",
+      "note": "41°44′N, 50°24′W, as received by Cape Race and others at 10:25 p.m. New York time. Established as the position sent; about 20 nautical miles west of the wreck."
+    },
+    {
+      "id": "cqd-position",
+      "label": "Distress position worked out by Boxhall",
+      "latitude_deg": 41.7667,
+      "longitude_deg": -50.2333,
+      "source_ids": ["brit-inquiry-report", "brit-inquiry-testimony", "us-inquiry-report"],
+      "certainty": "established",
+      "note": "41°46′N, 50°14′W. Established as the position sent and accepted in 1912; the wreck lies about 13 nautical miles to the east of it."
+    },
+    {
+      "id": "wreck-bow",
+      "label": "Bow section of the wreck",
+      "latitude_deg": 41.7325,
+      "longitude_deg": -49.9469,
+      "source_ids": ["britannica-titanic"],
+      "certainty": "estimated",
+      "note": "41°43′57″N, 49°56′49″W, a commonly quoted figure. Britannica's page refused direct requests: the figure was read only in search-result extracts and was not verified on a page opened by the project. Its longitude is that of the boiler field."
+    },
+    {
+      "id": "wreck-boiler-field",
+      "label": "Centre of the boiler field",
+      "latitude_deg": 41.7256,
+      "longitude_deg": -49.9469,
+      "source_ids": ["halpern-collision-point", "maib-1992-reappraisal", "ballard-1987"],
+      "certainty": "established",
+      "note": "41°43′32″N, 49°56′49″W (Ballard, as quoted by Halpern); the MAIB uses 41°43.6′N, 49°56.9′W for the boilers and stern. Taken as the point of the surface where the ship foundered."
+    },
+    {
+      "id": "wreck-stern",
+      "label": "Stern section of the wreck",
+      "latitude_deg": 41.7264,
+      "longitude_deg": -49.9483,
+      "source_ids": ["wikipedia-titanic", "maib-1992-reappraisal"],
+      "certainty": "estimated",
+      "note": "41°43′35″N, 49°56′54″W, a commonly quoted figure seen only in a search extract; consistent with the MAIB position for the boilers and stern."
+    },
+    {
+      "id": "collision-point",
+      "label": "Collision point (Halpern)",
+      "latitude_deg": 41.7583,
+      "longitude_deg": -49.9167,
+      "source_ids": ["halpern-collision-point"],
+      "certainty": "estimated",
+      "note": "About 41°45.5′N, 49°55′W, obtained by running the local current back from the wreck and allowing for the ship's travel after the collision.",
+      "alternatives": [
+        {
+          "holder": "Marine Accident Investigation Branch (1992)",
+          "position": "About 41°47′N, 49°55′W.",
+          "source_ids": ["maib-1992-reappraisal", "halpern-collision-point"]
+        }
+      ]
+    },
+    {
+      "id": "californian-reported",
+      "label": "Position reported by the Californian",
+      "latitude_deg": 42.0833,
+      "longitude_deg": -50.1167,
+      "source_ids": ["brit-inquiry-report", "us-inquiry-report"],
+      "certainty": "debated",
+      "note": "42°05′N, 50°07′W by her master's reckoning, from a log written up afterwards. The British court was satisfied that this position was not accurate."
+    }
+  ],
+  "heading": {
+    "true_deg": 337.5,
+    "source_ids": ["halpern-collision-point", "brit-inquiry-testimony"],
+    "certainty": "debated",
+    "note": "Halpern: after the collision the ship swung to starboard and came to rest heading about north by compass (Rowe, Q17667–17674), that is about north-north-west true with the variation of about two points west. The value is used to orient the sky and the horizon relative to the ship.",
+    "alternatives": [
+      {
+        "holder": "Marine Accident Investigation Branch (de Coverly, 1992)",
+        "position": "After the initial turn to port the heading did not much change, leaving the ship heading about west-south-west.",
+        "source_ids": ["maib-1992-reappraisal"]
+      }
+    ]
+  },
+  "environment": [
+    {
+      "id": "weather",
+      "title": "Weather",
+      "summary": "Perfectly clear and fine, without a cloud: no moon, the stars out, no wind.",
+      "source_ids": ["brit-inquiry-report", "brit-inquiry-testimony", "us-inquiry-report"],
+      "certainty": "established",
+      "note": "Report, Weather Conditions; Lee, Q2401–2405."
+    },
+    {
+      "id": "sea-state",
+      "title": "Sea",
+      "summary": "Flat calm; a survivor described the sea as like glass, the stars reflected in it.",
+      "source_ids": ["brit-inquiry-testimony", "wikipedia-titanic"],
+      "certainty": "established",
+      "note": "Lee, Q2404: \"Quite a calm sea.\" The \"like glass\" description (Gracie) is known through Wikipedia."
+    },
+    {
+      "id": "air-temperature",
+      "title": "Air temperature",
+      "summary": "About 32 °F, freezing, after falling ten degrees in under two hours during the evening.",
+      "value": 0,
+      "unit": "degC",
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "Report, Weather Conditions."
+    },
+    {
+      "id": "sea-temperature",
+      "title": "Sea temperature",
+      "summary": "About 28 °F, below the freezing point of fresh water.",
+      "value": -2,
+      "unit": "degC",
+      "source_ids": ["wikipedia-titanic"],
+      "certainty": "estimated",
+      "note": "Commonly quoted figure, not found in the primary sources read."
+    },
+    {
+      "id": "moon",
+      "title": "Moon",
+      "summary": "No Moon was in the sky. New Moon fell on 17 April 1912; during the sinking the thin waning crescent was below the horizon.",
+      "source_ids": [
+        "brit-inquiry-report",
+        "brit-inquiry-testimony",
+        "astronomy-engine",
+        "project-derivation"
+      ],
+      "certainty": "established",
+      "note": "\"There was no moon\" (report; Lee, Q2402). The phase and altitude are computed by the project with the ephemeris."
+    },
+    {
+      "id": "haze",
+      "title": "Haze on the horizon",
+      "summary": "The lookouts spoke of a slight haze ahead at the time of the collision; the officers saw none.",
+      "source_ids": ["brit-inquiry-testimony", "wikipedia-titanic"],
+      "certainty": "debated",
+      "note": "Lee, Q2401, Q2408; Boxhall, Q15339–15340: \"I never saw any haze whatever.\"",
+      "alternatives": [
+        {
+          "holder": "Tim Maltin",
+          "position": "A strong temperature inversion over the cold current produced abnormal refraction and a raised false horizon.",
+          "source_ids": ["wikipedia-titanic"]
+        },
+        {
+          "holder": "Samuel Halpern",
+          "position": "An indistinct horizon on a dark, flat-calm night, not a mirage.",
+          "source_ids": ["wikipedia-titanic"]
+        }
+      ]
+    },
+    {
+      "id": "ice-field",
+      "title": "Ice",
+      "summary": "A field of pack ice five to six miles wide lay across the track, running north and south, with bergs in and around it. Titanic stopped on its eastern side.",
+      "source_ids": ["halpern-collision-point", "brit-inquiry-report"],
+      "certainty": "estimated",
+      "note": "Halpern, from the evidence of the Californian and Mount Temple."
+    },
+    {
+      "id": "current",
+      "title": "Current",
+      "summary": "A current setting about south by west at a little over one knot carried the ship and the wreckage.",
+      "value": 1.09,
+      "unit": "kn",
+      "source_ids": ["halpern-collision-point", "maib-1992-reappraisal"],
+      "certainty": "estimated",
+      "note": "Halpern: 196.7° true at 1.09 knots; MAIB: 196.2° at 1.23 knots."
+    },
+    {
+      "id": "course-before-collision",
+      "title": "Course before the collision",
+      "summary": "266° true, at about 22 knots; the ship had turned about two points to port when she struck.",
+      "value": 266,
+      "unit": "deg",
+      "source_ids": ["halpern-collision-point", "brit-inquiry-report"],
+      "certainty": "established",
+      "note": "Report, The Collision."
+    },
+    {
+      "id": "depth",
+      "title": "Depth of water",
+      "summary": "About 3,800 m (12,500 ft).",
+      "value": 3800,
+      "unit": "m",
+      "source_ids": [
+        "bbc-2023-scan",
+        "press-2025-digital-resurrection",
+        "britannica-titanic",
+        "wikipedia-titanic"
+      ],
+      "certainty": "estimated",
+      "note": "Round figure given by the BBC. Britannica's 3,810 m was read only in a search-result extract; Wikipedia quotes 3,795 m. The depths of the two sections were not found separately in the sources read."
+    },
+    {
+      "id": "sky-computation",
+      "title": "Sky",
+      "summary": "The stars, planets and Moon are placed as they stood for the date, the time and the place, computed from a star catalogue and an ephemeris rather than drawn by hand.",
+      "source_ids": ["yale-bsc5", "astronomy-engine", "project-derivation"],
+      "certainty": "estimated",
+      "note": "Computed for the foundering position with the adopted clock offset (ship's time 2 h 58 min behind GMT). A different offset would turn the sky by about a quarter of a degree per minute of difference."
+    }
+  ],
+  "iceberg": [
+    {
+      "id": "iceberg-size",
+      "title": "Size",
+      "summary": "Witnesses put the iceberg a little higher than the forecastle or about the height of the Boat deck, some 50 to 100 ft above the water. A published summary gives 50 to 100 ft high and about 400 ft long.",
+      "source_ids": ["brit-inquiry-testimony", "wikipedia-titanic"],
+      "certainty": "estimated",
+      "note": "Lee, Q2439–2447, read directly; the other witnesses and the summary of Bigg and Wilton (2014) are known through Wikipedia. The scene shows a generic iceberg within this range, not a portrait."
+    },
+    {
+      "id": "iceberg-appearance",
+      "title": "Appearance",
+      "summary": "A dark mass, with no white showing until it was close alongside; one witness called it dark blue.",
+      "source_ids": ["brit-inquiry-testimony", "wikipedia-titanic"],
+      "certainty": "established",
+      "note": "Lee, Q2441–2442: one side black, the other white."
+    },
+    {
+      "id": "iceberg-photographs",
+      "title": "Photographs",
+      "summary": "Several photographs of icebergs taken in the area in the following days have been proposed as the one struck. None can be verified.",
+      "source_ids": ["wikipedia-titanic"],
+      "certainty": "debated",
+      "note": "The scene does not reproduce any of them."
+    },
+    {
+      "id": "iceberg-passage",
+      "title": "Passage along the ship",
+      "summary": "The iceberg passed down the starboard side and was left astern as the ship ran on and lost her way. Its distance from the ship after the collision is not recorded.",
+      "source_ids": ["brit-inquiry-testimony", "brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "The scene moves the iceberg aft at the ship's speed at the collision, falling evenly to nothing over four minutes: a modelling choice of the project, which leaves the iceberg about 1.4 km astern. Neither the time the ship took to stop nor the distance run was found in the sources read."
+    }
+  ],
+  "californian": [
+    {
+      "id": "californian-stopped",
+      "title": "Stopped in the ice",
+      "summary": "The SS Californian stopped for the night at the edge of the ice field at about 10:20 p.m. Her officers watched a steamer to the south, saw eight white rockets and saw her lights disappear; no action was taken until morning.",
+      "source_ids": ["brit-inquiry-report", "brit-inquiry-testimony", "maib-1992-reappraisal"],
+      "certainty": "established",
+      "note": "Stone and Gibson, British Inquiry, Day 7. Both MAIB inspectors agreed that the rockets were seen and that proper action was not taken."
+    },
+    {
+      "id": "californian-distance",
+      "title": "Distance from Titanic",
+      "summary": "The distance is disputed. The scene shows a faint light low on the horizon at about ten nautical miles, within the range accepted by the British court.",
+      "value": 10,
+      "unit": "nmi",
+      "source_ids": [
+        "brit-inquiry-report",
+        "maib-1992-reappraisal",
+        "us-inquiry-report",
+        "halpern-dozen-rockets"
+      ],
+      "certainty": "debated",
+      "note": "British report: probably not more than eight to ten miles.",
+      "alternatives": [
+        {
+          "holder": "Captain Lord",
+          "position": "19 to 19½ miles.",
+          "source_ids": ["brit-inquiry-report", "us-inquiry-report"]
+        },
+        {
+          "holder": "MAIB Deputy Chief Inspector de Coverly (1992)",
+          "position": "17 to 20 miles, most likely about 18; Titanic probably not seen.",
+          "source_ids": ["maib-1992-reappraisal"]
+        },
+        {
+          "holder": "MAIB Inspector Barnett (1992)",
+          "position": "5 to 10 miles, probably nearer five.",
+          "source_ids": ["maib-1992-reappraisal"]
+        },
+        {
+          "holder": "Samuel Halpern",
+          "position": "12 to at most about 14 nautical miles.",
+          "source_ids": ["halpern-dozen-rockets"]
+        }
+      ]
+    },
+    {
+      "id": "californian-bearing",
+      "title": "Bearing from Titanic",
+      "summary": "The scene places the light about north-west by north of Titanic, 326° true.",
+      "value": 326,
+      "unit": "deg",
+      "source_ids": [
+        "maib-1992-reappraisal",
+        "halpern-dozen-rockets",
+        "brit-inquiry-report",
+        "us-inquiry-report",
+        "project-derivation"
+      ],
+      "certainty": "debated",
+      "note": "MAIB (de Coverly): about north-west by north, taken by the project as 326° true. The other bearings recorded are listed as alternatives.",
+      "alternatives": [
+        {
+          "holder": "Samuel Halpern",
+          "position": "About 315° true.",
+          "source_ids": ["halpern-dozen-rockets"]
+        },
+        {
+          "holder": "Position reported by the Californian's master",
+          "position": "341° true from the boiler field, by the project's great-circle computation from that position.",
+          "source_ids": ["brit-inquiry-report", "us-inquiry-report", "project-derivation"]
+        }
+      ]
+    },
+    {
+      "id": "mystery-ship",
+      "title": "Lights seen from Titanic",
+      "summary": "From the bridge the masthead lights of a steamer were seen a little on the port bow, and boats were told to pull toward a light. Whether it was the Californian is part of the same dispute.",
+      "source_ids": ["brit-inquiry-testimony", "us-inquiry-report"],
+      "certainty": "debated",
+      "note": "Boxhall, Q15388–15408; the US report counts sixteen witnesses who saw a light."
+    }
+  ],
+  "wreck": [
+    {
+      "id": "two-sections",
+      "title": "Two main sections",
+      "summary": "The wreck lies in two main sections about 600 m apart, with a field of debris around the stern.",
+      "value": 600,
+      "unit": "m",
+      "source_ids": [
+        "mengot-wreck-site",
+        "press-2025-digital-resurrection",
+        "bbc-2023-scan",
+        "project-derivation"
+      ],
+      "certainty": "established",
+      "note": "About 600 m in most accounts; the BBC wrote about 800 m in 2023, and the commonly quoted coordinates give about 690 m between reference points."
+    },
+    {
+      "id": "bow-condition",
+      "title": "Bow section",
+      "summary": "The bow section sits upright, its stem dug about 60 ft into the bottom, its after end almost on top of the mud.",
+      "value": 18,
+      "unit": "m",
+      "source_ids": ["mengot-wreck-site"],
+      "certainty": "estimated",
+      "note": "Mengot."
+    },
+    {
+      "id": "stern-condition",
+      "title": "Stern section",
+      "summary": "The stern section is far more damaged: its decks collapsed on one another, its shell plating peeled away over its forward half.",
+      "source_ids": ["mengot-wreck-site", "bbc-2023-scan"],
+      "certainty": "established",
+      "note": "Mengot; BBC 2023."
+    },
+    {
+      "id": "debris-field",
+      "title": "Debris field",
+      "summary": "The surveyed site covers roughly three by five miles. Near the stern lie the boilers of No. 1 boiler room, parts of the engines, coal, pieces of hull and tens of thousands of objects.",
+      "source_ids": ["archaeology-2012-delgado", "whoi-oceanus-quest-to-map"],
+      "certainty": "established",
+      "note": "Delgado, on the 2010 survey."
+    },
+    {
+      "id": "distance-from-cqd",
+      "title": "Distance from the distress position",
+      "summary": "The wreck lies about 13 nautical miles east of the position transmitted in 1912.",
+      "value": 13,
+      "unit": "nmi",
+      "source_ids": ["maib-1992-reappraisal", "project-derivation"],
+      "certainty": "established",
+      "note": "MAIB: \"some 13 miles\". Great-circle distance computed by the project from the bow position to 41°46′N, 50°14′W: 13.0 nautical miles on a bearing of 279° true."
+    },
+    {
+      "id": "foremast-condition",
+      "title": "Foremast",
+      "summary": "The foremast was torn down and lies fallen across the port side of the bridge area.",
+      "source_ids": ["wikipedia-titanic", "project-derivation"],
+      "certainty": "estimated",
+      "note": "Known through Wikipedia, \"Wreck of the Titanic\". The moment it fell is not recorded; the scene lays it down when the bow section reaches the seabed. No description of the mainmast was found; the scene does not draw it on the wrecked stern, whose decks have collapsed."
+    },
+    {
+      "id": "funnels-lost",
+      "title": "Funnels",
+      "summary": "No funnel remains on the wreck: they were carried away during the sinking and the descent, taking the rigging with them.",
+      "source_ids": ["wikipedia-titanic", "archaeology-2012-delgado"],
+      "certainty": "estimated",
+      "note": "Known through Wikipedia, \"Wreck of the Titanic\"; Delgado records the base of the third funnel's deckhouse among the debris of the break zone."
+    }
+  ],
+  "surveys": [
+    {
+      "id": "discovery-1985",
+      "title": "Discovery (1985)",
+      "summary": "The wreck was found on 1 September 1985 by a joint French and American expedition led by Robert Ballard, using the towed vehicle Argo from the research vessel Knorr.",
+      "value": 1985,
+      "unit": "year",
+      "source_ids": ["archaeology-2012-delgado", "maib-1992-reappraisal", "bbc-2023-scan"],
+      "certainty": "established",
+      "note": "Delgado names IFREMER as co-discoverer."
+    },
+    {
+      "id": "survey-2010",
+      "title": "Site map (2010)",
+      "summary": "An expedition mapped the whole site for the first time with two autonomous underwater vehicles and a remotely operated vehicle, combining sonar and optical mosaics.",
+      "value": 2010,
+      "unit": "year",
+      "source_ids": ["archaeology-2012-delgado", "whoi-oceanus-quest-to-map"],
+      "certainty": "established",
+      "note": "Published in 2012."
+    },
+    {
+      "id": "scan-2022",
+      "title": "Digital model (2022)",
+      "summary": "In the summer of 2022 Magellan and Atlantic Productions scanned the wreck with two remotely operated vehicles, producing a full-size digital model from about 715,000 photographs and millions of laser measurements, 16 terabytes of data in all. National Geographic describes it as the largest underwater 3D scan ever made.",
+      "value": 2022,
+      "unit": "year",
+      "source_ids": ["bbc-2023-scan", "press-2025-digital-resurrection"],
+      "certainty": "established",
+      "note": "The BBC first reported more than 700,000 images and more than 200 hours of survey. The duration of data collection is given as three, four or six weeks depending on the outlet; \"largest\" is the producers' own description."
+    }
+  ]
+}

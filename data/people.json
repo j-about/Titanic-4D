@@ -1,0 +1,199 @@
+{
+  "casualty_counts": [
+    {
+      "id": "british-inquiry-1912",
+      "holder": "British Wreck Commissioner's report (1912)",
+      "aboard": 2201,
+      "saved": 711,
+      "lost": 1490,
+      "breakdown": [
+        {
+          "group": "First class",
+          "aboard": 325,
+          "saved": 203,
+          "lost": 122
+        },
+        {
+          "group": "Second class",
+          "aboard": 285,
+          "saved": 118,
+          "lost": 167
+        },
+        {
+          "group": "Third class",
+          "aboard": 706,
+          "saved": 178,
+          "lost": 528
+        },
+        {
+          "group": "Crew",
+          "aboard": 885,
+          "saved": 212,
+          "lost": 673
+        }
+      ],
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "The report speaks of \"the loss of 1,490 lives\". Established as the court's count; the true number differs between sources."
+    },
+    {
+      "id": "us-senate-1912",
+      "holder": "US Senate report (1912)",
+      "aboard": 2223,
+      "saved": 706,
+      "lost": 1517,
+      "breakdown": [
+        {
+          "group": "First class",
+          "aboard": 329,
+          "saved": 199,
+          "lost": 130
+        },
+        {
+          "group": "Second class",
+          "aboard": 285,
+          "saved": 119,
+          "lost": 166
+        },
+        {
+          "group": "Third class",
+          "aboard": 710,
+          "saved": 174,
+          "lost": 536
+        },
+        {
+          "group": "Crew",
+          "aboard": 899,
+          "saved": 214,
+          "lost": 685
+        }
+      ],
+      "source_ids": ["us-inquiry-report"],
+      "certainty": "established",
+      "note": "Established as the committee's count."
+    },
+    {
+      "id": "encyclopedia-titanica",
+      "holder": "Encyclopedia Titanica",
+      "aboard": 2208,
+      "saved": 712,
+      "lost": 1496,
+      "source_ids": ["encyclopedia-titanica-statistics"],
+      "certainty": "estimated",
+      "note": "1,317 passengers (324 first class, 284 second class, 709 third class) and 891 crew. That source's count, read only through a search-result extract of its table: the site refused direct requests, so the table itself was not opened."
+    },
+    {
+      "id": "board-of-trade-1503",
+      "holder": "British Board of Trade figure cited by Britannica",
+      "aboard": null,
+      "saved": null,
+      "lost": 1503,
+      "source_ids": ["britannica-titanic", "brit-inquiry-report"],
+      "certainty": "debated",
+      "note": "Britannica attributes 1,503 lives lost to the British Board of Trade. The figure does not appear in the Wreck Commissioner's report, which gives 1,490; its original document was not identified."
+    }
+  ],
+  "rescue": [
+    {
+      "id": "carpathia-turns",
+      "carpathia_time": "00:35",
+      "ats": "1912-04-15T00:37",
+      "title": "Carpathia turns toward the distress position",
+      "description": "The Cunard liner Carpathia, 58 miles away, receives the call and turns toward the position given.",
+      "source_ids": ["us-inquiry-testimony", "us-inquiry-report", "brit-inquiry-report"],
+      "certainty": "established",
+      "note": "Rostron gives 12:35 a.m. by his ship's time; the message is logged at 10:35 p.m. New York time."
+    },
+    {
+      "id": "carpathia-sees-flare",
+      "carpathia_time": "02:40",
+      "ats": "1912-04-15T02:45",
+      "title": "A green flare is seen from Carpathia",
+      "description": "Captain Rostron sees a green flare ahead, one of those burned in boat No. 2.",
+      "source_ids": ["us-inquiry-testimony", "brit-inquiry-report"],
+      "certainty": "established",
+      "note": "Rostron, US Inquiry, Day 1."
+    },
+    {
+      "id": "carpathia-stops",
+      "carpathia_time": "04:00",
+      "ats": "1912-04-15T04:05",
+      "title": "Carpathia stops among the boats",
+      "description": "Carpathia stops her engines after steering round icebergs for more than an hour.",
+      "source_ids": ["us-inquiry-testimony", "brit-inquiry-report"],
+      "certainty": "established",
+      "note": "Rostron: \"At 4 o'clock I stopped\"; the British report says 4.05."
+    },
+    {
+      "id": "first-boat-alongside",
+      "carpathia_time": "04:10",
+      "ats": "1912-04-15T04:15",
+      "title": "First boat alongside",
+      "description": "Boat No. 2, in charge of Fourth Officer Boxhall, is the first to reach Carpathia.",
+      "source_ids": ["us-inquiry-testimony", "brit-inquiry-report", "halpern-chronology-2023"],
+      "certainty": "established",
+      "note": "Rostron: \"At 4:10 I got the first boat alongside.\" The time is Carpathia's; Halpern makes it 4:15 by Titanic's clocks."
+    },
+    {
+      "id": "last-boat-alongside",
+      "carpathia_time": "08:15",
+      "ats": "1912-04-15T08:20",
+      "title": "Last boat alongside",
+      "description": "Boat No. 12, the last, reaches Carpathia with Second Officer Lightoller aboard.",
+      "source_ids": ["halpern-chronology-2023", "wikipedia-titanic"],
+      "certainty": "estimated",
+      "note": "Halpern's chronology, from a table by George Behe; Wikipedia gives about 8:30 from the same table."
+    },
+    {
+      "id": "all-aboard",
+      "carpathia_time": "08:30",
+      "ats": "1912-04-15T08:35",
+      "title": "All survivors aboard",
+      "description": "All the survivors are aboard Carpathia, which takes up thirteen of the boats.",
+      "source_ids": ["halpern-chronology-2023", "brit-inquiry-report"],
+      "certainty": "established",
+      "note": "Rostron's report to Cunard of 19 April, as cited by Halpern. The British report counts 712 people taken aboard, one of whom died soon afterwards."
+    },
+    {
+      "id": "carpathia-leaves",
+      "carpathia_time": "08:50",
+      "ats": "1912-04-15T08:55",
+      "title": "Carpathia leaves the area",
+      "description": "After a search of the area Carpathia gets under way; the Californian remains to search.",
+      "source_ids": ["halpern-chronology-2023"],
+      "certainty": "established",
+      "note": "Halpern's chronology."
+    }
+  ],
+  "facts": [
+    {
+      "id": "no-single-figure",
+      "title": "No single figure",
+      "summary": "The number of people on board, saved and lost differs from one source to another: last-minute changes to the lists, aliases and the inclusion or not of some crew categories make an exact count impossible. The counts are shown side by side.",
+      "source_ids": [
+        "brit-inquiry-report",
+        "us-inquiry-report",
+        "encyclopedia-titanica-statistics",
+        "britannica-titanic"
+      ],
+      "certainty": "established",
+      "note": "Lost: 1,490 to 1,517 across the sources listed; saved: 706 to 712."
+    },
+    {
+      "id": "survival-by-class",
+      "title": "Survival by class",
+      "summary": "By the British report, 62 per cent of first-class passengers were saved, 41 per cent of the second class, 25 per cent of the third class and 24 per cent of the crew.",
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "Report, Numbers Saved."
+    },
+    {
+      "id": "boats-a-and-b",
+      "title": "Collapsibles A and B",
+      "summary": "The people who reached collapsibles A and B from the water were later taken into other boats; neither collapsible was brought to Carpathia.",
+      "source_ids": ["us-inquiry-report", "flw-new-study-2026"],
+      "certainty": "established",
+      "note": "US report; the lifeboat studies."
+    }
+  ]
+}

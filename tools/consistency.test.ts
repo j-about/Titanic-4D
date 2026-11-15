@@ -1,0 +1,239 @@
+import { access, readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { describe, expect, it } from 'vitest';
+import { canonicalUrl, site } from '../src/config/site.ts';
+import { SUPPORT_PATH } from '../src/config/support.ts';
+
+const rootDir = join(import.meta.dirname, '..');
+
+function read(relativePath: string): Promise<string> {
+  return readFile(join(rootDir, relativePath), 'utf8');
+}
+
+function firstMatch(text: string, pattern: RegExp, description: string): string {
+  const value = pattern.exec(text)?.[1];
+  if (value === undefined) {
+    throw new Error(`Could not find ${description}.`);
+  }
+  return value;
+}
+
+interface PackageManifest {
+  readonly packageManager: string;
+  readonly scripts: { readonly check: string };
+  readonly devDependencies: Readonly<Record<string, string>>;
+}
+
+const manifest = JSON.parse(await read('package.json')) as PackageManifest;
+const dockerfile = await read('Dockerfile');
+const caddyfile = await read('Caddyfile');
+const e2eScript = await read('tools/e2e-container.sh');
+const workflow = await read('.github/workflows/ci.yml');
+
+/** An image reference that names an exact version and the digest of its content. */
+const PINNED_IMAGE = /^[\w./-]+:[\w.-]*\d+\.\d+\.\d+[\w.-]*@sha256:[0-9a-f]{64}$/;
+
+describe('pinned toolchain versions', () => {
+  const pnpmVersion = firstMatch(manifest.packageManager, /^pnpm@(.+)$/, 'the pnpm version');
+
+  it('installs the same pnpm version in the Dockerfile and the e2e container', () => {
+    expect(firstMatch(dockerfile, /pnpm@([\d.]+)/, 'pnpm in Dockerfile')).toBe(pnpmVersion);
+    expect(firstMatch(e2eScript, /pnpm_version="([\d.]+)"/, 'pnpm in e2e script')).toBe(
+      pnpmVersion,
+    );
+  });
+
+  it('builds the image with the Node.js version declared in .node-version', async () => {
+    const nodeVersion = (await read('.node-version')).trim();
+    expect(firstMatch(dockerfile, /FROM node:([\d.]+)-/, 'Node.js in Dockerfile')).toBe(
+      nodeVersion,
+    );
+  });
+
+  it('runs end-to-end tests in the image matching the installed Playwright version', () => {
+    const playwrightVersion = manifest.devDependencies['@playwright/test'];
+    expect(firstMatch(e2eScript, /playwright:v([\d.]+)-/, 'the Playwright image tag')).toBe(
+      playwrightVersion,
+    );
+  });
+
+  it('references the build frontend and every image by exact version and digest', () => {
+    const references = [
+      firstMatch(dockerfile, /^# syntax=(\S+)$/m, 'the build frontend of the Dockerfile'),
+      ...Array.from(dockerfile.matchAll(/^FROM (\S+)/gm), (match) => match[1] ?? ''),
+      firstMatch(e2eScript, /^readonly image="([^"]+)"$/m, 'the image of the e2e script'),
+    ];
+    expect(references).toHaveLength(4);
+    for (const reference of references) {
+      expect(reference).toMatch(PINNED_IMAGE);
+    }
+  });
+});
+
+describe('continuous integration', () => {
+  it('runs every step of `pnpm check`, with coverage for the unit tests', () => {
+    const steps = manifest.scripts.check.split('&&').map((step) => step.trim());
+    expect(steps).toContain('pnpm data:schema:check');
+    for (const step of steps) {
+      const command = step === 'pnpm test' ? 'pnpm test:coverage' : step;
+      expect(workflow).toContain(`      - run: ${command}\n`);
+    }
+  });
+
+  it('lists every job among the required checks of the deployment procedure', async () => {
+    const procedure = await read('docs/DEPLOY.md');
+    const jobNames = Array.from(workflow.matchAll(/^ {4}name: (.+)$/gm), (match) => match[1] ?? '');
+    expect(jobNames).toHaveLength(4);
+    for (const jobName of jobNames) {
+      expect(procedure).toContain(`   - \`${jobName}\`\n`);
+    }
+  });
+
+  it('checks that the container runs as the user that the image declares', () => {
+    const user = firstMatch(dockerfile, /^USER (\d+:\d+)$/m, 'the user of the image');
+    expect(workflow).toContain(
+      `test "$(docker inspect --format '{{.Config.User}}' titanic-4d:ci)" = "${user}"\n`,
+    );
+    expect(workflow).toContain(
+      `test "$(docker exec titanic-4d id -u):$(docker exec titanic-4d id -g)" = "${user}"\n`,
+    );
+  });
+});
+
+describe('performance budgets', () => {
+  interface Budgets {
+    readonly budgets: { readonly initialJavaScript: number };
+  }
+
+  it('enforces the JavaScript limit of the plan, counted in bytes of 1,000 to the kilobyte', async () => {
+    const plan = await read('docs/PLAN.md');
+    const { budgets } = JSON.parse(await read('budgets.json')) as Budgets;
+    const kilobytes = firstMatch(
+      plan,
+      /initial JavaScript at most (\d+) kB compressed/,
+      'the JavaScript budget in the plan',
+    );
+    expect(budgets.initialJavaScript).toBe(Number(kilobytes) * 1000);
+  });
+});
+
+describe('image content and caching', () => {
+  it('leaves the build manifest out of the image', async () => {
+    expect(await read('vite.config.ts')).toMatch(/\bmanifest: true\b/);
+    expect(dockerfile).toMatch(/^RUN pnpm build && rm -r dist\/\.vite$/m);
+  });
+
+  it('revalidates the models on every use and keeps them out of the one-hour rule', () => {
+    expect(caddyfile).toMatch(
+      /@model path \/models\/\*\n\s+header @model Cache-Control "no-cache"\n/,
+    );
+    const unversioned = firstMatch(caddyfile, /@unversioned not path (.+)/, 'the one-hour rule');
+    expect(unversioned.trim().split(/\s+/)).toContain('/models/*');
+  });
+
+  it('verifies on the server the model that the scene loads', async () => {
+    const verifier = await read('tools/verify-server.ts');
+    const address = firstMatch(verifier, /SHIP_MODEL_PATH = '([^']+)'/, 'the verified model');
+    expect(address).toMatch(/^\/models\//);
+    expect(await read('src/render/sceneView.ts')).toContain(`'${address}'`);
+    await expect(access(join(rootDir, 'public', address))).resolves.toBeUndefined();
+  });
+});
+
+describe('Caddyfile host redirects', () => {
+  it('redirects exactly the secondary hosts to the canonical origin', () => {
+    const hosts = firstMatch(caddyfile, /@secondaryHost host (.+)/, 'the secondary host matcher');
+    const byName = (a: string, b: string): number => a.localeCompare(b);
+    expect(hosts.trim().split(/\s+/).toSorted(byName)).toEqual(
+      [...site.secondaryHosts].toSorted(byName),
+    );
+    expect(caddyfile).toContain(`redir @secondaryHost ${site.canonicalOrigin}{uri} permanent`);
+  });
+});
+
+describe('people who died, as stated in the README', () => {
+  interface People {
+    readonly casualty_counts: readonly { readonly lost: number }[];
+  }
+
+  it('gives the lowest and the highest count of lives lost in the dataset', async () => {
+    const people = JSON.parse(await read('data/people.json')) as People;
+    const lost = people.casualty_counts.map((count) => count.lost);
+    const format = new Intl.NumberFormat('en-GB');
+    const readme = (await read('README.md')).replace(/\s+/g, ' ');
+    expect(lost.length).toBeGreaterThan(1);
+    expect(readme).toContain(
+      `between ${format.format(Math.min(...lost))} and ${format.format(Math.max(...lost))} people died`,
+    );
+    expect(readme).not.toMatch(/about 1,500/i);
+  });
+});
+
+describe('published contact and support addresses', () => {
+  it('gives the contact address and the canonical location in security.txt', async () => {
+    const securityTxt = await read('public/.well-known/security.txt');
+    expect(securityTxt).toContain(`Contact: mailto:${site.contactEmail}\n`);
+    expect(securityTxt).toContain(`Canonical: ${canonicalUrl('/.well-known/security.txt')}\n`);
+    const expires = firstMatch(securityTxt, /^Expires: (.+)$/m, 'the Expires field');
+    expect(expires).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/);
+    expect(Number.isNaN(Date.parse(expires))).toBe(false);
+  });
+
+  it('publishes no other address than the contact address', async () => {
+    const documents = await Promise.all(
+      ['README.md', 'SECURITY.md', 'public/.well-known/security.txt'].map(read),
+    );
+    for (const document of documents) {
+      const addresses = document.match(/[\w.+-]+@[\w-]+\.[\w.-]+/g) ?? [];
+      expect(addresses.length).toBeGreaterThan(0);
+      for (const address of addresses) {
+        expect(address).toBe(site.contactEmail);
+      }
+    }
+  });
+
+  it('points the funding file of the repository to the support section of the site', async () => {
+    const funding = await read('.github/FUNDING.yml');
+    expect(funding.trim()).toBe(`custom: ["${canonicalUrl(SUPPORT_PATH)}"]`);
+  });
+
+  it('declares the site map of the canonical origin in robots.txt', async () => {
+    expect(await read('public/robots.txt')).toContain(`Sitemap: ${canonicalUrl('/sitemap.xml')}`);
+  });
+});
+
+describe('asset pipeline', () => {
+  interface OptimiserManifest {
+    readonly packageManager: string;
+    readonly engines: Readonly<Record<string, string>>;
+    readonly devDependencies: Readonly<Record<string, string>>;
+  }
+
+  it('uses the same pnpm, Node.js range, TypeScript and Node.js types as the application', async () => {
+    const optimiser = JSON.parse(await read('assets/optimise/package.json')) as OptimiserManifest;
+    const root = JSON.parse(await read('package.json')) as OptimiserManifest;
+    expect(optimiser.packageManager).toBe(root.packageManager);
+    expect(optimiser.engines).toEqual(root.engines);
+    for (const name of ['typescript', '@types/node']) {
+      expect(optimiser.devDependencies[name], name).toBe(root.devDependencies[name]);
+    }
+  });
+
+  it('is rebuilt in CI with the uv version that the project requires', async () => {
+    const workflow = await read('.github/workflows/ci.yml');
+    const project = await read('assets/pyproject.toml');
+    const ciVersion = firstMatch(
+      workflow,
+      /setup-uv@[0-9a-f]{40}[^\n]*\n\s+with:\n\s+version: ([\d.]+)/,
+      'the uv version in CI',
+    );
+    const minimum = firstMatch(project, /uv_build>=([\d.]+)/, 'the uv_build requirement');
+    expect(ciVersion).toBe(minimum);
+  });
+
+  it('keeps the model out of the image build context only through its sources', async () => {
+    const dockerignore = await read('.dockerignore');
+    expect(dockerignore.split('\n')).toContain('assets');
+    expect(dockerignore).not.toMatch(/^public/m);
+  });
+});

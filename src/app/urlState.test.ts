@@ -1,0 +1,70 @@
+import { describe, expect, it } from 'vitest';
+import { clockToSeconds, secondsToClock } from '../time/shipTime.ts';
+import { formatUrlState, parseUrlState } from './urlState.ts';
+
+describe('clock conversion', () => {
+  it('counts from the collision at 23:40', () => {
+    expect(clockToSeconds('23:40')).toBe(0);
+    expect(clockToSeconds('00:45')).toBe(65 * 60);
+    expect(clockToSeconds('02:20')).toBe(9600);
+    expect(clockToSeconds('02:17:30')).toBe(9450);
+  });
+
+  it('rejects malformed clocks', () => {
+    expect(clockToSeconds('2:20')).toBeUndefined();
+    expect(clockToSeconds('24:00')).toBeUndefined();
+    expect(clockToSeconds('')).toBeUndefined();
+  });
+
+  it('round-trips', () => {
+    for (const t of [0, 59, 3900, 9450, 9960]) {
+      expect(clockToSeconds(secondsToClock(t))).toBe(t);
+    }
+  });
+});
+
+describe('parseUrlState', () => {
+  it('reads time, camera, rate, renderer and quality', () => {
+    expect(
+      parseUrlState('?t=01:40&camera=deck&rate=300&renderer=webgl2&quality=low', 9960),
+    ).toEqual({
+      t: 7200,
+      cameraMode: 'deck',
+      rate: 300,
+      renderer: 'webgl2',
+      quality: 'low',
+    });
+  });
+
+  it('ignores unknown or out-of-range values', () => {
+    const defaults = { renderer: 'auto', quality: 'medium' };
+    expect(parseUrlState('?t=12:00&camera=helicopter&rate=7', 9960)).toEqual(defaults);
+    expect(parseUrlState('?renderer=vulkan&quality=ultra', 9960)).toEqual(defaults);
+  });
+});
+
+describe('formatUrlState', () => {
+  it('writes a readable query string', () => {
+    expect(
+      formatUrlState(
+        { t: 7200, cameraMode: 'orbit', rate: 60 },
+        { renderer: 'auto', quality: 'medium' },
+      ),
+    ).toBe('?t=01:40:00&camera=orbit&rate=60');
+    expect(
+      formatUrlState(
+        { t: 0, cameraMode: 'guided', rate: 1 },
+        { renderer: 'webgl2', quality: 'high' },
+      ),
+    ).toBe('?t=23:40:00&camera=guided&rate=1&renderer=webgl2&quality=high');
+  });
+
+  it('is read back unchanged', () => {
+    const state = { t: 9450, cameraMode: 'underwater' as const, rate: 600 as const };
+    const rendering = { renderer: 'webgpu-readback', quality: 'low' } as const;
+    expect(parseUrlState(formatUrlState(state, rendering), 9960)).toEqual({
+      ...state,
+      ...rendering,
+    });
+  });
+});

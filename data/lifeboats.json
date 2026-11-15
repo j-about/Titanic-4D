@@ -1,0 +1,1402 @@
+{
+  "facts": [
+    {
+      "id": "boat-capacity",
+      "title": "Boats and capacity",
+      "summary": "Twenty boats with room for 1,178 people, for more than 2,200 on board.",
+      "value": 1178,
+      "unit": "persons",
+      "source_ids": ["brit-inquiry-report", "us-inquiry-report"],
+      "certainty": "established",
+      "note": "British report; the US report gives 1,176."
+    },
+    {
+      "id": "davit-layout",
+      "title": "Arrangement of the davits",
+      "summary": "Sixteen pairs of davits in four groups of four, forward and aft on each side. Odd-numbered boats were on the starboard side and even-numbered boats on the port side, numbered from forward.",
+      "source_ids": ["brit-inquiry-report", "halpern-list-trim-2023"],
+      "certainty": "established",
+      "note": "Report, Life-saving Appliances and Decks and Accommodation."
+    },
+    {
+      "id": "launch-sequence-debate",
+      "title": "The launching sequence is a reconstruction",
+      "summary": "No one recorded launch times during the night. Three modern reconstructions and the 1912 table disagree on the order and times of several boats. All four agree that No. 7 left first, at 12:40 to 12:45, and that the starboard forward boats left in the order 7, 5, 3, 1. The three modern reconstructions put collapsible C at 2:00 and collapsible D at 2:05 to 2:10; the 1912 table puts C at 1:40 and D at 2:05. Every time is approximate to about five minutes.",
+      "source_ids": [
+        "flw-new-study-2026",
+        "wfb-lifeboat-sequence",
+        "halpern-list-trim-2023",
+        "brit-inquiry-report"
+      ],
+      "certainty": "debated",
+      "note": "The times shown follow Fitch, Layton and Wormstedt (2026); the other positions are attached to each boat.",
+      "alternatives": [
+        {
+          "holder": "Samuel Halpern (2023)",
+          "position": "No. 6 before No. 8; aft port order 16, 12, 14, 10; starboard aft boats between 1:15 and 1:33.",
+          "source_ids": ["halpern-list-trim-2023"]
+        },
+        {
+          "holder": "British Inquiry report (1912)",
+          "position": "Aft port order 10, 12, 14, 16; collapsible C at 1:40.",
+          "source_ids": ["brit-inquiry-report"]
+        }
+      ]
+    },
+    {
+      "id": "occupancy-caveat",
+      "title": "Occupancy figures",
+      "summary": "About 712 people were saved in boats that could hold 1,178. The British report estimated that only about 652 can have left the ship in the boats, the rest being picked up from the water or transferred.",
+      "value": 652,
+      "unit": "persons",
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "estimated",
+      "note": "Report, The Boats: the numbers claimed by witnesses total 854 and are called quite unreliable."
+    },
+    {
+      "id": "lowering-duration",
+      "title": "Time taken to lower a boat",
+      "summary": "The launch times mark the moment a boat started down. The scene allows five minutes for a boat to reach the water unless a longer time is recorded, as for boats 1 and 6, which took about ten minutes.",
+      "value": 5,
+      "unit": "min",
+      "source_ids": ["flw-new-study-2026", "project-derivation"],
+      "certainty": "estimated",
+      "note": "The five minutes are the project's assumption; no study read gives a typical lowering time."
+    }
+  ],
+  "types": [
+    {
+      "id": "lifeboat",
+      "name": "Wooden lifeboat",
+      "count": 14,
+      "length_m": 9.14,
+      "breadth_m": 2.77,
+      "depth_m": 1.22,
+      "capacity": 65,
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "30 ft by 9 ft 1 in by 4 ft; 65 persons each (report, Life-saving Appliances)."
+    },
+    {
+      "id": "cutter",
+      "name": "Wooden emergency cutter",
+      "count": 2,
+      "length_m": 7.67,
+      "breadth_m": 2.18,
+      "depth_m": 0.91,
+      "capacity": 40,
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "25 ft 2 in by 7 ft 2 in by 3 ft; 40 persons each. Boats 1 and 2 were kept swung out abaft the bridge."
+    },
+    {
+      "id": "collapsible",
+      "name": "Engelhardt collapsible boat",
+      "count": 4,
+      "length_m": 8.36,
+      "breadth_m": 2.44,
+      "depth_m": 0.91,
+      "capacity": 47,
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "27 ft 5 in by 8 ft by 3 ft; 47 persons each."
+    }
+  ],
+  "boats": [
+    {
+      "id": "7",
+      "type": "lifeboat",
+      "side": "starboard",
+      "station": {
+        "group": "forward",
+        "x_m": 101.5,
+        "source_ids": ["brit-inquiry-report", "halpern-list-trim-2023", "project-derivation"],
+        "certainty": "estimated",
+        "note": "Forward group of davits, abreast the officers' quarters and the first-class entrance. Station estimated by the project from the layout described in the report and from Halpern's figure of about 220 ft from the bow for the davits of boat No. 2; it was not measured on a plan."
+      },
+      "launch": {
+        "ats": "1912-04-15T00:40",
+        "uncertainty": {
+          "before_min": 5,
+          "after_min": 5
+        },
+        "mode": "lowered",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "estimated",
+        "note": "Time at which the boat began lowering, from the 2026 chart of Fitch, Layton and Wormstedt, the latest revision of the sequence first published by Wormstedt, Fitch and Behe. All modern studies agree on about 12:40.",
+        "alternatives": [
+          {
+            "holder": "Samuel Halpern (2023)",
+            "position": "12:40 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          },
+          {
+            "holder": "British Inquiry report (1912)",
+            "position": "12:45 a.m.",
+            "source_ids": ["brit-inquiry-report"]
+          },
+          {
+            "holder": "Ioannis Georgiou (2012–2016), as tabulated by Halpern",
+            "position": "12:40 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          }
+        ]
+      },
+      "in_charge": {
+        "value": "Lookout George Hogg",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
+      "occupancy": {
+        "persons": 28,
+        "basis": "attributed",
+        "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
+        "certainty": "estimated",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
+        "alternatives": [
+          {
+            "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
+            "position": "27 persons.",
+            "source_ids": ["brit-inquiry-report"]
+          }
+        ]
+      },
+      "remark": {
+        "value": "First boat away.",
+        "source_ids": [
+          "flw-new-study-2026",
+          "wfb-lifeboat-sequence",
+          "halpern-list-trim-2023",
+          "brit-inquiry-report"
+        ],
+        "certainty": "established",
+        "note": "The three modern reconstructions and the 1912 table all put No. 7 first."
+      }
+    },
+    {
+      "id": "5",
+      "type": "lifeboat",
+      "side": "starboard",
+      "station": {
+        "group": "forward",
+        "x_m": 91.0,
+        "source_ids": ["brit-inquiry-report", "halpern-list-trim-2023", "project-derivation"],
+        "certainty": "estimated",
+        "note": "Forward group of davits, abreast the officers' quarters and the first-class entrance. Station estimated by the project from the layout described in the report and from Halpern's figure of about 220 ft from the bow for the davits of boat No. 2; it was not measured on a plan."
+      },
+      "launch": {
+        "ats": "1912-04-15T00:43",
+        "uncertainty": {
+          "before_min": 5,
+          "after_min": 5
+        },
+        "mode": "lowered",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "estimated",
+        "note": "Time at which the boat began lowering, from the 2026 chart of Fitch, Layton and Wormstedt, the latest revision of the sequence first published by Wormstedt, Fitch and Behe.",
+        "alternatives": [
+          {
+            "holder": "Samuel Halpern (2023)",
+            "position": "12:45 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          },
+          {
+            "holder": "British Inquiry report (1912)",
+            "position": "12:55 a.m.",
+            "source_ids": ["brit-inquiry-report"]
+          },
+          {
+            "holder": "Ioannis Georgiou (2012–2016), as tabulated by Halpern",
+            "position": "12:50 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          }
+        ]
+      },
+      "in_charge": {
+        "value": "Third Officer Herbert Pitman",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
+      "occupancy": {
+        "persons": 36,
+        "basis": "attributed",
+        "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
+        "certainty": "estimated",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
+        "alternatives": [
+          {
+            "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
+            "position": "41 persons.",
+            "source_ids": ["brit-inquiry-report"]
+          }
+        ]
+      },
+      "remark": {
+        "value": "The first distress signal went up while it was being lowered.",
+        "source_ids": ["wfb-lifeboat-sequence", "flw-new-study-2026", "halpern-dozen-rockets"],
+        "certainty": "estimated",
+        "note": "Wormstedt, Fitch and Behe place the first signal after No. 5 had started down and before No. 3; both times are reconstructions."
+      }
+    },
+    {
+      "id": "3",
+      "type": "lifeboat",
+      "side": "starboard",
+      "station": {
+        "group": "forward",
+        "x_m": 80.5,
+        "source_ids": ["brit-inquiry-report", "halpern-list-trim-2023", "project-derivation"],
+        "certainty": "estimated",
+        "note": "Forward group of davits, abreast the officers' quarters and the first-class entrance. Station estimated by the project from the layout described in the report and from Halpern's figure of about 220 ft from the bow for the davits of boat No. 2; it was not measured on a plan."
+      },
+      "launch": {
+        "ats": "1912-04-15T00:55",
+        "uncertainty": {
+          "before_min": 5,
+          "after_min": 5
+        },
+        "mode": "lowered",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "estimated",
+        "note": "Time at which the boat began lowering, from the 2026 chart of Fitch, Layton and Wormstedt, the latest revision of the sequence first published by Wormstedt, Fitch and Behe.",
+        "alternatives": [
+          {
+            "holder": "Samuel Halpern (2023)",
+            "position": "12:55 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          },
+          {
+            "holder": "British Inquiry report (1912)",
+            "position": "1:00 a.m.",
+            "source_ids": ["brit-inquiry-report"]
+          },
+          {
+            "holder": "Ioannis Georgiou (2012–2016), as tabulated by Halpern",
+            "position": "12:55 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          }
+        ]
+      },
+      "in_charge": {
+        "value": "Able Seaman George Moore",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
+      "occupancy": {
+        "persons": 32,
+        "basis": "attributed",
+        "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
+        "certainty": "estimated",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
+        "alternatives": [
+          {
+            "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
+            "position": "50 persons.",
+            "source_ids": ["brit-inquiry-report"]
+          }
+        ]
+      },
+      "remark": null
+    },
+    {
+      "id": "8",
+      "type": "lifeboat",
+      "side": "port",
+      "station": {
+        "group": "forward",
+        "x_m": 101.5,
+        "source_ids": ["brit-inquiry-report", "halpern-list-trim-2023", "project-derivation"],
+        "certainty": "estimated",
+        "note": "Forward group of davits, abreast the officers' quarters and the first-class entrance. Station estimated by the project from the layout described in the report and from Halpern's figure of about 220 ft from the bow for the davits of boat No. 2; it was not measured on a plan."
+      },
+      "launch": {
+        "ats": "1912-04-15T01:00",
+        "uncertainty": {
+          "before_min": 5,
+          "after_min": 5
+        },
+        "mode": "lowered",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "debated",
+        "note": "Time at which the boat began lowering, from the 2026 chart of Fitch, Layton and Wormstedt, the latest revision of the sequence first published by Wormstedt, Fitch and Behe. Fitch, Layton and Wormstedt make it the first port boat away; Halpern and the British report put No. 6 before it.",
+        "alternatives": [
+          {
+            "holder": "Samuel Halpern (2023)",
+            "position": "1:05 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          },
+          {
+            "holder": "British Inquiry report (1912)",
+            "position": "1:10 a.m.",
+            "source_ids": ["brit-inquiry-report"]
+          },
+          {
+            "holder": "Ioannis Georgiou (2012–2016), as tabulated by Halpern",
+            "position": "1:20 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          }
+        ]
+      },
+      "in_charge": {
+        "value": "Able Seaman Thomas Jones",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
+      "occupancy": {
+        "persons": 27,
+        "basis": "attributed",
+        "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
+        "certainty": "estimated",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
+        "alternatives": [
+          {
+            "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
+            "position": "39 persons.",
+            "source_ids": ["brit-inquiry-report"]
+          }
+        ]
+      },
+      "remark": {
+        "value": "Told to row for the light seen on the horizon.",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence", "halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Recorded in the project's research notes on the boats, which were compiled from the lifeboat studies and from Halpern's chronology and do not say which of them states it; not checked against the testimony."
+      }
+    },
+    {
+      "id": "1",
+      "type": "cutter",
+      "side": "starboard",
+      "station": {
+        "group": "forward",
+        "x_m": 70.1,
+        "source_ids": ["brit-inquiry-report", "halpern-list-trim-2023", "project-derivation"],
+        "certainty": "estimated",
+        "note": "Forward group of davits, abreast the officers' quarters and the first-class entrance. Station estimated by the project from the layout described in the report and from Halpern's figure of about 220 ft from the bow for the davits of boat No. 2; it was not measured on a plan."
+      },
+      "launch": {
+        "ats": "1912-04-15T01:05",
+        "uncertainty": {
+          "before_min": 5,
+          "after_min": 5
+        },
+        "mode": "lowered",
+        "reached_water_ats": "1912-04-15T01:15",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "estimated",
+        "note": "Time at which the boat began lowering, from the 2026 chart of Fitch, Layton and Wormstedt, the latest revision of the sequence first published by Wormstedt, Fitch and Behe.",
+        "alternatives": [
+          {
+            "holder": "Samuel Halpern (2023)",
+            "position": "1:05 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          },
+          {
+            "holder": "British Inquiry report (1912)",
+            "position": "1:10 a.m.",
+            "source_ids": ["brit-inquiry-report"]
+          },
+          {
+            "holder": "Ioannis Georgiou (2012–2016), as tabulated by Halpern",
+            "position": "1:00 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          }
+        ]
+      },
+      "in_charge": {
+        "value": "Lookout George Symons",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
+      "occupancy": {
+        "persons": 12,
+        "basis": "attributed",
+        "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
+        "certainty": "estimated",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
+        "alternatives": [
+          {
+            "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
+            "position": "12 persons.",
+            "source_ids": ["brit-inquiry-report"]
+          }
+        ]
+      },
+      "remark": {
+        "value": "Caught on a wire guy while lowering; reached the water about ten minutes later.",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence", "halpern-list-trim-2023"],
+        "certainty": "estimated",
+        "note": "As stated by the lifeboat studies and by Halpern; the ten minutes are the difference between the two times of the launch record."
+      }
+    },
+    {
+      "id": "6",
+      "type": "lifeboat",
+      "side": "port",
+      "station": {
+        "group": "forward",
+        "x_m": 91.0,
+        "source_ids": ["brit-inquiry-report", "halpern-list-trim-2023", "project-derivation"],
+        "certainty": "estimated",
+        "note": "Forward group of davits, abreast the officers' quarters and the first-class entrance. Station estimated by the project from the layout described in the report and from Halpern's figure of about 220 ft from the bow for the davits of boat No. 2; it was not measured on a plan."
+      },
+      "launch": {
+        "ats": "1912-04-15T01:10",
+        "uncertainty": {
+          "before_min": 5,
+          "after_min": 5
+        },
+        "mode": "lowered",
+        "reached_water_ats": "1912-04-15T01:20",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "debated",
+        "note": "Time at which the boat began lowering, from the 2026 chart of Fitch, Layton and Wormstedt, the latest revision of the sequence first published by Wormstedt, Fitch and Behe. Fitch, Layton and Wormstedt place it after No. 8; the others place it fifteen minutes earlier.",
+        "alternatives": [
+          {
+            "holder": "Samuel Halpern (2023)",
+            "position": "12:55 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          },
+          {
+            "holder": "British Inquiry report (1912)",
+            "position": "12:55 a.m.",
+            "source_ids": ["brit-inquiry-report"]
+          },
+          {
+            "holder": "Ioannis Georgiou (2012–2016), as tabulated by Halpern",
+            "position": "12:55 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          }
+        ]
+      },
+      "in_charge": {
+        "value": "Quartermaster Robert Hichens",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
+      "occupancy": {
+        "persons": 24,
+        "basis": "attributed",
+        "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
+        "certainty": "estimated",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
+        "alternatives": [
+          {
+            "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
+            "position": "28 persons.",
+            "source_ids": ["brit-inquiry-report"]
+          }
+        ]
+      },
+      "remark": {
+        "value": "Halted on the way down while a passenger climbed down the falls to help man it.",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "estimated",
+        "note": "As stated by the lifeboat studies of Wormstedt, Fitch and Behe and of Fitch, Layton and Wormstedt; not checked against the testimony."
+      }
+    },
+    {
+      "id": "16",
+      "type": "lifeboat",
+      "side": "port",
+      "station": {
+        "group": "aft",
+        "x_m": 201.0,
+        "source_ids": ["brit-inquiry-report", "halpern-list-trim-2023", "project-derivation"],
+        "certainty": "estimated",
+        "note": "After group of davits, abreast and forward of the second-class entrance at the after end of the Boat deck. Station estimated by the project from the layout described in the report; it was not measured on a plan."
+      },
+      "launch": {
+        "ats": "1912-04-15T01:20",
+        "uncertainty": {
+          "before_min": 5,
+          "after_min": 5
+        },
+        "mode": "lowered",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "estimated",
+        "note": "Time at which the boat began lowering, from the 2026 chart of Fitch, Layton and Wormstedt, the latest revision of the sequence first published by Wormstedt, Fitch and Behe. Fitch, Layton and Wormstedt and Halpern agree on 1:20.",
+        "alternatives": [
+          {
+            "holder": "Samuel Halpern (2023)",
+            "position": "1:20 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          },
+          {
+            "holder": "British Inquiry report (1912)",
+            "position": "1:35 a.m.",
+            "source_ids": ["brit-inquiry-report"]
+          },
+          {
+            "holder": "Ioannis Georgiou (2012–2016), as tabulated by Halpern",
+            "position": "1:30 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          }
+        ]
+      },
+      "in_charge": {
+        "value": "Master-at-Arms Joseph Bailey",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
+      "occupancy": {
+        "persons": 53,
+        "basis": "attributed",
+        "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
+        "certainty": "estimated",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
+        "alternatives": [
+          {
+            "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
+            "position": "56 persons.",
+            "source_ids": ["brit-inquiry-report"]
+          }
+        ]
+      },
+      "remark": null
+    },
+    {
+      "id": "14",
+      "type": "lifeboat",
+      "side": "port",
+      "station": {
+        "group": "aft",
+        "x_m": 190.5,
+        "source_ids": ["brit-inquiry-report", "halpern-list-trim-2023", "project-derivation"],
+        "certainty": "estimated",
+        "note": "After group of davits, abreast and forward of the second-class entrance at the after end of the Boat deck. Station estimated by the project from the layout described in the report; it was not measured on a plan."
+      },
+      "launch": {
+        "ats": "1912-04-15T01:25",
+        "uncertainty": {
+          "before_min": 5,
+          "after_min": 5
+        },
+        "mode": "lowered",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "debated",
+        "note": "Time at which the boat began lowering, from the 2026 chart of Fitch, Layton and Wormstedt, the latest revision of the sequence first published by Wormstedt, Fitch and Behe.",
+        "alternatives": [
+          {
+            "holder": "Samuel Halpern (2023)",
+            "position": "1:30 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          },
+          {
+            "holder": "British Inquiry report (1912)",
+            "position": "1:30 a.m.",
+            "source_ids": ["brit-inquiry-report"]
+          },
+          {
+            "holder": "Ioannis Georgiou (2012–2016), as tabulated by Halpern",
+            "position": "1:40 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          }
+        ]
+      },
+      "in_charge": {
+        "value": "Fifth Officer Harold Lowe",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
+      "occupancy": {
+        "persons": 40,
+        "basis": "attributed",
+        "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
+        "certainty": "estimated",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
+        "alternatives": [
+          {
+            "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
+            "position": "63 persons.",
+            "source_ids": ["brit-inquiry-report"]
+          }
+        ]
+      },
+      "remark": {
+        "value": "The after falls hung up and the boat dropped the last few feet.",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence", "halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Recorded in the project's research notes on the boats, which were compiled from the lifeboat studies and from Halpern's chronology and do not say which of them states it; not checked against the testimony."
+      }
+    },
+    {
+      "id": "12",
+      "type": "lifeboat",
+      "side": "port",
+      "station": {
+        "group": "aft",
+        "x_m": 180.0,
+        "source_ids": ["brit-inquiry-report", "halpern-list-trim-2023", "project-derivation"],
+        "certainty": "estimated",
+        "note": "After group of davits, abreast and forward of the second-class entrance at the after end of the Boat deck. Station estimated by the project from the layout described in the report; it was not measured on a plan."
+      },
+      "launch": {
+        "ats": "1912-04-15T01:30",
+        "uncertainty": {
+          "before_min": 5,
+          "after_min": 5
+        },
+        "mode": "lowered",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "debated",
+        "note": "Time at which the boat began lowering, from the 2026 chart of Fitch, Layton and Wormstedt, the latest revision of the sequence first published by Wormstedt, Fitch and Behe.",
+        "alternatives": [
+          {
+            "holder": "Samuel Halpern (2023)",
+            "position": "1:25 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          },
+          {
+            "holder": "British Inquiry report (1912)",
+            "position": "1:25 a.m.",
+            "source_ids": ["brit-inquiry-report"]
+          },
+          {
+            "holder": "Ioannis Georgiou (2012–2016), as tabulated by Halpern",
+            "position": "1:35 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          }
+        ]
+      },
+      "in_charge": {
+        "value": "Able Seaman John Poingdestre",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "debated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read.",
+        "alternatives": [
+          {
+            "holder": "Wikipedia, \"Lifeboats of the Titanic\"",
+            "position": "Able Seaman Clench at first, then Poingdestre.",
+            "source_ids": ["wikipedia-titanic"]
+          }
+        ]
+      },
+      "occupancy": {
+        "persons": 41,
+        "basis": "attributed",
+        "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
+        "certainty": "estimated",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
+        "alternatives": [
+          {
+            "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
+            "position": "42 persons.",
+            "source_ids": ["brit-inquiry-report"]
+          }
+        ]
+      },
+      "remark": {
+        "value": "Last boat to reach the Carpathia.",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Halpern's chronology has No. 12 arrive last, at about 8:15 a.m. by Carpathia's time."
+      }
+    },
+    {
+      "id": "9",
+      "type": "lifeboat",
+      "side": "starboard",
+      "station": {
+        "group": "aft",
+        "x_m": 169.5,
+        "source_ids": ["brit-inquiry-report", "halpern-list-trim-2023", "project-derivation"],
+        "certainty": "estimated",
+        "note": "After group of davits, abreast and forward of the second-class entrance at the after end of the Boat deck. Station estimated by the project from the layout described in the report; it was not measured on a plan."
+      },
+      "launch": {
+        "ats": "1912-04-15T01:32",
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
+        "mode": "lowered",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "debated",
+        "note": "Time at which the boat began lowering, from the 2026 chart of Fitch, Layton and Wormstedt, the latest revision of the sequence first published by Wormstedt, Fitch and Behe. Fitch, Layton and Wormstedt place it after No. 14 because a seaman who worked the falls of No. 14 then left in No. 9.",
+        "alternatives": [
+          {
+            "holder": "Samuel Halpern (2023)",
+            "position": "1:15 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          },
+          {
+            "holder": "British Inquiry report (1912)",
+            "position": "1:20 a.m.",
+            "source_ids": ["brit-inquiry-report"]
+          },
+          {
+            "holder": "Ioannis Georgiou (2012–2016), as tabulated by Halpern",
+            "position": "1:05 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          }
+        ]
+      },
+      "in_charge": {
+        "value": "Boatswain's Mate Albert Haines",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
+      "occupancy": {
+        "persons": 40,
+        "basis": "attributed",
+        "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
+        "certainty": "estimated",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
+        "alternatives": [
+          {
+            "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
+            "position": "56 persons.",
+            "source_ids": ["brit-inquiry-report"]
+          }
+        ]
+      },
+      "remark": null
+    },
+    {
+      "id": "11",
+      "type": "lifeboat",
+      "side": "starboard",
+      "station": {
+        "group": "aft",
+        "x_m": 180.0,
+        "source_ids": ["brit-inquiry-report", "halpern-list-trim-2023", "project-derivation"],
+        "certainty": "estimated",
+        "note": "After group of davits, abreast and forward of the second-class entrance at the after end of the Boat deck. Station estimated by the project from the layout described in the report; it was not measured on a plan."
+      },
+      "launch": {
+        "ats": "1912-04-15T01:35",
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
+        "mode": "lowered",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "debated",
+        "note": "Time at which the boat began lowering, from the 2026 chart of Fitch, Layton and Wormstedt, the latest revision of the sequence first published by Wormstedt, Fitch and Behe.",
+        "alternatives": [
+          {
+            "holder": "Samuel Halpern (2023)",
+            "position": "1:25 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          },
+          {
+            "holder": "British Inquiry report (1912)",
+            "position": "1:25 a.m.",
+            "source_ids": ["brit-inquiry-report"]
+          },
+          {
+            "holder": "Ioannis Georgiou (2012–2016), as tabulated by Halpern",
+            "position": "1:10 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          }
+        ]
+      },
+      "in_charge": {
+        "value": "Able Seaman Sidney Humphreys",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
+      "occupancy": {
+        "persons": 50,
+        "basis": "attributed",
+        "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
+        "certainty": "estimated",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
+        "alternatives": [
+          {
+            "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
+            "position": "70 persons.",
+            "source_ids": ["brit-inquiry-report"]
+          }
+        ]
+      },
+      "remark": {
+        "value": "Loaded from A deck.",
+        "source_ids": ["flw-new-study-2026"],
+        "certainty": "estimated",
+        "note": "From the 2026 chart of Fitch, Layton and Wormstedt, which marks the loading on A deck with a question mark."
+      }
+    },
+    {
+      "id": "13",
+      "type": "lifeboat",
+      "side": "starboard",
+      "station": {
+        "group": "aft",
+        "x_m": 190.5,
+        "source_ids": ["brit-inquiry-report", "halpern-list-trim-2023", "project-derivation"],
+        "certainty": "estimated",
+        "note": "After group of davits, abreast and forward of the second-class entrance at the after end of the Boat deck. Station estimated by the project from the layout described in the report; it was not measured on a plan."
+      },
+      "launch": {
+        "ats": "1912-04-15T01:37",
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
+        "mode": "lowered",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "debated",
+        "note": "Time at which the boat began lowering, from the 2026 chart of Fitch, Layton and Wormstedt, the latest revision of the sequence first published by Wormstedt, Fitch and Behe.",
+        "alternatives": [
+          {
+            "holder": "Samuel Halpern (2023)",
+            "position": "1:30 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          },
+          {
+            "holder": "British Inquiry report (1912)",
+            "position": "1:35 a.m.",
+            "source_ids": ["brit-inquiry-report"]
+          },
+          {
+            "holder": "Ioannis Georgiou (2012–2016), as tabulated by Halpern",
+            "position": "1:15 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          }
+        ]
+      },
+      "in_charge": {
+        "value": "Leading Fireman Frederick Barrett",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
+      "occupancy": {
+        "persons": 55,
+        "basis": "attributed",
+        "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
+        "certainty": "estimated",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
+        "alternatives": [
+          {
+            "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
+            "position": "64 persons.",
+            "source_ids": ["brit-inquiry-report"]
+          }
+        ]
+      },
+      "remark": {
+        "value": "Loaded from A deck; carried aft by a pump discharge under the descending No. 15.",
+        "source_ids": ["flw-new-study-2026", "halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "The loading on A deck is from the 2026 chart of Fitch, Layton and Wormstedt; the pump discharge and the descent of No. 15 are from Halpern's chronology."
+      }
+    },
+    {
+      "id": "15",
+      "type": "lifeboat",
+      "side": "starboard",
+      "station": {
+        "group": "aft",
+        "x_m": 201.0,
+        "source_ids": ["brit-inquiry-report", "halpern-list-trim-2023", "project-derivation"],
+        "certainty": "estimated",
+        "note": "After group of davits, abreast and forward of the second-class entrance at the after end of the Boat deck. Station estimated by the project from the layout described in the report; it was not measured on a plan."
+      },
+      "launch": {
+        "ats": "1912-04-15T01:38",
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
+        "mode": "lowered",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "debated",
+        "note": "Time at which the boat began lowering, from the 2026 chart of Fitch, Layton and Wormstedt, the latest revision of the sequence first published by Wormstedt, Fitch and Behe.",
+        "alternatives": [
+          {
+            "holder": "Samuel Halpern (2023)",
+            "position": "1:33 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          },
+          {
+            "holder": "British Inquiry report (1912)",
+            "position": "1:35 a.m.",
+            "source_ids": ["brit-inquiry-report"]
+          },
+          {
+            "holder": "Ioannis Georgiou (2012–2016), as tabulated by Halpern",
+            "position": "1:25 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          }
+        ]
+      },
+      "in_charge": {
+        "value": "Fireman Frank Dymond",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
+      "occupancy": {
+        "persons": 66,
+        "basis": "attributed",
+        "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
+        "certainty": "estimated",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
+        "alternatives": [
+          {
+            "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
+            "position": "70 persons.",
+            "source_ids": ["brit-inquiry-report"]
+          }
+        ]
+      },
+      "remark": {
+        "value": "Started down about half a minute after No. 13.",
+        "source_ids": ["flw-new-study-2026", "halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "From the 2026 study of Fitch, Layton and Wormstedt and from Halpern's chronology."
+      }
+    },
+    {
+      "id": "2",
+      "type": "cutter",
+      "side": "port",
+      "station": {
+        "group": "forward",
+        "x_m": 70.1,
+        "source_ids": ["brit-inquiry-report", "halpern-list-trim-2023", "project-derivation"],
+        "certainty": "estimated",
+        "note": "Forward group of davits, abreast the officers' quarters and the first-class entrance. Station estimated by the project from the layout described in the report and from Halpern's figure of about 220 ft from the bow for the davits of boat No. 2; it was not measured on a plan."
+      },
+      "launch": {
+        "ats": "1912-04-15T01:42",
+        "uncertainty": {
+          "before_min": 3,
+          "after_min": 3
+        },
+        "mode": "lowered",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "estimated",
+        "note": "Time at which the boat began lowering, from the 2026 chart of Fitch, Layton and Wormstedt, the latest revision of the sequence first published by Wormstedt, Fitch and Behe. Moved from 1:45 to 1:42 in the 2026 study.",
+        "alternatives": [
+          {
+            "holder": "Samuel Halpern (2023)",
+            "position": "1:45 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          },
+          {
+            "holder": "British Inquiry report (1912)",
+            "position": "1:45 a.m.",
+            "source_ids": ["brit-inquiry-report"]
+          },
+          {
+            "holder": "Ioannis Georgiou (2012–2016), as tabulated by Halpern",
+            "position": "1:50 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          }
+        ]
+      },
+      "in_charge": {
+        "value": "Fourth Officer Joseph Boxhall",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
+      "occupancy": {
+        "persons": 18,
+        "basis": "attributed",
+        "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
+        "certainty": "estimated",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
+        "alternatives": [
+          {
+            "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
+            "position": "26 persons.",
+            "source_ids": ["brit-inquiry-report"]
+          }
+        ]
+      },
+      "remark": {
+        "value": "First boat picked up by the Carpathia.",
+        "source_ids": ["us-inquiry-testimony", "brit-inquiry-report", "halpern-chronology-2023"],
+        "certainty": "established",
+        "note": "Rostron: \"At 4:10 I got the first boat alongside\" (US Inquiry, Day 1); the boat was No. 2."
+      }
+    },
+    {
+      "id": "10",
+      "type": "lifeboat",
+      "side": "port",
+      "station": {
+        "group": "aft",
+        "x_m": 169.5,
+        "source_ids": ["brit-inquiry-report", "halpern-list-trim-2023", "project-derivation"],
+        "certainty": "estimated",
+        "note": "After group of davits, abreast and forward of the second-class entrance at the after end of the Boat deck. Station estimated by the project from the layout described in the report; it was not measured on a plan."
+      },
+      "launch": {
+        "ats": "1912-04-15T01:50",
+        "uncertainty": {
+          "before_min": 5,
+          "after_min": 5
+        },
+        "mode": "lowered",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "estimated",
+        "note": "Time at which the boat began lowering, from the 2026 chart of Fitch, Layton and Wormstedt, the latest revision of the sequence first published by Wormstedt, Fitch and Behe. Fitch, Layton and Wormstedt and Halpern agree on 1:50.",
+        "alternatives": [
+          {
+            "holder": "Samuel Halpern (2023)",
+            "position": "1:50 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          },
+          {
+            "holder": "British Inquiry report (1912)",
+            "position": "1:20 a.m.",
+            "source_ids": ["brit-inquiry-report"]
+          },
+          {
+            "holder": "Ioannis Georgiou (2012–2016), as tabulated by Halpern",
+            "position": "1:45 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          }
+        ]
+      },
+      "in_charge": {
+        "value": "Able Seaman Edward Buley",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
+      "occupancy": {
+        "persons": 57,
+        "basis": "attributed",
+        "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
+        "certainty": "estimated",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
+        "alternatives": [
+          {
+            "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
+            "position": "55 persons.",
+            "source_ids": ["brit-inquiry-report"]
+          }
+        ]
+      },
+      "remark": null
+    },
+    {
+      "id": "4",
+      "type": "lifeboat",
+      "side": "port",
+      "station": {
+        "group": "forward",
+        "x_m": 80.5,
+        "source_ids": ["brit-inquiry-report", "halpern-list-trim-2023", "project-derivation"],
+        "certainty": "estimated",
+        "note": "Forward group of davits, abreast the officers' quarters and the first-class entrance. Station estimated by the project from the layout described in the report and from Halpern's figure of about 220 ft from the bow for the davits of boat No. 2; it was not measured on a plan."
+      },
+      "launch": {
+        "ats": "1912-04-15T01:50",
+        "uncertainty": {
+          "before_min": 5,
+          "after_min": 5
+        },
+        "mode": "lowered",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "debated",
+        "note": "Time at which the boat began lowering, from the 2026 chart of Fitch, Layton and Wormstedt, the latest revision of the sequence first published by Wormstedt, Fitch and Behe.",
+        "alternatives": [
+          {
+            "holder": "Samuel Halpern (2023)",
+            "position": "1:55 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          },
+          {
+            "holder": "British Inquiry report (1912)",
+            "position": "1:55 a.m.",
+            "source_ids": ["brit-inquiry-report"]
+          },
+          {
+            "holder": "Ioannis Georgiou (2012–2016), as tabulated by Halpern",
+            "position": "1:55 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          }
+        ]
+      },
+      "in_charge": {
+        "value": "Quartermaster Walter Perkis",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
+      "occupancy": {
+        "persons": 30,
+        "basis": "attributed",
+        "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
+        "certainty": "estimated",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
+        "alternatives": [
+          {
+            "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
+            "position": "40 persons.",
+            "source_ids": ["brit-inquiry-report"]
+          }
+        ]
+      },
+      "remark": {
+        "value": "Lowered to A deck early in the night and loaded there through the promenade windows.",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "estimated",
+        "note": "As stated by the lifeboat studies of Wormstedt, Fitch and Behe and of Fitch, Layton and Wormstedt; not checked against the testimony."
+      }
+    },
+    {
+      "id": "c",
+      "type": "collapsible",
+      "side": "starboard",
+      "station": {
+        "group": "forward",
+        "x_m": 70.1,
+        "source_ids": ["brit-inquiry-report", "halpern-list-trim-2023", "project-derivation"],
+        "certainty": "estimated",
+        "note": "Stowed on the Boat deck by the davits of the emergency cutter on its side and launched from them. Station estimated by the project."
+      },
+      "launch": {
+        "ats": "1912-04-15T02:00",
+        "uncertainty": {
+          "before_min": 5,
+          "after_min": 5
+        },
+        "mode": "lowered",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "estimated",
+        "note": "Time at which the boat began lowering, from the 2026 chart of Fitch, Layton and Wormstedt, the latest revision of the sequence first published by Wormstedt, Fitch and Behe. Wormstedt, Fitch and Behe attribute the British report's 1:40 to a watch already put back 23 minutes.",
+        "alternatives": [
+          {
+            "holder": "Samuel Halpern (2023)",
+            "position": "2:00 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          },
+          {
+            "holder": "British Inquiry report (1912)",
+            "position": "1:40 a.m.",
+            "source_ids": ["brit-inquiry-report"]
+          },
+          {
+            "holder": "Ioannis Georgiou (2012–2016), as tabulated by Halpern",
+            "position": "2:00 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          }
+        ]
+      },
+      "in_charge": {
+        "value": "Quartermaster George Rowe",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
+      "occupancy": {
+        "persons": 43,
+        "basis": "attributed",
+        "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
+        "certainty": "estimated",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
+        "alternatives": [
+          {
+            "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
+            "position": "71 persons.",
+            "source_ids": ["brit-inquiry-report"]
+          }
+        ]
+      },
+      "remark": {
+        "value": "Launched from the davits of boat No. 1.",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "estimated",
+        "note": "As stated by the lifeboat studies of Wormstedt, Fitch and Behe and of Fitch, Layton and Wormstedt; not checked against the testimony."
+      }
+    },
+    {
+      "id": "d",
+      "type": "collapsible",
+      "side": "port",
+      "station": {
+        "group": "forward",
+        "x_m": 70.1,
+        "source_ids": ["brit-inquiry-report", "halpern-list-trim-2023", "project-derivation"],
+        "certainty": "estimated",
+        "note": "Stowed on the Boat deck by the davits of the emergency cutter on its side and launched from them. Station estimated by the project."
+      },
+      "launch": {
+        "ats": "1912-04-15T02:05",
+        "uncertainty": {
+          "before_min": 5,
+          "after_min": 5
+        },
+        "mode": "lowered",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "estimated",
+        "note": "Time at which the boat began lowering, from the 2026 chart of Fitch, Layton and Wormstedt, the latest revision of the sequence first published by Wormstedt, Fitch and Behe.",
+        "alternatives": [
+          {
+            "holder": "Samuel Halpern (2023)",
+            "position": "2:05 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          },
+          {
+            "holder": "British Inquiry report (1912)",
+            "position": "2:05 a.m.",
+            "source_ids": ["brit-inquiry-report"]
+          },
+          {
+            "holder": "Ioannis Georgiou (2012–2016), as tabulated by Halpern",
+            "position": "2:10 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          }
+        ]
+      },
+      "in_charge": {
+        "value": "Quartermaster Arthur Bright",
+        "source_ids": ["halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "Named as in charge in the boat in Halpern's chronology, as recorded in the project's research notes, which give the rank and the surname; the forename was not checked against a source read."
+      },
+      "occupancy": {
+        "persons": 20,
+        "basis": "attributed",
+        "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
+        "certainty": "estimated",
+        "note": "Figure attributed to Wormstedt and Fitch (2011), read through Wikipedia and not checked against the book. The twenty figures add up to 713, close to the number of people saved (706 to 712 depending on the source), so they are not uniformly counts at launch.",
+        "alternatives": [
+          {
+            "holder": "Witnesses' claims tabulated by the British Inquiry report (1912), which calls them unreliable",
+            "position": "44 persons.",
+            "source_ids": ["brit-inquiry-report"]
+          }
+        ]
+      },
+      "remark": {
+        "value": "Last boat lowered from the davits, those of boat No. 2; the water was by then only a few metres below the Boat deck.",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "estimated",
+        "note": "As stated by the lifeboat studies; the project's research notes record the water 10 to 15 ft below the port side of the Boat deck."
+      }
+    },
+    {
+      "id": "a",
+      "type": "collapsible",
+      "side": "starboard",
+      "station": {
+        "group": "officers-quarters-roof",
+        "x_m": 73.0,
+        "source_ids": ["brit-inquiry-report", "halpern-list-trim-2023", "project-derivation"],
+        "certainty": "estimated",
+        "note": "Stowed on the roof of the officers' quarters beside the first funnel. Station estimated by the project."
+      },
+      "launch": {
+        "ats": "1912-04-15T02:15",
+        "uncertainty": {
+          "before_min": 2,
+          "after_min": 2
+        },
+        "mode": "floated-off",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "estimated",
+        "note": "Time at which the boat floated off, from the 2026 chart of Fitch, Layton and Wormstedt, the latest revision of the sequence first published by Wormstedt, Fitch and Behe.",
+        "alternatives": [
+          {
+            "holder": "Samuel Halpern (2023)",
+            "position": "2:17 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          },
+          {
+            "holder": "British Inquiry report (1912)",
+            "position": "Floated off when the ship sank.",
+            "source_ids": ["brit-inquiry-report"]
+          },
+          {
+            "holder": "Ioannis Georgiou (2012–2016), as tabulated by Halpern",
+            "position": "2:17 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          }
+        ]
+      },
+      "in_charge": null,
+      "occupancy": {
+        "persons": 13,
+        "basis": "reached-from-water",
+        "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
+        "certainty": "estimated",
+        "note": "Number of people who reached the boat from the water, attributed to Wormstedt and Fitch (2011) through Wikipedia; not counted by the British report."
+      },
+      "remark": {
+        "value": "Floated off partly swamped as the forward Boat deck went under, while being attached to the falls.",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence", "halpern-chronology-2023"],
+        "certainty": "estimated",
+        "note": "As stated by the lifeboat studies and by Halpern's chronology; not checked against the testimony."
+      }
+    },
+    {
+      "id": "b",
+      "type": "collapsible",
+      "side": "port",
+      "station": {
+        "group": "officers-quarters-roof",
+        "x_m": 73.0,
+        "source_ids": ["brit-inquiry-report", "halpern-list-trim-2023", "project-derivation"],
+        "certainty": "estimated",
+        "note": "Stowed on the roof of the officers' quarters beside the first funnel. Station estimated by the project."
+      },
+      "launch": {
+        "ats": "1912-04-15T02:15",
+        "uncertainty": {
+          "before_min": 2,
+          "after_min": 2
+        },
+        "mode": "floated-off",
+        "source_ids": ["flw-new-study-2026", "wfb-lifeboat-sequence"],
+        "certainty": "estimated",
+        "note": "Time at which the boat floated off, from the 2026 chart of Fitch, Layton and Wormstedt, the latest revision of the sequence first published by Wormstedt, Fitch and Behe.",
+        "alternatives": [
+          {
+            "holder": "Samuel Halpern (2023)",
+            "position": "2:17 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          },
+          {
+            "holder": "British Inquiry report (1912)",
+            "position": "Floated off when the ship sank.",
+            "source_ids": ["brit-inquiry-report"]
+          },
+          {
+            "holder": "Ioannis Georgiou (2012–2016), as tabulated by Halpern",
+            "position": "2:18 a.m.",
+            "source_ids": ["halpern-list-trim-2023"]
+          }
+        ]
+      },
+      "in_charge": null,
+      "occupancy": {
+        "persons": 28,
+        "basis": "reached-from-water",
+        "source_ids": ["halpern-centennial-reappraisal-2011", "wikipedia-titanic"],
+        "certainty": "estimated",
+        "note": "Number of people who reached the boat from the water, attributed to Wormstedt and Fitch (2011) through Wikipedia; not counted by the British report."
+      },
+      "remark": {
+        "value": "Floated off upside down; men stood on its upturned hull through the night.",
+        "source_ids": [
+          "flw-new-study-2026",
+          "wfb-lifeboat-sequence",
+          "halpern-chronology-2023",
+          "us-inquiry-report"
+        ],
+        "certainty": "estimated",
+        "note": "As stated by the lifeboat studies and by Halpern's chronology; the US report speaks of about thirty men standing on it."
+      }
+    }
+  ]
+}

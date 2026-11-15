@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Titanic 4D — The sinking of RMS Titanic in space and time</title>
+    <meta
+      name="description"
+      content="An interactive, source-backed 3D reconstruction of the sinking of RMS Titanic on the night of 14–15 April 1912, navigable in space and time."
+    >
+    <meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#05080c">
+    <link rel="canonical" href="https://www.titanic-4d.org/">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Titanic 4D">
+    <meta property="og:title" content="Titanic 4D — The sinking of RMS Titanic in space and time">
+    <meta
+      property="og:description"
+      content="An interactive, source-backed 3D reconstruction of the sinking of RMS Titanic on the night of 14–15 April 1912."
+    >
+    <meta property="og:url" content="https://www.titanic-4d.org/">
+    <meta property="og:locale" content="en_GB">
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+  <body class="app">
+    <a class="skip-link" href="#timeline">Skip to the timeline</a>
+    <a class="skip-link" href="#panel">Skip to the description of the scene</a>
+    <!--@site-header-->
+    <main id="main" class="app-main" tabindex="-1">
+      <h1 class="visually-hidden">
+        The sinking of RMS Titanic, 14–15 April 1912, in space and time
+      </h1>
+      <section class="scene" aria-labelledby="scene-heading">
+        <h2 id="scene-heading" class="visually-hidden">3D scene</h2>
+        <div id="scene-frame" class="scene__frame" data-status="loading">
+          <canvas id="scene-canvas" class="scene__canvas"></canvas>
+          <div id="camera-root" class="scene__toolbar"></div>
+          <p id="scene-status" class="scene__status" role="status" hidden></p>
+        </div>
+        <p id="scene-description" class="visually-hidden"></p>
+      </section>
+      <section id="timeline" class="timeline" aria-labelledby="timeline-heading" tabindex="-1">
+        <h2 id="timeline-heading" class="visually-hidden">Timeline</h2>
+        <div id="timeline-root"></div>
+      </section>
+      <section id="panel" class="panel" aria-labelledby="panel-heading" tabindex="-1">
+        <h2 id="panel-heading" class="visually-hidden">Description of the scene</h2>
+        <div id="panel-root"></div>
+      </section>
+      <p id="announcer" class="visually-hidden" aria-live="polite" aria-atomic="true"></p>
+      <noscript>
+        <p class="notice">
+          This reconstruction needs JavaScript to draw the scene and to move through time.
+          <a href="/narrative/">The night in words</a>
+          tells the same events in text and needs no script.
+        </p>
+      </noscript>
+    </main>
+    <!--@site-footer-->
+  </body>
+</html>

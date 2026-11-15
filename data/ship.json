@@ -1,0 +1,800 @@
+{
+  "reference_frame": {
+    "description": "Longitudinal positions (x) are metres aft of the forward perpendicular; heights (z) are metres above the top of keel; transverse positions (y) are metres from the centre line, positive to starboard. The forward perpendicular meets the stem at the level of E deck; the after perpendicular is the forward side of the rudder post, 850 ft (259.08 m) aft.",
+    "source_ids": ["halpern-stability-trim", "brit-inquiry-report"],
+    "certainty": "established",
+    "note": "Definition of the perpendiculars from the Harland and Wolff sheer plan as described by Halpern. The compartment lengths of the British report add up to exactly 850 ft."
+  },
+  "particulars": [
+    {
+      "id": "length-overall",
+      "title": "Length overall",
+      "summary": "882 ft 9 in from stem to stern.",
+      "value": 269.06,
+      "unit": "m",
+      "source_ids": ["wikipedia-titanic", "archaeology-2012-delgado"],
+      "certainty": "established",
+      "note": "Universally quoted figure; Delgado writes of the ship's 882-foot length. Not stated in the report sections read."
+    },
+    {
+      "id": "length-between-perpendiculars",
+      "title": "Length between perpendiculars",
+      "summary": "850 ft.",
+      "value": 259.08,
+      "unit": "m",
+      "source_ids": ["halpern-stability-trim", "brit-inquiry-report"],
+      "certainty": "established",
+      "note": "Used in the Harland and Wolff calculations; equal to the sum of the sixteen compartment lengths."
+    },
+    {
+      "id": "breadth",
+      "title": "Extreme breadth",
+      "summary": "92 ft 6 in.",
+      "value": 28.19,
+      "unit": "m",
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "Registered breadth 92.5 ft."
+    },
+    {
+      "id": "depth-moulded",
+      "title": "Depth, keel to C deck",
+      "summary": "64 ft 9 in from the top of keel to the top of beam at the lowest point of sheer of C deck.",
+      "value": 19.74,
+      "unit": "m",
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "Wikipedia gives 64 ft 6 in; the report is the primary source."
+    },
+    {
+      "id": "load-draught",
+      "title": "Load draught",
+      "summary": "34 ft 7 in.",
+      "value": 10.54,
+      "unit": "m",
+      "source_ids": ["brit-inquiry-testimony"],
+      "certainty": "established",
+      "note": "Wilding, British Inquiry, Q19796."
+    },
+    {
+      "id": "displacement-load",
+      "title": "Displacement at load draught",
+      "summary": "52,310 long tons of 2,240 lb.",
+      "value": 53150,
+      "unit": "t",
+      "source_ids": ["brit-inquiry-testimony"],
+      "certainty": "established",
+      "note": "Wilding, British Inquiry, Q19797–19798. Converted at 1.01605 t per long ton."
+    },
+    {
+      "id": "displacement-at-collision",
+      "title": "Displacement at the time of the collision",
+      "summary": "About 48,300 long tons.",
+      "value": 49075,
+      "unit": "t",
+      "source_ids": ["halpern-stability-trim"],
+      "certainty": "estimated",
+      "note": "Halpern: load displacement less 28 in of draught at 143.8 long tons per inch of immersion."
+    },
+    {
+      "id": "gross-tonnage",
+      "title": "Gross register tonnage",
+      "summary": "46,328 gross register tons.",
+      "value": 46328,
+      "unit": "grt",
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "A measure of enclosed volume, not of weight."
+    },
+    {
+      "id": "speed-at-collision",
+      "title": "Speed at the time of the collision",
+      "summary": "About 22 knots.",
+      "value": 22,
+      "unit": "kn",
+      "source_ids": ["brit-inquiry-report", "brit-inquiry-testimony"],
+      "certainty": "established",
+      "note": "Boxhall's estimate (Q15645) accepted by the report; figures of 22 and 22½ knots were put to Wilding."
+    },
+    {
+      "id": "block-coefficient",
+      "title": "Block coefficient",
+      "summary": "0.684 at load draught.",
+      "value": 0.684,
+      "unit": "ratio",
+      "source_ids": ["halpern-stability-trim"],
+      "certainty": "established",
+      "note": "From the Harland and Wolff record of particulars for hull 401, as reported by Halpern."
+    },
+    {
+      "id": "prismatic-coefficient",
+      "title": "Prismatic coefficient",
+      "summary": "0.705.",
+      "value": 0.705,
+      "unit": "ratio",
+      "source_ids": ["halpern-stability-trim"],
+      "certainty": "established",
+      "note": "Same record."
+    },
+    {
+      "id": "midship-coefficient",
+      "title": "Midship section coefficient",
+      "summary": "About 0.970: a midship section very close to rectangular.",
+      "value": 0.97,
+      "unit": "ratio",
+      "source_ids": ["halpern-stability-trim", "project-derivation"],
+      "certainty": "estimated",
+      "note": "Ratio of the block coefficient to the prismatic coefficient."
+    },
+    {
+      "id": "stem-overhang",
+      "title": "Stem head forward of the forward perpendicular",
+      "summary": "About 2 ft 6 in at forecastle level; the stem rakes 1 ft in 12 ft.",
+      "value": 0.76,
+      "unit": "m",
+      "source_ids": ["halpern-stability-trim", "project-derivation"],
+      "certainty": "estimated",
+      "note": "Derived from the stem rake and the height of the forecastle above the perpendicular's intersection with the stem at E deck."
+    },
+    {
+      "id": "stern-overhang",
+      "title": "Stern abaft the after perpendicular",
+      "summary": "About 30 ft.",
+      "value": 9.22,
+      "unit": "m",
+      "source_ids": ["project-derivation"],
+      "certainty": "estimated",
+      "note": "Length overall less the length between perpendiculars and the stem overhang."
+    },
+    {
+      "id": "boat-deck-height",
+      "title": "Boat deck above keel",
+      "summary": "About 92 ft 6 in at the lowest point of sheer; about 60 ft 6 in above the waterline at the time of the accident.",
+      "value": 28.19,
+      "unit": "m",
+      "source_ids": ["brit-inquiry-report", "brit-inquiry-testimony"],
+      "certainty": "established",
+      "note": "Report, Decks and Accommodation; Wilding, Q19839."
+    },
+    {
+      "id": "crows-nest-height",
+      "title": "Crow's nest above keel",
+      "summary": "A steel look-out cage on the foremast about 95 ft above the load waterline.",
+      "value": 39.5,
+      "unit": "m",
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "The height above the waterline is from the report; the height above keel adds the load draught."
+    },
+    {
+      "id": "wing-propeller-diameter",
+      "title": "Wing propellers",
+      "summary": "Two three-bladed wing propellers, 23 ft 6 in in diameter.",
+      "value": 7.16,
+      "unit": "m",
+      "source_ids": ["wikipedia-titanic"],
+      "certainty": "estimated",
+      "note": "Commonly quoted figure, read in a tertiary source only."
+    },
+    {
+      "id": "centre-propeller-diameter",
+      "title": "Centre propeller",
+      "summary": "One centre propeller driven by the turbine, about 17 ft in diameter.",
+      "value": 5.18,
+      "unit": "m",
+      "source_ids": ["wikipedia-titanic"],
+      "certainty": "debated",
+      "note": "No photograph of Titanic's centre propeller is known.",
+      "alternatives": [
+        {
+          "holder": "Older view, by analogy with Olympic",
+          "position": "16 ft 6 in with four blades.",
+          "source_ids": ["wikipedia-titanic"]
+        }
+      ]
+    },
+    {
+      "id": "rudder-height",
+      "title": "Rudder",
+      "summary": "78 ft 8 in high and 15 ft 3 in long.",
+      "value": 23.98,
+      "unit": "m",
+      "source_ids": ["wikipedia-titanic"],
+      "certainty": "estimated",
+      "note": "Read in a tertiary source only."
+    },
+    {
+      "id": "bilge-keel-length",
+      "title": "Bilge keels",
+      "summary": "About 300 ft long and 25 in deep, amidships.",
+      "value": 91.44,
+      "unit": "m",
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "Report, Structure."
+    }
+  ],
+  "sheer": {
+    "rise_at_bow_m": 3.96,
+    "rise_at_stern_m": 1.52,
+    "source_ids": ["brit-inquiry-report"],
+    "certainty": "established",
+    "note": "D and E decks stand 13 ft higher above the waterline at the bow and 5 ft higher at the stern than at their lowest point amidships. The transcription gives an inconsistent figure for F deck at the bow, read here as a transcription error."
+  },
+  "decks": [
+    {
+      "id": "boat",
+      "name": "Boat deck",
+      "height_amidships_m": 28.19,
+      "x_start_m": 57.15,
+      "x_end_m": 209.55,
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "About 500 ft long with its fore end 190 ft from the bow (report); positions are converted to the forward perpendicular by subtracting the stem overhang."
+    },
+    {
+      "id": "a",
+      "name": "A deck (Promenade)",
+      "height_amidships_m": 25.32,
+      "x_start_m": 57.15,
+      "x_end_m": 209.55,
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "About 500 ft long (report), assumed to share the extent of the Boat deck; 9 ft 6 in below it. Wikipedia gives 546 ft for the A-deck superstructure.",
+      "alternatives": [
+        {
+          "holder": "Wikipedia, \"Titanic\"",
+          "position": "A-deck superstructure 546 ft (166 m) long.",
+          "source_ids": ["wikipedia-titanic"]
+        }
+      ]
+    },
+    {
+      "id": "b",
+      "name": "B deck (Bridge)",
+      "height_amidships_m": 22.58,
+      "x_start_m": -0.76,
+      "x_end_m": 267.46,
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "Level shared by the forecastle (125 ft), the 550 ft midship superstructure and the poop (about 105 ft), separated by two well decks of about 50 ft. 9 ft below A deck."
+    },
+    {
+      "id": "c",
+      "name": "C deck (Shelter)",
+      "height_amidships_m": 19.84,
+      "x_start_m": -0.76,
+      "x_end_m": 268.3,
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "Runs the whole length of the ship and is exposed in the two well decks; 9 ft below B deck. The height above keel adds the load draught to the report's height above the waterline."
+    },
+    {
+      "id": "d",
+      "name": "D deck (Saloon)",
+      "height_amidships_m": 16.64,
+      "x_start_m": -0.5,
+      "x_end_m": 266.5,
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "20 ft above the load waterline amidships, 33 ft at the bow and 25 ft at the stern."
+    },
+    {
+      "id": "e",
+      "name": "E deck (Upper)",
+      "height_amidships_m": 13.89,
+      "x_start_m": 0,
+      "x_end_m": 264,
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "11 ft above the load waterline amidships. Bulkheads C to J are watertight up to this deck."
+    },
+    {
+      "id": "f",
+      "name": "F deck (Middle)",
+      "height_amidships_m": 11.3,
+      "x_start_m": 0.5,
+      "x_end_m": 262,
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "2 ft 6 in above the load waterline amidships."
+    },
+    {
+      "id": "g",
+      "name": "G deck (Lower)",
+      "height_amidships_m": 8.86,
+      "x_start_m": 1.5,
+      "x_end_m": 259.08,
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "5 ft 6 in below the load waterline amidships. Interrupted by the boiler and engine rooms: 190 ft forward of the boilers and 210 ft aft of the machinery."
+    },
+    {
+      "id": "orlop",
+      "name": "Orlop deck",
+      "height_amidships_m": 6.43,
+      "x_start_m": 3,
+      "x_end_m": 259.08,
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "13 ft 6 in below the load waterline; interrupted like G deck. The mail-room floor in No. 3 hold was 24 ft above the keel."
+    },
+    {
+      "id": "tank-top",
+      "name": "Tank top (inner bottom)",
+      "height_amidships_m": 1.6,
+      "x_start_m": 14.02,
+      "x_end_m": 242.01,
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "The double bottom is 63 in deep on the centre line (78 in under the reciprocating engines) and runs from bulkhead A to 20 ft before bulkhead P."
+    }
+  ],
+  "bulkheads": [
+    {
+      "id": "a",
+      "x_m": 14.02,
+      "watertight_to_deck": "d",
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "Built to C deck, watertight to D deck. Position is the running sum of the compartment lengths given by the report; bulkheads were stepped in places, so stations are nominal."
+    },
+    {
+      "id": "b",
+      "x_m": 27.74,
+      "watertight_to_deck": "d",
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "Running sum of compartment lengths."
+    },
+    {
+      "id": "c",
+      "x_m": 43.28,
+      "watertight_to_deck": "e",
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "Running sum of compartment lengths."
+    },
+    {
+      "id": "d",
+      "x_m": 58.83,
+      "watertight_to_deck": "e",
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "Running sum of compartment lengths. Forward bulkhead of the boiler rooms."
+    },
+    {
+      "id": "e",
+      "x_m": 75.29,
+      "watertight_to_deck": "e",
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "Running sum of compartment lengths. Between boiler rooms 6 and 5; the damage ended about 2 ft abaft it."
+    },
+    {
+      "id": "f",
+      "x_m": 92.66,
+      "watertight_to_deck": "e",
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "Running sum of compartment lengths."
+    },
+    {
+      "id": "g",
+      "x_m": 110.03,
+      "watertight_to_deck": "e",
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "Running sum of compartment lengths."
+    },
+    {
+      "id": "h",
+      "x_m": 127.41,
+      "watertight_to_deck": "e",
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "Running sum of compartment lengths."
+    },
+    {
+      "id": "j",
+      "x_m": 145.69,
+      "watertight_to_deck": "e",
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "Running sum of compartment lengths."
+    },
+    {
+      "id": "k",
+      "x_m": 156.67,
+      "watertight_to_deck": "d",
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "Running sum of compartment lengths: 89 ft abaft amidships, against \"90 ft abaft amidships\" in the report."
+    },
+    {
+      "id": "l",
+      "x_m": 177.7,
+      "watertight_to_deck": "d",
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "Running sum of compartment lengths."
+    },
+    {
+      "id": "m",
+      "x_m": 195.07,
+      "watertight_to_deck": "d",
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "Running sum of compartment lengths."
+    },
+    {
+      "id": "n",
+      "x_m": 214.27,
+      "watertight_to_deck": "d",
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "Running sum of compartment lengths."
+    },
+    {
+      "id": "o",
+      "x_m": 230.73,
+      "watertight_to_deck": "d",
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "Running sum of compartment lengths."
+    },
+    {
+      "id": "p",
+      "x_m": 248.11,
+      "watertight_to_deck": "d",
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "Running sum of compartment lengths."
+    }
+  ],
+  "compartments": [
+    {
+      "id": "forepeak",
+      "name": "Forepeak",
+      "x_start_m": 0,
+      "x_end_m": 14.02,
+      "breached_by_collision": true,
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "46 ft long; peak tank below, store rooms above."
+    },
+    {
+      "id": "hold-1",
+      "name": "No. 1 hold",
+      "x_start_m": 14.02,
+      "x_end_m": 27.74,
+      "breached_by_collision": true,
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "45 ft long."
+    },
+    {
+      "id": "hold-2",
+      "name": "No. 2 hold",
+      "x_start_m": 27.74,
+      "x_end_m": 43.28,
+      "breached_by_collision": true,
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "51 ft long."
+    },
+    {
+      "id": "hold-3",
+      "name": "No. 3 hold",
+      "x_start_m": 43.28,
+      "x_end_m": 58.83,
+      "breached_by_collision": true,
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "51 ft long; mail and baggage rooms on the Orlop deck, squash court on G deck."
+    },
+    {
+      "id": "boiler-room-6",
+      "name": "No. 6 boiler room",
+      "x_start_m": 58.83,
+      "x_end_m": 75.29,
+      "breached_by_collision": true,
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "54 ft long; four double-ended boilers."
+    },
+    {
+      "id": "boiler-room-5",
+      "name": "No. 5 boiler room",
+      "x_start_m": 75.29,
+      "x_end_m": 92.66,
+      "breached_by_collision": true,
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "57 ft long; five double-ended boilers. Opened in the forward starboard bunker, about 2 ft abaft bulkhead E."
+    },
+    {
+      "id": "boiler-room-4",
+      "name": "No. 4 boiler room",
+      "x_start_m": 92.66,
+      "x_end_m": 110.03,
+      "breached_by_collision": false,
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "debated",
+      "note": "57 ft long; five double-ended boilers. The report judged damage here \"very doubtful\"; water later rose through the stokehold plates."
+    },
+    {
+      "id": "boiler-room-3",
+      "name": "No. 3 boiler room",
+      "x_start_m": 110.03,
+      "x_end_m": 127.41,
+      "breached_by_collision": false,
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "57 ft long; five double-ended boilers."
+    },
+    {
+      "id": "boiler-room-2",
+      "name": "No. 2 boiler room",
+      "x_start_m": 127.41,
+      "x_end_m": 145.69,
+      "breached_by_collision": false,
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "60 ft long; five double-ended boilers."
+    },
+    {
+      "id": "boiler-room-1",
+      "name": "No. 1 boiler room",
+      "x_start_m": 145.69,
+      "x_end_m": 156.67,
+      "breached_by_collision": false,
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "36 ft long; five single-ended boilers."
+    },
+    {
+      "id": "reciprocating-engine-room",
+      "name": "Reciprocating engine room",
+      "x_start_m": 156.67,
+      "x_end_m": 177.7,
+      "breached_by_collision": false,
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "69 ft long."
+    },
+    {
+      "id": "turbine-engine-room",
+      "name": "Turbine engine room",
+      "x_start_m": 177.7,
+      "x_end_m": 195.07,
+      "breached_by_collision": false,
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "57 ft long. The two emergency dynamos stood on a platform in its casing at saloon-deck level."
+    },
+    {
+      "id": "electric-engine-room",
+      "name": "Electric engine room",
+      "x_start_m": 195.07,
+      "x_end_m": 214.27,
+      "breached_by_collision": false,
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "63 ft long; the four main 400 kW dynamos."
+    },
+    {
+      "id": "shaft-tunnel-forward",
+      "name": "Shaft tunnel, forward section",
+      "x_start_m": 214.27,
+      "x_end_m": 230.73,
+      "breached_by_collision": false,
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "54 ft long."
+    },
+    {
+      "id": "shaft-tunnel-aft",
+      "name": "Shaft tunnel, after section",
+      "x_start_m": 230.73,
+      "x_end_m": 248.11,
+      "breached_by_collision": false,
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "57 ft long."
+    },
+    {
+      "id": "after-peak",
+      "name": "After peak",
+      "x_start_m": 248.11,
+      "x_end_m": 259.08,
+      "breached_by_collision": false,
+      "source_ids": ["brit-inquiry-report"],
+      "certainty": "established",
+      "note": "36 ft long; trimming tank below, stores above."
+    }
+  ],
+  "funnels": [
+    {
+      "id": 1,
+      "x_m": 75.29,
+      "base_above_keel_m": 32.5,
+      "top_above_keel_m": 53.3,
+      "length_fore_aft_m": 7.47,
+      "breadth_m": 5.79,
+      "rake_deg": 9.46,
+      "exhausts_boilers": true,
+      "source_ids": [
+        "brit-inquiry-report",
+        "wikipedia-titanic",
+        "model-monkey-funnels",
+        "project-derivation"
+      ],
+      "certainty": "estimated",
+      "note": "Station derived from the report's statement that the uptakes united immediately above the bulkhead between two boiler rooms (here bulkhead E). Top at 175 ft above keel (Wikipedia); elliptical section 24 ft 6 in by 19 ft and rake of 2 in per foot from secondary sources. The height of the base above the deckhouse is the project's estimate. Other heights circulate, such as 163 ft 8 in attributed to the builder's rigging plan, which could not be traced to a page read."
+    },
+    {
+      "id": 2,
+      "x_m": 110.03,
+      "base_above_keel_m": 32.5,
+      "top_above_keel_m": 53.3,
+      "length_fore_aft_m": 7.47,
+      "breadth_m": 5.79,
+      "rake_deg": 9.46,
+      "exhausts_boilers": true,
+      "source_ids": [
+        "brit-inquiry-report",
+        "wikipedia-titanic",
+        "model-monkey-funnels",
+        "project-derivation"
+      ],
+      "certainty": "estimated",
+      "note": "Station derived from bulkhead G, between boiler rooms 4 and 3. Dimensions as for the first funnel."
+    },
+    {
+      "id": 3,
+      "x_m": 145.69,
+      "base_above_keel_m": 32.5,
+      "top_above_keel_m": 53.3,
+      "length_fore_aft_m": 7.47,
+      "breadth_m": 5.79,
+      "rake_deg": 9.46,
+      "exhausts_boilers": true,
+      "source_ids": [
+        "brit-inquiry-report",
+        "wikipedia-titanic",
+        "model-monkey-funnels",
+        "project-derivation"
+      ],
+      "certainty": "estimated",
+      "note": "Station derived from bulkhead J, between boiler rooms 2 and 1. Dimensions as for the first funnel."
+    },
+    {
+      "id": 4,
+      "x_m": 181.36,
+      "base_above_keel_m": 32.5,
+      "top_above_keel_m": 53.3,
+      "length_fore_aft_m": 7.47,
+      "breadth_m": 5.79,
+      "rake_deg": 9.46,
+      "exhausts_boilers": false,
+      "source_ids": ["brit-inquiry-report", "halpern-afpp-2011", "project-derivation"],
+      "certainty": "estimated",
+      "note": "A ventilator over the turbine room carrying the galley flues, not a boiler uptake (report). Station obtained by keeping the 117 ft spacing of the others; Halpern places the fourth funnel at about 578 to 590 ft aft of the forward perpendicular."
+    }
+  ],
+  "masts": [
+    {
+      "id": "foremast",
+      "x_m": 32,
+      "base_above_keel_m": 25.4,
+      "top_above_keel_m": 62.5,
+      "rake_deg": 9.46,
+      "source_ids": ["brit-inquiry-report", "wikipedia-titanic", "project-derivation"],
+      "certainty": "estimated",
+      "note": "A steel pole mast with a teak top, standing within the forecastle and carrying the crow's nest (report). The exact station was not found in the sources read; it is placed by the project near the after end of the forecastle. Masthead height and rake are commonly quoted figures not verified in a primary source."
+    },
+    {
+      "id": "mainmast",
+      "x_m": 207,
+      "base_above_keel_m": 28.19,
+      "top_above_keel_m": 62.5,
+      "rake_deg": 9.46,
+      "source_ids": ["brit-inquiry-report", "halpern-trim-heel-2017", "project-derivation"],
+      "certainty": "estimated",
+      "note": "Abaft the fourth funnel (Wilding, as quoted by Halpern). The exact station was not found in the sources read; it is placed by the project near the after end of the Boat deck."
+    }
+  ],
+  "zones": [
+    {
+      "id": "forecastle",
+      "name": "Forecastle deck",
+      "x_start_m": -0.76,
+      "x_end_m": 37.34,
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "125 ft long, at the level of B deck."
+    },
+    {
+      "id": "forward-well-deck",
+      "name": "Forward well deck",
+      "x_start_m": 37.34,
+      "x_end_m": 52.58,
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "About 50 ft of C deck open to the sky between the forecastle and the superstructure."
+    },
+    {
+      "id": "superstructure",
+      "name": "Midship superstructure (B deck)",
+      "x_start_m": 52.58,
+      "x_end_m": 220.22,
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "550 ft long."
+    },
+    {
+      "id": "after-well-deck",
+      "name": "After well deck",
+      "x_start_m": 220.22,
+      "x_end_m": 235.46,
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "About 50 ft of C deck open to the sky between the superstructure and the poop."
+    },
+    {
+      "id": "poop",
+      "name": "Poop deck",
+      "x_start_m": 235.46,
+      "x_end_m": 267.46,
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "About 105 ft long, at the level of B deck, carrying the docking bridge."
+    },
+    {
+      "id": "navigating-bridge",
+      "name": "Navigating bridge and wheelhouse",
+      "x_start_m": 57.15,
+      "x_end_m": 62,
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "At the fore end of the Boat deck, 190 ft from the bow (report); the fore-and-aft extent is the project's estimate."
+    },
+    {
+      "id": "officers-quarters",
+      "name": "Officers' quarters",
+      "x_start_m": 62,
+      "x_end_m": 88,
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "Deckhouse around the wheelhouse and the forward funnel casing, with the Marconi rooms abaft that casing (report); extent estimated by the project. Collapsibles A and B were stowed on its roof."
+    },
+    {
+      "id": "promenade-screen",
+      "name": "Enclosed forward promenade of A deck",
+      "x_start_m": 57.15,
+      "x_end_m": 115.67,
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "A glazed screen 192 ft long at the forward end of A deck on both sides."
+    },
+    {
+      "id": "forward-expansion-joint",
+      "name": "Forward expansion joint",
+      "x_start_m": 84,
+      "x_end_m": 84,
+      "source_ids": ["brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "The report states that the Boat and A decks had two expansion joints. Their stations were not found in the sources read; this one is placed by the project abaft the first funnel."
+    },
+    {
+      "id": "after-expansion-joint",
+      "name": "After expansion joint",
+      "x_start_m": 170,
+      "x_end_m": 170,
+      "source_ids": ["brit-inquiry-report", "halpern-trim-heel-2017", "project-derivation"],
+      "certainty": "estimated",
+      "note": "Lookout Symons saw the ship part abaft the after expansion plate, about abeam the after funnel or a little forward of it (as quoted by Halpern). Station placed by the project accordingly."
+    }
+  ]
+}
