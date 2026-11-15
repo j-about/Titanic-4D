@@ -153,6 +153,14 @@
   font-size: var(--text-sm);
 }
 
+/* A link alone on its line is a target of its own: one box, 24 CSS pixels high at least. */
+.event-sources a,
+.notice-item a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--target-min-small);
+}
+
 .prose .chronicle__meta {
   margin-block-end: var(--space-2);
 }
