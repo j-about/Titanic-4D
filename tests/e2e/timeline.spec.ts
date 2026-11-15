@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { hideOverlays, narrativeEventCount, openAt, showOverlays, waitForFrame } from './app.ts';
 import { findAccessibilityViolations } from './axe.ts';
+import { focusRingSides } from './pixels.ts';
 
 const clock = (page: import('@playwright/test').Page) => page.locator('.clock__time');
 
@@ -14,6 +15,45 @@ async function sceneImage(page: import('@playwright/test').Page): Promise<Buffer
   await showOverlays(page);
   return image;
 }
+
+/**
+ * Sides on which the control that holds the focus, enlarged by the reach of its ring, lies outside
+ * the visible part of the box matching `scroller` that holds it, or outside the window; empty
+ * when the control shows whole with its ring.
+ */
+const sidesOfFocusedControlCut = (
+  page: import('@playwright/test').Page,
+  scroller: string,
+): Promise<string[]> =>
+  page.evaluate((selector) => {
+    const focused = document.activeElement;
+    const box = focused?.closest(selector);
+    if (!(focused instanceof HTMLElement && box instanceof HTMLElement)) {
+      return [`the focus is not inside ${selector}`];
+    }
+    const style = getComputedStyle(focused);
+    const reach = Math.max(
+      0,
+      Number.parseFloat(style.outlineOffset) + Number.parseFloat(style.outlineWidth),
+    );
+    const control = focused.getBoundingClientRect();
+    const frame = box.getBoundingClientRect();
+    const left = frame.left + box.clientLeft;
+    const top = frame.top + box.clientTop;
+    const excesses: readonly (readonly [string, number])[] = [
+      ['left of the box', left - (control.left - reach)],
+      ['right of the box', control.right + reach - (left + box.clientWidth)],
+      ['top of the box', top - (control.top - reach)],
+      ['bottom of the box', control.bottom + reach - (top + box.clientHeight)],
+      ['left of the window', -(control.left - reach)],
+      ['right of the window', control.right + reach - window.innerWidth],
+      ['top of the window', -(control.top - reach)],
+      ['bottom of the window', control.bottom + reach - window.innerHeight],
+    ];
+    return excesses
+      .filter(([, excess]) => excess > 0.5)
+      .map(([side, excess]) => `${excess.toFixed(1)} px beyond the ${side}`);
+  }, scroller);
 
 /** True when the page is no wider than its window. */
 const fitsTheWindow = (page: import('@playwright/test').Page): Promise<boolean> =>
@@ -72,6 +112,169 @@ test.describe('timeline', () => {
     await expect(clock(page)).toHaveText('2:20 a.m.');
     await expect(bookmark).toHaveAttribute('aria-current', 'true');
     await expect(page).toHaveURL(/t=02:20:00/);
+  });
+
+  // 305 px is what a 320 px window leaves beside a scroll bar that takes room.
+  for (const viewport of [
+    { width: 1280, height: 720 },
+    { width: 640, height: 400 },
+    { width: 320, height: 640 },
+    { width: 305, height: 640 },
+  ]) {
+    test(`shows the whole of each key moment that takes the keyboard focus, ring included, at ${viewport.width} px`, async ({
+      page,
+    }, testInfo) => {
+      await page.setViewportSize(viewport);
+      await openAt(page, testInfo, '23:40');
+      const bookmarks = page.locator('.bookmark');
+      const count = await bookmarks.count();
+      expect(count).toBeGreaterThan(1);
+      await page.locator('#scrubber').focus();
+      for (let index = 0; index < count; index += 1) {
+        await page.keyboard.press('Tab');
+        await expect(bookmarks.nth(index)).toBeFocused();
+        expect(await sidesOfFocusedControlCut(page, '.bookmarks__list')).toEqual([]);
+      }
+      for (let index = count - 2; index >= 0; index -= 1) {
+        await page.keyboard.press('Shift+Tab');
+        await expect(bookmarks.nth(index)).toBeFocused();
+        expect(await sidesOfFocusedControlCut(page, '.bookmarks__list')).toEqual([]);
+      }
+    });
+  }
+
+  test('leaves the key moments where they are under the pointer, and shows the whole of one once a key is pressed', async ({
+    page,
+  }, testInfo) => {
+    await openAt(page, testInfo, '23:40');
+    const list = page.locator('.bookmarks__list');
+    const scrollLeft = (): Promise<number> => list.evaluate((element) => element.scrollLeft);
+    /** The first key moment that the list shows only in part, with the point of its visible part to press. */
+    const cut = await list.evaluate((element) => {
+      const frame = element.getBoundingClientRect();
+      for (const [index, bookmark] of [...element.querySelectorAll('.bookmark')].entries()) {
+        const box = bookmark.getBoundingClientRect();
+        if (box.left < frame.right - 12 && box.right > frame.right + 12) {
+          return { index, x: (box.left + frame.right) / 2, y: box.top + box.height / 2 };
+        }
+      }
+      return null;
+    });
+    expect(cut).not.toBeNull();
+    const before = await scrollLeft();
+    await page.mouse.move(cut?.x ?? 0, cut?.y ?? 0);
+    await page.mouse.down();
+    expect(await scrollLeft()).toBe(before);
+    await page.mouse.up();
+    expect(await scrollLeft()).toBe(before);
+    const pressed = page.locator('.bookmark').nth(cut?.index ?? 0);
+    await expect(pressed).toHaveAttribute('aria-current', 'true');
+    await expect(pressed).toBeFocused();
+    // A key pressed after the pointer makes the ring appear: the key moment is then shown whole.
+    await page.keyboard.press('Shift');
+    expect(await sidesOfFocusedControlCut(page, '.bookmarks__list')).toEqual([]);
+  });
+
+  test('keeps the page where it is while playback moves through the narrative, at 200 % zoom', async ({
+    page,
+  }, testInfo) => {
+    await page.setViewportSize({ width: 640, height: 400 });
+    // The next event begins at 12:05 a.m., half a minute of the night away.
+    await openAt(page, testInfo, '00:04:30');
+    await page.getByRole('tab', { name: 'Narrative' }).click();
+    const current = page.locator('.narrative [aria-current="step"]');
+    const eventInProgress = await current.textContent();
+    const play = page.getByRole('button', { name: 'Play', exact: true });
+    await play.focus();
+    await page.keyboard.press('Enter');
+    const pause = page.getByRole('button', { name: 'Pause', exact: true });
+    await expect(pause).toBeFocused();
+    const scrollBefore = await page.evaluate(() => window.scrollY);
+    await expect(current).not.toHaveText(eventInProgress ?? '', { timeout: 20_000 });
+    expect(await page.evaluate(() => window.scrollY)).toBe(scrollBefore);
+    await expect(pause).toBeInViewport({ ratio: 1 });
+  });
+
+  test('lets the keys scroll the page and the key moments once a key moment holds the focus', async ({
+    page,
+  }, testInfo) => {
+    await page.setViewportSize({ width: 640, height: 400 });
+    await openAt(page, testInfo, '23:40');
+    const list = page.locator('.bookmarks__list');
+    await page.locator('#scrubber').focus();
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
+    await expect(page.locator('.bookmark').nth(1)).toBeFocused();
+    const rowBefore = await list.evaluate((element) => element.scrollLeft);
+    await page.keyboard.press('ArrowRight');
+    await page.keyboard.press('ArrowRight');
+    await expect
+      .poll(() => list.evaluate((element) => element.scrollLeft))
+      .toBeGreaterThan(rowBefore);
+    // The End key takes the page to its end, in several frames; a key released later must not
+    // bring it back to the key moment.
+    const pageEnd = await page.evaluate(
+      () => document.documentElement.scrollHeight - window.innerHeight,
+    );
+    expect(pageEnd).toBeGreaterThan(await page.evaluate(() => window.scrollY));
+    await page.keyboard.press('End');
+    await expect.poll(() => page.evaluate(() => Math.round(window.scrollY))).toBe(pageEnd);
+    await page.keyboard.press('Control');
+    await page.evaluate(
+      () =>
+        new Promise<void>((resolve) => {
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+        }),
+    );
+    expect(await page.evaluate(() => Math.round(window.scrollY))).toBe(pageEnd);
+  });
+
+  test('follows the event in progress inside the panel of the two-column layout, forward and backward', async ({
+    page,
+  }, testInfo) => {
+    await openAt(page, testInfo, '23:40');
+    await page.getByRole('tab', { name: 'Narrative' }).click();
+    await page.locator('#rate-select').selectOption('600');
+    const panel = page.getByRole('tabpanel', { name: 'Narrative' });
+    /** Pixels of the event in progress that lie outside the visible part of the panel. */
+    const hiddenPartOfTheEventInProgress = (): Promise<number> =>
+      panel.evaluate((box) => {
+        const item = box.querySelector('[aria-current="step"]');
+        if (item === null) {
+          return Number.POSITIVE_INFINITY;
+        }
+        const event = item.getBoundingClientRect();
+        const top = box.getBoundingClientRect().top + box.clientTop;
+        return Math.max(0, top - event.top, event.bottom - (top + box.clientHeight));
+      });
+    /** Plays from the keyboard until the clock matches, then pauses. */
+    const playUntil = async (time: RegExp): Promise<void> => {
+      await page.getByRole('button', { name: 'Play', exact: true }).focus();
+      await page.keyboard.press('Enter');
+      await expect(clock(page)).toHaveText(time, { timeout: 30_000 });
+      await page.keyboard.press('Enter');
+      await expect(page.getByRole('button', { name: 'Play', exact: true })).toBeFocused();
+    };
+    await playUntil(/^[12]:\d\d a\.m\.$/);
+    expect(await hiddenPartOfTheEventInProgress()).toBeLessThanOrEqual(0.5);
+    expect(await panel.evaluate((box) => box.scrollTop)).toBeGreaterThan(0);
+    expect(await page.evaluate(() => window.scrollY)).toBe(0);
+    const scrolledForward = await panel.evaluate((box) => box.scrollTop);
+    await page.getByRole('button', { name: 'Run time backward' }).click();
+    await playUntil(/^12:[0-2]\d a\.m\.$/);
+    expect(await hiddenPartOfTheEventInProgress()).toBeLessThanOrEqual(0.5);
+    expect(await panel.evaluate((box) => box.scrollTop)).toBeLessThan(scrolledForward);
+    expect(await page.evaluate(() => window.scrollY)).toBe(0);
+  });
+
+  test('announces the instant reached by a jump as one text, without a doubled full stop', async ({
+    page,
+  }, testInfo) => {
+    await openAt(page, testInfo, '23:40');
+    await page.getByRole('button', { name: 'Go to 2:20 a.m. The ship founders' }).click();
+    const announcement = page.locator('#announcer');
+    await expect(announcement).toHaveText(/^2:20 a\.m\. \S/);
+    await expect(announcement).not.toHaveText(/\.\./);
   });
 
   test('shows the title of every key moment in full, also with the spacing of WCAG 1.4.12', async ({
@@ -342,6 +545,56 @@ test.describe('views', () => {
       .poll(async () => (await sceneImage(page)).equals(before), { timeout: 20_000 })
       .toBe(false);
     expect(await findAccessibilityViolations(page)).toEqual([]);
+  });
+
+  test('draws the ring of each step button on its four sides', async ({ page }, testInfo) => {
+    await openAt(page, testInfo, '01:00', 'orbit');
+    const buttons = page.getByRole('group', { name: 'Move the camera' }).getByRole('button');
+    const count = await buttons.count();
+    expect(count).toBe(6);
+    await page.locator('#quality-select').focus();
+    for (let index = 0; index < count; index += 1) {
+      await page.keyboard.press('Tab');
+      await expect(buttons.nth(index)).toBeFocused();
+      const sides = await focusRingSides(page);
+      for (const [side, share] of Object.entries(sides)) {
+        expect(share, `${side} side of the ring of step button ${index + 1}`).toBeGreaterThan(0.95);
+      }
+    }
+  });
+
+  test('keeps the ring of a control inside the box that scrolls to bring it into view', async ({
+    page,
+  }, testInfo) => {
+    // In a window this low the view controls scroll inside their box once the help is open.
+    await page.setViewportSize({ width: 1280, height: 560 });
+    await openAt(page, testInfo, '01:00', 'orbit');
+    const toolbar = page.locator('#camera-root');
+    const stops = await toolbar.locator('select:visible, button:visible, summary:visible').count();
+    expect(stops).toBe(10);
+    await page.getByText('Controls of the 3D view').click();
+    // From the end of the box, each control above is reached only once the box has scrolled back.
+    await toolbar.evaluate((box) => {
+      box.scrollTop = box.scrollHeight;
+    });
+    expect(await toolbar.evaluate((box) => box.scrollTop)).toBeGreaterThan(0);
+    for (let stop = 1; stop < stops; stop += 1) {
+      await page.keyboard.press('Shift+Tab');
+      expect(await sidesOfFocusedControlCut(page, '#camera-root')).toEqual([]);
+    }
+    await expect(page.locator('#camera-select')).toBeFocused();
+    await page.getByRole('tab', { name: 'Narrative' }).click();
+    const panel = page.getByRole('tabpanel', { name: 'Narrative' });
+    await page.keyboard.press('Tab');
+    await expect(panel).toBeFocused();
+    for (let stop = 0; stop < 16; stop += 1) {
+      await page.keyboard.press('Tab');
+      expect(await sidesOfFocusedControlCut(page, '[role="tabpanel"]')).toEqual([]);
+    }
+    for (let stop = 0; stop < 8; stop += 1) {
+      await page.keyboard.press('Shift+Tab');
+      expect(await sidesOfFocusedControlCut(page, '[role="tabpanel"]')).toEqual([]);
+    }
   });
 
   test('shows how to operate the 3D view, the keys that move time included', async ({
