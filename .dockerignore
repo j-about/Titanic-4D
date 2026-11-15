@@ -9,3 +9,6 @@ docs
 tests
 *.tsbuildinfo
 .venv
+
+# Asset pipeline: its output is committed where the application reads it
+assets
