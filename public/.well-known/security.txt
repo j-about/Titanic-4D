@@ -1,0 +1,4 @@
+Contact: mailto:contact@titanic-4d.org
+Expires: 2027-10-31T23:59:59Z
+Preferred-Languages: en, fr
+Canonical: https://www.titanic-4d.org/.well-known/security.txt
