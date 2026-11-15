@@ -1,9 +1,11 @@
+import type { Dataset } from '../data/schema/dataset.ts';
 import type { TimelineEvent } from '../sim/events.ts';
 import { lastEventIndexAt } from '../sim/events.ts';
 import type { ShipState, TimelineModel } from '../sim/timelineModel.ts';
 import { formatShipClock } from '../time/shipTime.ts';
 import { certaintyBadge } from './certaintyBadge.ts';
 import { el, setText } from './dom.ts';
+import { createFloodingDiagram } from './floodingDiagram.ts';
 import {
   describeBoats,
   describeFlooding,
@@ -57,7 +59,12 @@ function eventItem(event: TimelineEvent, onJump: (t: number) => void): HTMLEleme
 }
 
 /** Creates the summary of the current instant: phase, description, figures and recent events. */
-export function createNowPanel(model: TimelineModel, onJump: (t: number) => void): NowPanel {
+export function createNowPanel(
+  dataset: Dataset,
+  model: TimelineModel,
+  onJump: (t: number) => void,
+): NowPanel {
+  const floodingDiagram = createFloodingDiagram(dataset);
   const phase = el('h3', { class: 'panel__heading' });
   const description = el('p', { class: 'panel__lead' });
   const trim = term('Trim');
@@ -83,6 +90,7 @@ export function createNowPanel(model: TimelineModel, onJump: (t: number) => void
     phase,
     description,
     facts,
+    floodingDiagram.element,
     recentHeading,
     recent,
     empty,
@@ -100,6 +108,7 @@ export function createNowPanel(model: TimelineModel, onJump: (t: number) => void
     setText(boats.value, describeBoats(ship));
     setText(signals.value, `${ship.rocketsFired} fired`);
     setText(lighting.value, describeLighting(ship.lightingOutput));
+    floodingDiagram.update(ship);
 
     const lastIndex = lastEventIndexAt(model.events, ship.t);
     if (lastIndex !== shownLastIndex) {

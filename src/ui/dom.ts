@@ -51,6 +51,20 @@ export function setAttribute(element: Element, name: string, value: string | nul
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
+/** Creates an SVG element with the given attributes. */
+export function svgEl<Tag extends keyof SVGElementTagNameMap>(
+  tag: Tag,
+  attributes: Readonly<Record<string, string | number>> = {},
+  children: readonly SVGElement[] = [],
+): SVGElementTagNameMap[Tag] {
+  const element = document.createElementNS(SVG_NAMESPACE, tag);
+  for (const [name, value] of Object.entries(attributes)) {
+    element.setAttribute(name, String(value));
+  }
+  element.append(...children);
+  return element;
+}
+
 /** Creates a decorative 24×24 icon from SVG path data. */
 export function icon(pathData: string): SVGSVGElement {
   const svg = document.createElementNS(SVG_NAMESPACE, 'svg');

@@ -420,6 +420,75 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Flooding diagram */
+
+.flooding {
+  margin: 0 0 var(--space-5);
+  font-size: var(--text-sm);
+}
+
+.flooding__caption {
+  margin-block-end: var(--space-2);
+  color: var(--color-text-muted);
+}
+
+.flooding__drawing {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+}
+
+.flooding__hull {
+  fill: var(--color-surface-raised);
+  stroke: var(--color-border-strong);
+  stroke-width: 0.09375rem;
+  vector-effect: non-scaling-stroke;
+}
+
+.flooding__water {
+  fill: var(--color-water);
+}
+
+.flooding__bulkhead {
+  stroke: var(--color-border-strong);
+  stroke-width: 0.0625rem;
+  vector-effect: non-scaling-stroke;
+}
+
+.flooding__sea {
+  stroke: var(--color-text);
+  stroke-width: 0.09375rem;
+  stroke-dasharray: 6 4;
+  vector-effect: non-scaling-stroke;
+}
+
+.flooding__legend {
+  margin-block: var(--space-2);
+  color: var(--color-text-muted);
+}
+
+.flooding__table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.flooding__table th,
+.flooding__table td {
+  padding: var(--space-1) var(--space-2);
+  border-block-end: 0.0625rem solid var(--color-border);
+  font-weight: normal;
+  text-align: start;
+}
+
+.flooding__table thead th {
+  color: var(--color-text-muted);
+}
+
+.flooding__table .flooding__number {
+  text-align: end;
+}
+
 /* Certainty */
 
 .certainty {
