@@ -270,7 +270,7 @@ vectorised transcendental functions whose results can depend on the processor; a
 are pinned by `assets/uv.lock` and `assets/optimise/pnpm-lock.yaml`.
 
 Verified: two builds on the development machine, and a build from a fresh copy of the tree with
-freshly installed dependencies in the `mcr.microsoft.com/playwright:v1.65.1-noble` container
+freshly installed dependencies in the `mcr.microsoft.com/playwright:v1.65.1-noble` (the image that `tools/e2e-container.sh` pins by digest) container
 (Ubuntu 24.04), give the committed file. Not verified: another processor architecture, another
 operating system or a C library other than glibc 2.39. The custom normals pass through Blender's
 compiled code, so a platform whose arithmetic differs in the last place could change a few

@@ -393,3 +393,119 @@ or the strictness of the content security policy more than necessary.
 0.45 MB file (0.13 MB with Brotli) fetched after the first frame. Tests wait for the model
 through `data-assets` and `data-ship-model` on the canvas, and one of them checks that the
 detailed model is the one drawn under the production policy.
+
+## ADR 0013 — Amendments after the review of 2026-11-15
+
+**Status:** accepted (2026-11-15). Amends ADR 0004, ADR 0005, ADR 0008 and ADR 0011; the text
+of those records is left as written.
+
+**Context.** A review of the whole repository found places where the delivery was looser than
+the records state, or where a record did not describe the code.
+
+**Decision.**
+
+- **Model of the ship (amends ADR 0005, caching).** `/models/*` is served with
+  `Cache-Control: no-cache` instead of the one-hour rule of the other unversioned files. The
+  model keeps its address from one build to the next while the script that reads its named
+  parts is fingerprinted and immutable; a copy stored for an hour could meet a newer script.
+  Each use now revalidates the stored copy with its entity tag, and an unchanged file costs a
+  304. The file stays at `public/models/ship-lod1.glb`, where the pipeline writes it and where
+  the `assets` job compares it; giving it a fingerprinted address through a Vite import was not
+  retained for that reason. `tools/verify-server.ts` checks the media type, the cache policy,
+  the 304 and the precompressed variants on the running server.
+- **Build manifest (amends ADR 0005).** `dist/.vite/manifest.json` is read by
+  `tools/check-budgets.ts` after a build and by nothing else. The Dockerfile removes
+  `dist/.vite` before the files are copied into the runtime stage, and `tools/verify-server.ts`
+  checks that `/.vite/manifest.json` answers 404.
+- **Budgets (amends ADR 0005).** The limits of `budgets.json` are bytes with 1,000 bytes to the
+  kilobyte: 400,000 for the initial JavaScript, which is the 400 kB of the plan, 20,000 for the
+  initial CSS and 8,000 for the entry document. The earlier values were multiples of 1,024, so
+  the JavaScript limit stood 9,600 bytes above the criterion. `tools/consistency.test.ts`
+  compares the JavaScript limit with the figure written in `docs/PLAN.md`.
+- **Pinned images (amends ADR 0004 and ADR 0005).** The build frontend of the Dockerfile
+  (`# syntax=docker/dockerfile:1.29.0@sha256:…`) and the Playwright image of
+  `tools/e2e-container.sh` are referenced by exact version and digest, like the two base
+  images. The digests are those of the multi-platform indexes, read from the registries on
+  2026-11-15 with `docker buildx imagetools inspect`. The tag of the Playwright image still has
+  to match the installed `@playwright/test`; a unit test checks both the tag and the presence
+  of a digest on the four references.
+- **Continuous integration (amends ADR 0005).** The `quality` job runs
+  `pnpm data:schema:check`, so that it runs every step of `pnpm check`; a unit test compares
+  the two lists. The `container` job compares the user of the image and of the running
+  container with the `USER` of the Dockerfile (`10001:10001`) instead of accepting anything
+  other than root, an empty answer included.
+- **Gate before deployment (amends ADR 0005).** Dokploy deploys every push to `master` without
+  waiting for CI, and the image build runs no test. Automatic deployment on push is kept
+  (`docs/PLAN.md`, M7); the gate is the protection of `master` on GitHub, with the four CI jobs
+  as required checks, which the owner sets up as a step of `docs/DEPLOY.md`.
+- **Certificates in live mode (amends ADR 0005).** `tools/verify-server.ts --live` completes
+  the TLS handshake whether or not the certificate is trusted and reports the verdict of the
+  TLS layer as a check, with its reason. Each host, and each of its two steps (certificate,
+  redirection from HTTP), is a group of its own: a host that cannot be reached is reported by
+  name and the others are still checked. Until then an untrusted certificate ended the
+  connection before any check ran, and the first failing host hid the following ones.
+- **Pure modules next to the renderer (amends ADR 0008).** ADR 0008 lists camera poses among
+  the code that lives in `src/ship/` and `src/sim/`, and calls `src/render/` a separate chunk.
+  As built, the modules of `src/render/` that compute without three.js (camera poses and
+  steps in `src/render/camera/`, the gamepad mapping, the quality levels in
+  `src/render/quality.ts`, the placement of the Californian's light) are pure functions with
+  unit tests and stay next to the renderer that uses them. Two modules there are stateful by
+  nature and import no three.js either: `cameraInput.ts`, which listens to the pointer, the
+  keyboard and the gamepad, and `cameraRig.ts`, which keeps the camera the user chose in each
+  mode. `src/app/`, `src/ui/` and `src/main.ts` import the pure ones statically, so those are
+  part of the entry chunk; the separate chunk is `src/render/sceneView.ts` and what only it
+  imports, that is every module that imports three.js. The rule itself is unchanged: what can be computed without a renderer
+  is pure and tested, and the three.js modules only turn it into GPU resources.
+- **Sentence on the people who died (amends ADR 0011).** The wording "about 1,500" merged
+  counts that the sources give separately. The README now gives the lowest and the highest
+  count of lives lost recorded in `data/people.json` (1,490 and 1,517), and
+  `tools/consistency.test.ts` compares the sentence with the dataset.
+
+- **Announcements (amends ADR 0008).** There are two polite regions, not one: a status for the
+  loading or failed state of the scene, and a live region for events. During playback at most
+  one event is announced every four seconds, key events only at high speed; after the user
+  moves in time the new instant is announced once, 0.7 s after the last move.
+- **Starts of the scene (amends ADR 0004 and ADR 0008).** Starts are numbered and only the
+  latest is kept, so a restart or a fallback during a start in flight neither leaks a view nor
+  leaves the canvas undrawn. A fallback to WebGL 2 is not written into the address, which keeps
+  the renderer the user asked for; later restarts on the same page stay on WebGL 2. A star
+  catalogue that cannot be loaded ends in the failed state with its own message, without
+  trying another renderer. When the scene fails, the focus that was on the canvas or on the
+  view controls moves to the main content.
+- **Camera without dragging (WCAG 2.5.7 and 2.5.1).** The view toolbar has Turn, Tilt, Zoom and
+  Move buttons: one click is one step (15°, a ratio of 1.25, 30 m), through the same request
+  path as the pointer, the keyboard and the gamepad. Below 64 rem the controls sit under the
+  canvas. The operating instructions are in a disclosure of the toolbar, closed when the page
+  loads so that the controls cover as little of the view as possible, and available at every
+  width.
+- **Address.** The address is written at most every 500 ms, with a trailing write and a last
+  one when the page is hidden; a write that the browser refuses is reported and dropped.
+- **Image up to date.** The frame of the scene carries `data-up-to-date`, true when the canvas
+  shows everything asked of the scene so far; end-to-end tests wait on it instead of comparing
+  successive screenshots.
+- **Provenance of what is displayed.** A wireless event combines the record of the log entry
+  with the adopted clock offset: it is no more certain than the offset, and the alternative
+  offsets appear as other positions. Margins of wireless times and of distress signals are in
+  the records, not in the code. The text of a lifeboat event carries the sources of every
+  record it uses. A record cannot be `established` on reference works, on works known through
+  another, or on the project's own derivations alone. The footer and the About page derive
+  the sentence on the people who died from the counts of the dataset. The Sources tab also
+  lists the sky, the haze, the funnels once they have fallen, the depth of the seabed and the
+  light of the Californian.
+- **Light of the Californian.** Drawn from the records of her distance and bearing until the
+  foundering; its height above the horizon and its brightness are modelling values, named as
+  such in `src/render/californianLight.ts`.
+- **Stern section.** Its keyframes bring it to the seabed rudder first, as the dataset's own
+  record says; the attitude during the fall is the project's choice and is marked as such.
+- **Lifeboats.** A lowering boat bears against the ship's side where the list brings the side
+  under the davits. The lifeboats swing out from the recorded order, the cutters are swung out
+  from the start as their record says, collapsibles C and D swing out before they start down,
+  and A and B stay on the roof of the officers' quarters until the sea reaches them.
+- **Generated hull.** The normals of the shell are the true outward normals up to the top edge
+  of the plating, and a quad whose first corners coincide is no longer dropped.
+
+**Consequences.** `tools/verify-server.ts` can be imported by a test without running, and its
+transport checks are covered by `tools/verify-server.test.ts` against a local server with a
+self-signed certificate. A change of the job names in the workflow must be repeated in the list
+of required checks of `docs/DEPLOY.md` and in the branch protection itself; a unit test covers
+the document.

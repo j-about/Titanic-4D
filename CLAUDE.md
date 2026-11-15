@@ -41,38 +41,40 @@ Run `pnpm check` and the end-to-end suite before every commit.
 
 ## Repository map
 
-| Path                                    | Content                                                                 |
-| --------------------------------------- | ----------------------------------------------------------------------- |
-| `index.html`                            | Application document                                                    |
-| `about/`, `legal-notice/`, `narrative/` | Documents of the static pages; their content is generated               |
-| `src/pages/`                            | Static pages rendered to HTML at build time, shared header and footer   |
-| `data/`                                 | Historical dataset (JSON) and its exported JSON Schemas                 |
-| `src/data/`                             | Zod schemas, typed loader and validation of the dataset                 |
-| `src/sim/`                              | Pure simulation: timeline model, poses, events, waterline               |
-| `src/ship/`                             | Pure geometry of the ship: hull form, mesh data, lamps                  |
-| `src/sky/`                              | Star catalogue codec, sky orientation (ephemerides), star appearance    |
-| `src/ocean/`                            | Wave spectrum, FFT field and analytic waves                             |
-| `src/render/`                           | three.js scene, objects, cameras, quality levels (separate chunk)       |
-| `src/app/`                              | Store, playback, address state                                          |
-| `src/ui/`                               | Timeline, panels, camera controls, announcements                        |
-| `src/time/`                             | Ship's time conversions and formatting                                  |
-| `src/config/`                           | Typed configuration (site identity, later support links and legal data) |
-| `src/styles/`                           | Design tokens, base styles and layout                                   |
-| `public/`                               | Files served unchanged: `.well-known/security.txt`, `models/` (built)   |
-| `assets/`                               | Asset pipeline: Python project run by uv, Blender, glTF-Transform       |
-| `tools/`                                | Build and verification scripts, run by Node.js as TypeScript            |
-| `tests/e2e/`                            | Playwright tests (accessibility, behaviour, visual regression)          |
-| `docs/`                                 | Plan, status, decisions, data, sky and accessibility documentation      |
-| `Dockerfile`                            | Build with Node.js, serve with Caddy as an unprivileged user            |
-| `Caddyfile`                             | Headers, caching, fallback, host redirects                              |
-| `budgets.json`                          | Performance budgets checked by `tools/check-budgets.ts`                 |
+| Path                                    | Content                                                                |
+| --------------------------------------- | ---------------------------------------------------------------------- |
+| `index.html`                            | Application document                                                   |
+| `about/`, `legal-notice/`, `narrative/` | Documents of the static pages; their content is generated              |
+| `src/pages/`                            | Static pages rendered to HTML at build time, shared header and footer  |
+| `data/`                                 | Historical dataset (JSON) and its exported JSON Schemas                |
+| `src/data/`                             | Zod schemas, typed loader and validation of the dataset                |
+| `src/sim/`                              | Pure simulation: timeline model, poses, events, waterline              |
+| `src/ship/`                             | Pure geometry of the ship: hull form, mesh data, lamps                 |
+| `src/sky/`                              | Star catalogue codec, sky orientation (ephemerides), star appearance   |
+| `src/ocean/`                            | Wave spectrum, FFT field and analytic waves                            |
+| `src/render/`                           | three.js scene and objects (separate chunk); pure camera, quality code |
+| `src/app/`                              | Store, playback, address state                                         |
+| `src/ui/`                               | Timeline, panels, camera controls, announcements                       |
+| `src/time/`                             | Ship's time conversions and formatting                                 |
+| `src/config/`                           | Typed configuration: site identity, navigation, support links, legal   |
+| `src/styles/`                           | Design tokens, base styles and layout                                  |
+| `public/`                               | Files served unchanged: `.well-known/security.txt`, `models/` (built)  |
+| `assets/`                               | Asset pipeline: Python project run by uv, Blender, glTF-Transform      |
+| `tools/`                                | Build and verification scripts, run by Node.js as TypeScript           |
+| `tests/e2e/`                            | Playwright tests (accessibility, behaviour, visual regression)         |
+| `docs/`                                 | Plan, status, decisions, data, sky, accessibility, assets, deployment  |
+| `Dockerfile`                            | Build with Node.js, serve with Caddy as an unprivileged user           |
+| `Caddyfile`                             | Headers, caching, fallback, host redirects                             |
+| `budgets.json`                          | Performance budgets checked by `tools/check-budgets.ts`                |
 
 ## Conventions
 
 - TypeScript strict; relative imports carry the `.ts` extension; only erasable syntax, so that
   Node.js runs `tools/` directly.
 - No default exports, no barrel files, no `any`, no non-null assertions.
-- Unit tests sit next to the code as `*.test.ts` (Node) or `*.dom.test.ts` (happy-dom).
+- Unit tests sit next to the code as `*.test.ts` (Node environment; under `src/`, type-checked
+  with the browser configuration), `*.node.test.ts` (tests under `src/` that use Node.js APIs,
+  type-checked by `tsconfig.node.json`) or `*.dom.test.ts` (happy-dom).
 - Comments explain what the code does and how. Rationale, history and future work belong in
   `docs/DECISIONS.md`, commit messages and pull requests.
 - Conventional Commits; one pull request per milestone.
@@ -87,8 +89,14 @@ Run `pnpm check` and the end-to-end suite before every commit.
   `certainty` (`established`, `estimated`, `debated`) and `note`. Data keys are snake_case.
 - The state of the scene is a pure function of `t` (seconds since the collision). Nothing in
   `src/sim/` may keep state between calls or use unseeded randomness.
-- Pure code first: anything computable without a renderer goes in `src/sim/` or `src/ship/`
-  with unit tests; `src/render/` only turns it into GPU resources.
+- Pure code first: anything computable without a renderer is a pure function with unit tests.
+  The simulation and the geometry of the ship are in `src/sim/` and `src/ship/`. In
+  `src/render/`, the modules that compute without three.js (camera poses and steps, gamepad
+  mapping, quality levels, placement of the Californian's light) are pure and unit-tested too,
+  and stay next to the renderer that uses them; the camera input and the camera rig are the
+  only stateful ones: they collect what the user does and keep the camera the user chose. The
+  modules that import three.js only turn that data into GPU resources and are reached through
+  the dynamic import of `src/render/sceneView.ts`.
 - Visual baselines (`tests/e2e/__screenshots__/`) are re-recorded only after the images have
   been looked at; note the review in `docs/STATUS.md`.
 - A night image is mostly black: after a visual change, check that the old baselines fail before
@@ -105,7 +113,8 @@ Run `pnpm check` and the end-to-end suite before every commit.
 ## Environment notes
 
 - Node.js 26.13.1 and pnpm 12.18.0 (`.node-version`, `packageManager`).
-- End-to-end tests run in `mcr.microsoft.com/playwright` at the tag matching `@playwright/test`.
+- End-to-end tests run in `mcr.microsoft.com/playwright` at the tag matching `@playwright/test`,
+  referenced by digest in `tools/e2e-container.sh`.
 - Headless Chromium cannot present a WebGPU canvas on a software rasteriser: the `webgpu`
   project uses `renderer=webgpu-readback` (ADR 0004).
 - No secret is ever committed, logged or written to a pull request.

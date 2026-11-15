@@ -87,7 +87,8 @@ single source of truth under test.
 ### M7 — Deployment
 
 Dokploy application built from the Dockerfile, four domains with Let's Encrypt certificates,
-automatic deployment on push to `master`, post-deployment verification.
+automatic deployment on push to `master`, `master` protected on GitHub so that only commits
+whose pull request passed CI reach it, post-deployment verification.
 
 Done when: the checks in `docs/DEPLOY.md` pass against the live hosts and are recorded in
 STATUS.md.

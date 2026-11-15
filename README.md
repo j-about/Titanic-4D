@@ -5,9 +5,9 @@ built on sourced historical data.
 
 Live site: <https://www.titanic-4d.org>
 
-The project treats its subject as what it is — a disaster in which about 1,500 people died.
-The tone is sober and informative; every state shown on screen is tied to a documented source
-and a stated level of certainty.
+The project treats its subject as what it is — a disaster in which between 1,490 and 1,517
+people died, depending on the source. The tone is sober and informative; every state shown on
+screen is tied to a documented source and a stated level of certainty.
 
 ## Status
 
@@ -24,6 +24,9 @@ milestones in [docs/PLAN.md](docs/PLAN.md) and the architectural decisions in
   3D view: drag or arrow keys to turn, wheel, pinch or plus and minus to zoom, Space to play or
   pause, comma and full stop to step by one minute; in the free camera, W, A, S, D, Q and E to
   move.
+- **Buttons.** The view toolbar has Turn, Tilt, Zoom and, for the free camera, Move buttons:
+  one click is one step, so nothing requires dragging, pinching or a wheel. "Controls of the 3D
+  view" in the same toolbar lists every way of operating the view.
 - **Gamepad.** With a standard gamepad, the right stick turns the view, the triggers zoom, and
   the left stick and the bumpers move the free camera.
 - **Description.** The "Now" tab states the instant in words and figures and draws the water in

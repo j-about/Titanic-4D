@@ -35,8 +35,8 @@ Notes:
 
 - Software WebGPU (Dawn on SwiftShader) and software WebGL 2 (ANGLE on SwiftShader) are both
   available in headless Chromium, so both backends are exercised without a GPU.
-- The GitHub Actions workflow has not yet run on GitHub; its first run happens on the pull
-  request.
+- The GitHub Actions workflow runs on the pull request. Its run on commit `300afd5`
+  (2026-11-15) passed with its four jobs: quality, end-to-end, container and assets.
 
 ## M1 — Data and TimelineModel (done, 2026-11-14)
 
@@ -45,7 +45,7 @@ Delivered:
 - Twelve data files in `data/` (sources, time reference, ship, chronology, attitude, flooding,
   lifeboats, signals, lighting, break-up, site, people), each validated by a Zod schema and
   exported as JSON Schema in `data/schema/`.
-- More than 300 records, each with `source_ids`, `certainty` and `note`; 40 sources with their
+- More than 300 records, each with `source_ids`, `certainty` and `note`; 39 sources with their
   access level.
 - `src/time/shipTime.ts`: ship's time, New York time and GMT conversions.
 - `src/sim/`: monotone interpolation, hull poses, merged narrative events and `TimelineModel`.
@@ -214,8 +214,8 @@ Verified:
 | Whole suite under the production CSP      | suite run against the Caddy container                                   | 84 of 84 pass, same baselines                                    |
 | Container image                           | `node tools/verify-server.ts`                                           | 77 of 77                                                         |
 
-Visual review of the six re-recorded baselines (12 images), of the signal at 12:47 a.m. and of
-both sections of the wreck:
+Visual review of the six re-recorded baselines (12 images; the two at 2:20 a.m. came out
+identical to the previous ones), of the signal at 12:47 a.m. and of both sections of the wreck:
 
 - Agrees: a dark mass of ice about as high as the Boat deck beside the bow at 11:40 p.m.; white
   stars bursting high above the bridge, inside the frame; hull without funnels on the seabed,
@@ -266,10 +266,11 @@ Verified:
 | Whole suite under the production CSP                                    | suite run against the Caddy container                               | 117 pass, same baselines; WebAssembly decoding allowed, nothing else                      |
 | Container image                                                         | `node tools/verify-server.ts`                                       | 144 of 144                                                                                |
 | First frame at 50 Mb/s, cache empty                                     | `tests/e2e/performance.spec.ts`                                     | 2.6 s at 1280 × 720; 3.4 to 3.8 s at 1920 × 1080, on a software rasteriser                |
+| Limits enforced by that test                                            | same file, `webgl2` project only                                    | First frame under 5 s and under 2.5 MB transferred; 50 Mb/s down, 10 Mb/s up, 20 ms       |
 
-Visual review of the six re-recorded baselines (12 images) and of close-ups at 12:45 a.m.,
-1:40 a.m. and on the seabed, against the renders of the pipeline and the description of the
-ship:
+Visual review of the six re-recorded baselines (12 images; the two at 2:20 a.m., when the ship
+is gone, came out identical to the previous ones) and of close-ups at 12:45 a.m., 1:40 a.m. and
+on the seabed, against the renders of the pipeline and the description of the ship:
 
 - Agrees: smooth hull with the sheer line; rows of lit windows on B deck and the promenade
   above the rows of ports; soft glow around the lights; davits, deckhouses and bridge readable;
@@ -280,8 +281,11 @@ ship:
   than lamps would light them; no cut-away view of the water inside the hull in 3D (the diagram
   of the "Now" tab shows it).
 
-Not verified here: the `assets` job has not yet run on GitHub at the time of writing; frame rate
-on real graphics hardware (the software rasteriser of this environment is not representative).
+The `assets` job has since run on GitHub (commit `300afd5`, 2026-11-15): it passed, and the
+model it rebuilt there is identical to the committed file.
+
+Not verified here: frame rate on real graphics hardware (the software rasteriser of this
+environment is not representative).
 
 ## M6 — Accessibility, UX, support, legal notice (done, 2026-11-15)
 
@@ -314,13 +318,26 @@ Verified:
 | Container image, pages, security.txt, site map   | `node tools/verify-server.ts`                              | 144 of 144                                                  |
 | Budgets                                          | `pnpm budgets`                                             | JavaScript 318 kB of 400 kB, CSS 3.7 kB, HTML 1.4 kB (gzip) |
 
+Visual review of the twelve baselines re-recorded with this milestone (commit `6c7edb9`),
+carried out on 2026-11-15 from the history of the repository by placing each image beside its
+previous version:
+
+- The header and its menu make the canvas one pixel shorter: every image went from 880 × 349 to
+  880 × 348 pixels.
+- Agrees: each of the six instants shows the same content as before on both backends (ship,
+  iceberg, lit ports and their reflection, empty sea at 2:20 a.m., hull on the seabed);
+  only the glints of the sea and a few stars fall on other pixels, as the frame is drawn at
+  another height.
+- Ten of these baselines were replaced by those of M5, reviewed above; the two at 2:20 a.m.
+  stayed the current ones until the corrections of the review.
+
 Not verified here, and why:
 
 - Screen readers, voice control and forced colours need a person (`docs/ACCESSIBILITY.md`).
-- Sixty frames per second on an integrated GPU and first render under five seconds at 50 Mb/s
-  cannot be measured on the software rasteriser of this environment. The page weighs about
-  0.4 MB compressed before the 3D scene starts, which is a fraction of a second at that speed;
-  the frame rate remains to be measured on real hardware.
+- Sixty frames per second on an integrated GPU cannot be measured on the software rasteriser of
+  this environment; the frame rate remains to be measured on real hardware. The first render
+  under five seconds at 50 Mb/s is measured and enforced by `tests/e2e/performance.spec.ts`
+  since M5 (see the M5 table), on the software rasteriser.
 
 ## M7 — Deployment (artefacts ready, deployment not run)
 
@@ -332,8 +349,8 @@ Ready in the repository:
 
 - `Dockerfile`, `Caddyfile` and the CI job that builds the image, checks its headers, caching,
   fallbacks and host redirects, and runs the end-to-end suite against it.
-- `docs/DEPLOY.md`: prerequisites, the sequence of Dokploy MCP calls, verification, going back,
-  maintenance.
+- `docs/DEPLOY.md`: prerequisites, the protection of `master` that the owner sets up, the
+  sequence of Dokploy MCP calls, verification, going back, maintenance.
 - `tools/verify-server.ts --live`: checks of the deployed site, including the certificate of
   each of the four hosts and the redirection from HTTP to HTTPS.
 
@@ -345,8 +362,103 @@ Verified:
 | Container mode of the verification   | `node tools/verify-server.ts --origin <container>` | 144 of 144                                                                                |
 | Live mode of the verification        | `node tools/verify-server.ts --live`               | Runs and reports; not meaningful from the authoring environment, whose proxy re-signs TLS |
 
+Remaining for the owner: the protection of `master` described in `docs/DEPLOY.md`; on
+2026-11-15 GitHub reported the branch as not protected, and Dokploy deploys every push to it
+without waiting for CI.
+
 Remaining for the deployment session: steps 1 to 8 of `docs/DEPLOY.md`, then the results of the
 live verification and of the end-to-end suite against the canonical URL, recorded here.
+
+## Review of 2026-11-15 — corrections
+
+State before these corrections, on commit `300afd5`: unit tests 316 of 316; pipeline tests 26 of
+26; end-to-end 117 pass and 1 skipped by design, on the preview server and on the production
+image; `tools/verify-server.ts` 144 of 144 against the container.
+
+Corrected (decisions in ADR 0013):
+
+- **CI.** The quality job runs `pnpm data:schema:check`, so it runs every step of `pnpm check`.
+  The container job compares the user of the image and of the running container with
+  `10001:10001`; the earlier comparison passed on an empty answer.
+- **Budgets.** `budgets.json` counts 1,000 bytes to the kilobyte: 400,000 bytes for the initial
+  JavaScript (was 409,600), 20,000 for the CSS, 8,000 for the entry document.
+- **Model of the ship.** `/models/*` is served with `Cache-Control: no-cache` and revalidated by
+  entity tag, instead of being cached for an hour beside fingerprinted scripts.
+- **Build manifest.** `dist/.vite` is removed from the image; `/.vite/manifest.json` must answer
+  404.
+- **Pinned images.** The build frontend of the Dockerfile and the Playwright image are
+  referenced by exact version and digest, like the base images.
+- **Verification of the server.** New checks for the model (media type, cache policy, 304,
+  precompressed variants) and for the absence of the build manifest. In live mode an untrusted
+  certificate is now reported as a failed check with its reason, and each host is checked even
+  when another one cannot be reached.
+- **Deployment procedure.** `docs/DEPLOY.md` states that Dokploy deploys on push independently
+  of CI and gives the protection of `master` as a step for the owner; going back goes through a
+  pull request.
+- **Documentation.** Number of sources (39), first-render statement of M6, visual review of
+  the M6 baselines, state of the `assets` job on GitHub, place of the pure modules of
+  `src/render/` (ADR 0013), sentence of the README on the people who died (the lowest and the
+  highest count of the dataset instead of "about 1,500").
+
+- **`CLAUDE.md`.** Repository map (`src/config/`, `src/render/`, `docs/`), the three suffixes of
+  unit test files, the "pure code first" convention as it is applied (ADR 0013) and the digest
+  of the Playwright image.
+
+The same review led to corrections in the data, the simulation, the scene and the interface
+(decisions in ADR 0013):
+
+- **Provenance.** Wireless events are no more certain than the clock offset that converts them
+  and show the alternative offsets; margins of wireless times and of distress signals are in
+  the records; lifeboat events carry the sources of every record their text uses; a record
+  cannot be `established` on reference works, on works known through another or on the
+  project's derivations alone (three records downgraded to `estimated`: the position of the
+  bow of the wreck, the depth, the count of Encyclopedia Titanica); the sentence on the people
+  who died is derived from the counts of the dataset; the Sources tab also lists the sky, the
+  haze, the fallen funnels, the depth of the seabed and the light of the Californian.
+- **Stern section.** It reaches the seabed rudder first, as the dataset's own record says.
+- **Lifeboats.** Boats being lowered bear against the ship's side instead of passing through
+  it; the lifeboats swing out from the recorded order, the cutters from the start, collapsibles
+  C and D before they start down; A and B stay on the roof until the sea reaches them.
+- **Generated hull.** True outward normals up to the top edge of the plating; no quad dropped
+  at the stern tip.
+- **Scene and application.** Numbered starts of the scene (no leaked view, no undrawn canvas);
+  a fallback to WebGL 2 no longer written into the address; a missing star catalogue reported
+  as such; "Reset view" working in the free camera; address written at most every 500 ms.
+- **Light of the Californian** drawn low on the horizon until the foundering.
+- **Accessibility.** Turn, Tilt, Zoom and Move buttons as the single-click alternative to
+  dragging, pinching and the wheel (WCAG 2.5.7, 2.5.1); focus kept when the canvas is
+  replaced and moved to the main content when the scene fails; titles of the key moments no
+  longer clipped; operating instructions available at every width; meaning of the levels of
+  certainty given in text; no false "loading" status without JavaScript;
+  `docs/ACCESSIBILITY.md` brought in line with the code.
+- **Tests.** The frame of the scene reports when the canvas is up to date, and the end-to-end
+  tests wait on it.
+
+Verified after all the corrections:
+
+| Check                                                       | Command                                                  | Result                                                                                                 |
+| ----------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Type checking, lint, dataset, schema export, build, budgets | `pnpm check`                                             | Pass; JavaScript 353,913 B of 400,000 B gzip                                                           |
+| Unit tests                                                  | `pnpm test`                                              | 493 of 493 pass                                                                                        |
+| Pipeline tests; model rebuilt                               | `pnpm assets:test`, `pnpm assets:build`                  | 26 of 26 pass; same SHA-256, model unchanged                                                           |
+| End-to-end, WebGL 2 and WebGPU                              | Playwright in the official image                         | 145 pass, 1 skipped by design; no axe-core violation                                                   |
+| Whole suite under the production CSP                        | suite run against the Caddy container                    | 145 pass, 1 skipped by design, same baselines                                                          |
+| Container image, built with the pinned frontend             | `node tools/verify-server.ts`                            | 160 of 160, including the model (no-cache, entity tag, 304, br and gzip) and the absent build manifest |
+| Container user                                              | `docker inspect`, `docker exec id -u`                    | `10001:10001`                                                                                          |
+| First frame at 50 Mb/s, cache empty                         | `tests/e2e/performance.spec.ts` and a run at 1920 × 1080 | Within the 5 s budget at 1280 × 720; 2.5 to 3.6 s at 1920 × 1080, on a software rasteriser             |
+| Workflow syntax                                             | actionlint                                               | Pass                                                                                                   |
+
+Visual review of the twelve re-recorded baselines (880 × 341 pixels instead of 880 × 348: the
+interface around the canvas changed height):
+
+- Agrees: the same six scenes as before on both backends; the boats now hang swung out along
+  the Boat deck from 12:13 a.m.; the stern on the seabed is seen from the same side.
+- Differs: the lowest row of each image shows the edge of the frame, because the canvas is a
+  fraction of a pixel high; the content tests leave those rows out.
+
+Not verified here: the scripted accessibility audit of M6 predates the new view controls, so
+its tab-stop count and target measurements are to be taken again; screen readers and real
+graphics hardware remain to be tested by a person (`docs/ACCESSIBILITY.md`).
 
 ## Tooling availability in the authoring session
 
@@ -358,4 +470,5 @@ live verification and of the end-to-end suite against the canonical URL, recorde
 
 ## Blockers
 
-None.
+None in the repository. Two actions belong to the owner: running M7 from a session that has the
+Dokploy MCP tools, and protecting `master` on GitHub as `docs/DEPLOY.md` describes.
