@@ -5,16 +5,16 @@ Milestones and acceptance criteria are defined in [PLAN.md](PLAN.md).
 
 ## Milestones
 
-| Milestone                                         | State                               |
-| ------------------------------------------------- | ----------------------------------- |
-| M0 — Skeleton                                     | Done                                |
-| M1 — Data and TimelineModel                       | Done                                |
-| M2 — LOD0 scene and complete timeline             | Done                                |
-| M3 — Ocean, exact sky, lighting                   | Done                                |
-| M4 — Flooding, boats, rockets, break-up, wreck    | Done                                |
-| M5 — LOD1/LOD2, post-processing, quality settings | Done                                |
-| M6 — Accessibility, UX, support, legal notice     | Done                                |
-| M7 — Deployment                                   | Artefacts ready; deployment not run |
+| Milestone                                         | State                                         |
+| ------------------------------------------------- | --------------------------------------------- |
+| M0 — Skeleton                                     | Done                                          |
+| M1 — Data and TimelineModel                       | Done                                          |
+| M2 — LOD0 scene and complete timeline             | Done                                          |
+| M3 — Ocean, exact sky, lighting                   | Done                                          |
+| M4 — Flooding, boats, rockets, break-up, wreck    | Done                                          |
+| M5 — LOD1/LOD2, post-processing, quality settings | Done                                          |
+| M6 — Accessibility, UX, support, legal notice     | Done                                          |
+| M7 — Deployment                                   | Deployed; verified over IPv4; two checks open |
 
 ## M0 — Skeleton (done, 2026-11-14)
 
@@ -284,8 +284,9 @@ on the seabed, against the renders of the pipeline and the description of the sh
 The `assets` job has since run on GitHub (commit `300afd5`, 2026-11-15): it passed, and the
 model it rebuilt there is identical to the committed file.
 
-Not verified here: frame rate on real graphics hardware (the software rasteriser of this
-environment is not representative).
+Not verified in the authoring session, whose software rasteriser is not representative: frame
+rate on real graphics hardware. Measured since on a discrete card; see "Real hardware" under
+M7.
 
 ## M6 — Accessibility, UX, support, legal notice (done, 2026-11-15)
 
@@ -335,39 +336,160 @@ Not verified here, and why:
 
 - Screen readers, voice control and forced colours need a person (`docs/ACCESSIBILITY.md`).
 - Sixty frames per second on an integrated GPU cannot be measured on the software rasteriser of
-  this environment; the frame rate remains to be measured on real hardware. The first render
-  under five seconds at 50 Mb/s is measured and enforced by `tests/e2e/performance.spec.ts`
-  since M5 (see the M5 table), on the software rasteriser.
+  the authoring environment. The frame rate has since been measured on a discrete card ("Real
+  hardware" under M7) and remains to be measured on an integrated one. The first render under
+  five seconds at 50 Mb/s is measured and enforced by `tests/e2e/performance.spec.ts` since M5
+  (see the M5 table), on the software rasteriser.
 
-## M7 — Deployment (artefacts ready, deployment not run)
+## M7 — Deployment (deployed on 2026-11-15; two checks open)
 
-The tools of the `dokploy-mcp` server were not available in the authoring session, so no
-Dokploy resource was created. M7 must be run again from a session that has them, following
-`docs/DEPLOY.md`.
+Carried out on 2026-11-15 from a session that had the tools of the `dokploy-mcp` server, by the
+steps of `docs/DEPLOY.md`; decisions in ADR 0014. Times are UTC.
 
-Ready in the repository:
+What was done, in order:
 
-- `Dockerfile`, `Caddyfile` and the CI job that builds the image, checks its headers, caching,
-  fallbacks and host redirects, and runs the end-to-end suite against it.
-- `docs/DEPLOY.md`: prerequisites, the protection of `master` that the owner sets up, the
-  sequence of Dokploy MCP calls, verification, going back, maintenance.
-- `tools/verify-server.ts --live`: checks of the deployed site, including the certificate of
-  each of the four hosts and the redirection from HTTP to HTTPS.
+1. **DNS, first check** (10:12). The AAAA records of `titanic-4d.com` and `www.titanic-4d.com`
+   named a machine that is not the server, so no domain was to be created before the zone was
+   corrected.
+2. **Protection of `master`** (10:14), through the GitHub API, before the application existed
+   in Dokploy: pull request required, the four CI jobs required and bound to GitHub Actions,
+   branch up to date, rule applied to administrators, no force push, no deletion.
+3. **Dokploy resources** (10:15): project `Titanic-4D`, its `production` environment and the
+   application `Titanic 4D`, with the GitHub source `j-about/Titanic-4D`, branch `master`,
+   deployment on every push, build type `dockerfile`, `Dockerfile` and context `.`. No
+   environment variable and no redirect rule.
+4. **Merge** of pull request #1 with a merge commit (`d7e705d`, 10:17:08), the four checks
+   green on its head `315f4bd`. Dokploy deployed that push by itself.
+5. **DNS, second check** (10:51), after the owner had corrected the zone: the four
+   authoritative servers answered the addresses of the server for the four hosts.
+6. **Domains** (10:52): the canonical host first, then the three others, each with its own
+   Let's Encrypt certificate, port 8080, HTTPS.
+7. **Verification** of the live hosts (10:53 to 10:55).
+
+The deployment therefore preceded the domains, in the reverse order of steps 6 and 7 of
+`docs/DEPLOY.md`: Traefik applies the domain of an application without a new deployment.
 
 Verified:
 
-| Check                                | Command                                            | Result                                                                                    |
-| ------------------------------------ | -------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| Image built from the committed files | `docker build`                                     | Pass                                                                                      |
-| Container mode of the verification   | `node tools/verify-server.ts --origin <container>` | 144 of 144                                                                                |
-| Live mode of the verification        | `node tools/verify-server.ts --live`               | Runs and reports; not meaningful from the authoring environment, whose proxy re-signs TLS |
+| Check                                      | Command                                                                                                             | Result                                                                                                                                                                                                               |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Install and every check, on `315f4bd`      | `pnpm install --frozen-lockfile`, `pnpm check`                                                                      | Pass with Node.js 26.13.1 and pnpm 12.18.0; 493 of 493 unit tests; JavaScript 353,913 B of 400,000 B gzip                                                                                                            |
+| Image built from `315f4bd`                 | `docker build --tag titanic-4d .`                                                                                   | Pass (10:16)                                                                                                                                                                                                         |
+| Container of that image                    | `node tools/verify-server.ts --origin http://127.0.0.1:8080`, `docker inspect`, `docker ps`                         | 160 of 160; user `10001:10001`; healthy                                                                                                                                                                              |
+| End-to-end against that container          | `E2E_BASE_URL=http://127.0.0.1:8080 tools/e2e-container.sh`                                                         | 145 pass, 1 skipped by design; ended at 10:18, after the merge                                                                                                                                                       |
+| Checks of pull request #1 before the merge | `gh pr view 1 --json statusCheckRollup`                                                                             | The four jobs successful on `315f4bd`; they were the gate of the merge                                                                                                                                               |
+| Protection of `master`                     | `gh api repos/j-about/Titanic-4D/branches/master/protection`                                                        | Strict status checks on the four jobs, administrators included, pull request required, no force push, no deletion                                                                                                    |
+| CI on `master` after the merge             | `gh run view 43703328850`                                                                                           | The four jobs successful on `d7e705d`                                                                                                                                                                                |
+| Automatic deployment on push               | `deployment-all`                                                                                                    | Deployment of `d7e705d` created at 10:17:11, three seconds after the merge, without any call to `application-deploy`                                                                                                 |
+| Build on the server                        | `deployment-readLogs`                                                                                               | Clone of `d7e705d`; image built from the pinned frontend and base images; dataset valid; 13 files precompressed; done at 10:17:41                                                                                    |
+| Container on the server                    | `application-readLogs`, `docker-getContainersByAppNameMatch`                                                        | Caddy serving on port 8080 without error; container running and healthy                                                                                                                                              |
+| DNS records of the four hosts, 10:51       | A and AAAA queries to the four authoritative servers of the zones; reverse queries for both addresses of the server | Every host: the A record and the AAAA record of the server, whose two addresses have the same reverse name                                                                                                           |
+| … public resolvers                         | The same queries to Cloudflare, Google and Quad9                                                                    | The records of the server at 10:51; at 11:11 one cache of Quad9 still answered the former AAAA record of `www.titanic-4d.com`, with 31 s of its time to live left; at 11:31 Quad9 answered the records of the server |
+| Domains in Dokploy                         | `domain-byApplicationId`                                                                                            | The four hosts, port 8080, HTTPS, `letsencrypt`; no redirect rule                                                                                                                                                    |
+| Deployed site                              | `node tools/verify-server.ts --live`                                                                                | 180 of 180 at 10:53                                                                                                                                                                                                  |
+| … certificates                             | same run; names and expiry read from each certificate in a TLS handshake                                            | Four certificates, each naming its own host only, trusted, issued by Let's Encrypt; they expire on 13 February 2027                                                                                                  |
+| … redirections                             | same run                                                                                                            | Each secondary host: 301 from `/a/b?x=1` to `https://www.titanic-4d.org/a/b?x=1`; each host: HTTP to HTTPS, permanent                                                                                                |
+| End-to-end against the canonical URL       | `E2E_BASE_URL=https://www.titanic-4d.org tools/e2e-container.sh`                                                    | 145 pass, 1 skipped by design, same baselines                                                                                                                                                                        |
 
-Remaining for the owner: the protection of `master` described in `docs/DEPLOY.md`; on
-2026-11-15 GitHub reported the branch as not protected, and Dokploy deploys every push to it
-without waiting for CI.
+The suite against the preview server (`pnpm test:e2e:container`) was run by CI on `315f4bd`.
+In the session it was run after the deployment, on the branch of this record: 145 pass, 1
+skipped by design.
 
-Remaining for the deployment session: steps 1 to 8 of `docs/DEPLOY.md`, then the results of the
-live verification and of the end-to-end suite against the canonical URL, recorded here.
+Findings:
+
+- `domain-validateDomain` reported `www.titanic-4d.com` as valid while its AAAA record named
+  another machine: it accepts a host as soon as one of its addresses is the server's
+  (ADR 0014).
+- For up to an hour after the correction of the zone, a resolver could still give the former
+  AAAA record of the two `.com` hosts.
+
+Not verified yet:
+
+- That a later push to `master`, through a pull request, replaces the running deployment by
+  itself. The first deployment was started by the push of pull request #1; the merge of the
+  pull request that carries this record is the next push.
+- The four hosts over IPv6. The machine that ran the checks has no IPv6 route: the IPv6
+  address of the server was identified by its reverse name, and every check above went over
+  IPv4. `docs/DEPLOY.md` gives the command to run from a machine that has such a route.
+
+### Real hardware (measured on 2026-11-15)
+
+Frame rate and time to the first frame, measured on a graphics card for the first time. Method
+in ADR 0014: Microsoft Edge driven through the DevTools protocol. No file of the application
+changed. The page carried a mutation observer and one animation-frame callback of the measuring
+script, which before playback also read the name of the card through a WebGL 2 context and a
+WebGPU adapter of its own, started playback by a click on "Play" and, during the runs at ×60,
+looked at the buttons every 100 ms. One run for each playback figure, three loads for each
+first frame.
+
+| Item       | Value                                                                                                                                                                                                                 |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Machine    | AMD Ryzen 9 5950X (16 cores), NVIDIA GeForce RTX 4090 (a discrete card; the machine has no integrated one), Windows 11                                                                                                |
+| Display    | 1920 × 1080 at 144 Hz (6.94 ms for one refresh), one of the three displays attached                                                                                                                                   |
+| Browser    | Microsoft Edge 157.0.4341.60, full screen: viewport of 1920 × 1080 CSS pixels; device pixel ratio 1, forced with `--force-device-scale-factor=1`; new profile for each run, extensions off, background throttling off |
+| Motion     | Forced on with `--force-prefers-no-reduced-motion`, except in the row "Reduced motion": Windows has animation effects off on the measuring account, which Edge reports as `prefers-reduced-motion: reduce`            |
+| Scene      | "medium" detail (`quality=medium`), guided tour, canvas of 1520 × 773 pixels, detailed model in place during playback; backend read from `data-backend`, WebGL 2 asked for with `renderer=webgl2`                     |
+| Site       | The production image built from `315f4bd`, whose tree is that of `d7e705d`, in a local container; the deployed site where it is named                                                                                 |
+| Other load | Load average of the Linux side of the machine (WSL 2): 0.1 to 2.2 during the playback runs, 3.3 to 5.4 during the first-frame loads; the load of Windows, where the browser ran, was not recorded                     |
+
+"Frames drawn" counts the frames for which the application finished issuing its drawing
+commands, one write of `data-rendered-time` each. It shows how often the scene was redrawn, not
+that each frame reached the screen, which was not observed. The intervals are those between two
+such writes; a write is stamped when the work of the page ends, so a refresh of the display
+without a new frame shows in the animation frames of the page, counted in their own row, and
+not as one long interval between writes. Clock times in this table are ship's time.
+
+| Measurement                                                                                                                                                                                                          | WebGPU                                                                                                                            | WebGL 2                                                                                                                           |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| First frame of the scene, whichever model of the ship it shows; cache empty, 50 Mb/s down, 10 Mb/s up, 20 ms; 3 loads                                                                                                | 789, 810 and 828 ms                                                                                                               | 1,283, 1,296 and 1,342 ms                                                                                                         |
+| … detailed model in place (`data-assets` ready, looked at every 10 ms from 700 ms after the navigation)                                                                                                              | 844, 866 and 901 ms                                                                                                               | 1,339, 1,354 and 1,394 ms                                                                                                         |
+| First frame of the deployed site; cache empty, connection of the machine; 3 loads                                                                                                                                    | 654, 680 and 690 ms                                                                                                               | 1,126, 1,153 and 1,212 ms                                                                                                         |
+| … detailed model in place                                                                                                                                                                                            | At most 776, 776 and 794 ms: in place when first looked at                                                                        | 1,175, 1,207 and 1,264 ms                                                                                                         |
+| Playback at ×1 from 12:45 a.m.; the 180 s after the first 5 s                                                                                                                                                        | 24,015 frames drawn, 133.4 per second; median interval 7.4 ms, 99th centile 10.0 ms, longest 35 ms                                | 25,580 frames drawn, 142.1 per second; median interval 7.0 ms, 99th centile 8.0 ms, longest 26 ms                                 |
+| … intervals over 16.7 ms and over 33.3 ms; lowest rate over one second                                                                                                                                               | 2 and 1; 120 per second                                                                                                           | 1 and 0; 137 per second                                                                                                           |
+| … animation frames two refreshes apart instead of one                                                                                                                                                                | 1,899 of 24,014 (7.9 %)                                                                                                           | 339 of 25,579 (1.3 %)                                                                                                             |
+| Playback at ×60 from 11:40 p.m. to the end of the timeline at 2:26 a.m.; the 164 s after the first 2 s                                                                                                               | 21,928 frames drawn, 133.7 per second; median interval 7.4 ms, 99th centile 9.3 ms, longest 35 ms                                 | 22,823 frames drawn, 139.2 per second; median interval 7.1 ms, 99th centile 8.3 ms, longest 27 ms                                 |
+| … intervals over 16.7 ms and over 33.3 ms; lowest rate over one second                                                                                                                                               | 3 and 1; 117 per second                                                                                                           | 1 and 0; 132 per second                                                                                                           |
+| … animation frames two refreshes apart instead of one                                                                                                                                                                | 1,678 of 21,935 (7.6 %)                                                                                                           | 790 of 22,836 (3.5 %)                                                                                                             |
+| Display synchronisation and frame limit off (`--disable-gpu-vsync --disable-frame-rate-limit`), ×1 from 12:45 a.m., 60 s                                                                                             | 131.4 per second; median interval 7.5 ms, 99th centile 10.7 ms, longest 14 ms                                                     | 135.5 per second; median interval 7.3 ms, 99th centile 8.3 ms, longest 10 ms                                                      |
+| Share of the time in which the card was executing work for any process, desktop included, during the three runs above (`nvidia-smi`, one sample per second, mean of each run without its first 8 and last 3 samples) | 27 to 29 %; highest sample 38 %                                                                                                   | 27 to 32 %; highest sample 40 %                                                                                                   |
+| Reduced motion, ×1 from 12:45 a.m., 60 s: synchronised, then not synchronised                                                                                                                                        | 144.0 per second, no refresh without a new frame; then 492 per second (median interval 1.9 ms), the card at work 39 % of the time | 144.0 per second, no refresh without a new frame; then 554 per second (median interval 1.8 ms), the card at work 32 % of the time |
+
+The WebGPU playback runs are second takes. The first ones were taken while a new run of the
+scripted accessibility audit, not recorded yet, was running in containers on the same machine
+(load average 1.5 to 4.9): 130.4, 123.4 and 122.8 frames per second with motion, 479 per second
+with reduced motion and no synchronisation.
+
+What the figures show, on this machine:
+
+- With motion, the scene is redrawn 133 to 142 times per second and does not hold the 144 Hz
+  of the display: a frame takes 7.0 to 7.6 ms on average, against 6.94 ms for one refresh.
+  With the synchronisation off the rate is no higher (WebGPU 131.4 against 133.4 and 133.7,
+  WebGL 2 135.5 against 142.1 and 139.2), so the synchronisation is not what keeps the scene
+  under 144 Hz. Why the runs without synchronisation are 1.5 to 5 % slower is not explained.
+- The card is not the limit either: once the sea is frozen it draws the same scene 492 to 554
+  times per second. The time in which the card is at work is not a share of its capacity; it
+  is given to show that it changes little, from 27 to 32 % at 131 to 142 frames per second to
+  32 to 39 % at 492 to 554. This points to the work of the page on the processor as the limit.
+  No processor time and no profile were collected.
+- With reduced motion, which freezes the sea and holds the guided camera, a frame takes about
+  2 ms. The difference, about 5 to 5.5 ms per frame, is attributed to the moving sea: at
+  "medium" the wave field is evaluated on the processor and sent to the card again for every
+  frame whose instant differs from the previous one, which is every frame of a playback. This
+  rests on the code; no run separates the sea from the held camera.
+- The first frame is within the five seconds of the criterion of `docs/PLAN.md`, on the
+  emulated connection and on the deployed site. The connection of the machine to the deployed
+  site was not characterised beyond HTTP/2 and about 11 ms to an open TCP connection, name
+  resolution included.
+
+The criterion of `docs/PLAN.md` (60 frames per second aimed at, 30 at least, at 1080p on a
+recent integrated GPU at "medium") is not settled by these figures. They come from a discrete
+card and a 16-core desktop processor, and a frame that the processor limits cannot be scaled to
+another machine.
+
+Not measured: the frame rate on an integrated GPU and on a slower processor; the processor time
+of a frame; whether each frame reached the screen (no presentation or GPU timing was
+collected); the "low" and "high" levels.
 
 ## Review of 2026-11-15 — corrections
 
@@ -392,9 +514,9 @@ Corrected (decisions in ADR 0013):
   precompressed variants) and for the absence of the build manifest. In live mode an untrusted
   certificate is now reported as a failed check with its reason, and each host is checked even
   when another one cannot be reached.
-- **Deployment procedure.** `docs/DEPLOY.md` states that Dokploy deploys on push independently
-  of CI and gives the protection of `master` as a step for the owner; going back goes through a
-  pull request.
+- **Deployment procedure.** `docs/DEPLOY.md` was changed to state that Dokploy deploys on push
+  independently of CI and to give the protection of `master` as a step for the owner (carried
+  out since: see M7 and ADR 0014); going back goes through a pull request.
 - **Documentation.** Number of sources (39), first-render statement of M6, visual review of
   the M6 baselines, state of the `assets` job on GitHub, place of the pure modules of
   `src/render/` (ADR 0013), sentence of the README on the people who died (the lowest and the
@@ -456,19 +578,21 @@ interface around the canvas changed height):
 - Differs: the lowest row of each image shows the edge of the frame, because the canvas is a
   fraction of a pixel high; the content tests leave those rows out.
 
-Not verified here: the scripted accessibility audit of M6 predates the new view controls, so
-its tab-stop count and target measurements are to be taken again; screen readers and real
-graphics hardware remain to be tested by a person (`docs/ACCESSIBILITY.md`).
+Not verified in that review: the scripted accessibility audit of M6 predates the new view
+controls, so its tab-stop count and target measurements are to be taken again; screen readers
+remain to be tested by a person (`docs/ACCESSIBILITY.md`). The frame rate has since been
+measured on a discrete card ("Real hardware" under M7) and remains to be measured on an
+integrated one.
 
-## Tooling availability in the authoring session
+## Tooling availability
 
 - Context7 and DeepWiki MCP servers: both available and consulted for Vite, Biome, Vitest,
   Playwright, Caddy, TypeScript, Zod, three.js and Astronomy Engine.
 - Astral skills (`uv`, `ty`, `ruff`): available and used for the asset pipeline (M5).
-- Dokploy MCP server: not available in the session that produced M0. M7 must be run from a
-  session that has it.
+- Dokploy MCP server: not available in the authoring session; available in the session of
+  2026-11-15 that ran M7.
 
 ## Blockers
 
-None in the repository. Two actions belong to the owner: running M7 from a session that has the
-Dokploy MCP tools, and protecting `master` on GitHub as `docs/DEPLOY.md` describes.
+None in the repository. One open check needs another machine: the four hosts over IPv6 (see
+M7).

@@ -11,9 +11,9 @@ screen is tied to a documented source and a stated level of certainty.
 
 ## Status
 
-The project is under construction. Progress is tracked in [docs/STATUS.md](docs/STATUS.md), the
-milestones in [docs/PLAN.md](docs/PLAN.md) and the architectural decisions in
-[docs/DECISIONS.md](docs/DECISIONS.md).
+The site is live. What is done, what was verified and what remains open are tracked in
+[docs/STATUS.md](docs/STATUS.md), the milestones in [docs/PLAN.md](docs/PLAN.md) and the
+architectural decisions in [docs/DECISIONS.md](docs/DECISIONS.md).
 
 ## Using the application
 
