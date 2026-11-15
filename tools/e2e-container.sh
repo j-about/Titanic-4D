@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Runs the Playwright suite inside the official Playwright image, so that screenshots are rendered
-# by the same browser build, fonts and software rasteriser on every machine and in CI.
+# Runs the Playwright suite inside the official Playwright image: the browser build, the fonts and
+# the software rasteriser that render the screenshots are those of the image, here and in CI.
 # Arguments are forwarded to `playwright test`, for example: tools/e2e-container.sh --update-snapshots
 #
 # By default the suite builds the application and serves it with `vite preview`. When E2E_BASE_URL
@@ -8,7 +8,7 @@
 # on http://127.0.0.1:8080), and the test container shares the network of the host to reach it.
 set -euo pipefail
 
-readonly image="mcr.microsoft.com/playwright:v1.65.1-noble"
+readonly image="mcr.microsoft.com/playwright:v1.65.1-noble@sha256:1507cbfc550a63a6b7396791ca4f00df17beb56342d2447b3f106c306f525579"
 readonly pnpm_version="12.18.0"
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 readonly repo_root
@@ -18,7 +18,7 @@ if [[ -n "${E2E_BASE_URL:-}" ]]; then
   network_arguments=(--network host)
 fi
 
-# Dependencies are installed into a named volume: the host node_modules may target another platform.
+# Dependencies are installed into a named volume mounted over node_modules, apart from the host's.
 # Files written to the bind mount are handed back to the invoking user when the container exits.
 docker run --rm --ipc=host \
   ${network_arguments[@]+"${network_arguments[@]}"} \

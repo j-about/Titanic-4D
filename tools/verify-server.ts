@@ -16,15 +16,18 @@ interface Response {
 interface RequestOptions {
   readonly host?: string;
   readonly acceptEncoding?: string;
+  readonly ifNoneMatch?: string;
 }
 
 /**
  * Two modes. By default the tool checks a container reached over HTTP at `--origin`, and
  * addresses the other hosts through the Host header. With `--live` it checks the deployed site:
  * every host is reached by its own name over HTTPS, and certificates and the redirection from
- * HTTP are checked as well.
+ * HTTP are checked as well. The options are read from the command line when the file is run as
+ * a program; a module that imports it gets the defaults and runs no check by itself.
  */
 const { values } = parseArgs({
+  args: import.meta.main ? process.argv.slice(2) : [],
   options: {
     origin: { type: 'string' },
     live: { type: 'boolean', default: false },
@@ -35,6 +38,10 @@ const origin = new URL(values.origin ?? (live ? site.canonicalOrigin : 'http://1
 const DAY_MS = 86_400_000;
 /** Shortest remaining validity accepted for a certificate, in days. */
 const MIN_CERTIFICATE_DAYS = 7;
+/** Address from which the scene fetches the detailed model of the ship. */
+const SHIP_MODEL_PATH = '/models/ship-lod1.glb';
+/** Address at which the build writes its manifest, which the image does not contain. */
+const BUILD_MANIFEST_PATH = '/.vite/manifest.json';
 
 const failures: string[] = [];
 let checkCount = 0;
@@ -64,6 +71,7 @@ function get(path: string, options: RequestOptions = {}): Promise<Response> {
         method: 'GET',
         headers: {
           ...(options.host === undefined || direct ? {} : { Host: options.host }),
+          ...(options.ifNoneMatch === undefined ? {} : { 'If-None-Match': options.ifNoneMatch }),
           'Accept-Encoding': options.acceptEncoding ?? 'identity',
         },
       },
@@ -181,6 +189,51 @@ async function verifyFallbacks(documentHtml: string): Promise<void> {
     header(unversioned, 'cache-control') === 'public, max-age=3600',
     header(unversioned, 'cache-control'),
   );
+
+  const manifest = await get(BUILD_MANIFEST_PATH);
+  check(`${BUILD_MANIFEST_PATH} is not served`, manifest.status === 404, String(manifest.status));
+}
+
+/**
+ * Checks the detailed model of the ship: its media type, its revalidation on every use, with a
+ * validator that turns an unchanged file into a 304, and its precompressed variants.
+ */
+async function verifyShipModel(): Promise<void> {
+  const response = await get(SHIP_MODEL_PATH);
+  const etag = header(response, 'etag');
+  check(`${SHIP_MODEL_PATH} responds 200`, response.status === 200, String(response.status));
+  check(
+    `${SHIP_MODEL_PATH} is a binary glTF model`,
+    header(response, 'content-type') === 'model/gltf-binary',
+    header(response, 'content-type'),
+  );
+  check(
+    `${SHIP_MODEL_PATH} is revalidated on every use`,
+    header(response, 'cache-control') === 'no-cache',
+    header(response, 'cache-control'),
+  );
+  check(`${SHIP_MODEL_PATH} carries an entity tag`, etag !== '');
+  checkSecurityHeaders(SHIP_MODEL_PATH, response);
+
+  if (etag !== '') {
+    const revalidated = await get(SHIP_MODEL_PATH, { ifNoneMatch: etag });
+    check(
+      `${SHIP_MODEL_PATH} answers 304 to its own entity tag`,
+      revalidated.status === 304 && revalidated.body.byteLength === 0,
+      String(revalidated.status),
+    );
+  }
+
+  for (const encoding of ['br', 'gzip']) {
+    const compressed = await get(SHIP_MODEL_PATH, { acceptEncoding: encoding });
+    check(
+      `${SHIP_MODEL_PATH} is served precompressed with ${encoding}`,
+      header(compressed, 'content-encoding') === encoding &&
+        header(compressed, 'content-type') === 'model/gltf-binary' &&
+        header(compressed, 'cache-control') === 'no-cache',
+      `${header(compressed, 'content-encoding')}, ${header(compressed, 'content-type')}, ${header(compressed, 'cache-control')}`,
+    );
+  }
 }
 
 async function verifyRedirects(): Promise<void> {
@@ -277,18 +330,33 @@ async function verifyStaticPages(): Promise<void> {
 
 interface CertificateSummary {
   readonly authorized: boolean;
+  /** Reason given by the TLS layer when the certificate is not trusted for the host. */
+  readonly authorizationError: string;
   readonly issuer: string;
   readonly validTo: number;
   readonly names: string;
 }
 
-/** Opens a TLS connection to a host and reports on the certificate it presents. */
-function readCertificate(host: string): Promise<CertificateSummary> {
+/** Ports of the two transports checked in live mode. */
+interface TransportPorts {
+  readonly https: number;
+  readonly http: number;
+}
+
+const STANDARD_PORTS: TransportPorts = { https: 443, http: 80 };
+
+/**
+ * Opens a TLS connection to a host and reports on the certificate it presents. The handshake is
+ * completed whether or not the certificate is trusted, and the verdict of the TLS layer is part
+ * of the report; the promise is rejected only when no handshake takes place.
+ */
+export function readCertificate(host: string, port: number): Promise<CertificateSummary> {
   return new Promise((resolve, reject) => {
-    const socket = tlsConnect({ host, port: 443, servername: host }, () => {
+    const socket = tlsConnect({ host, port, servername: host, rejectUnauthorized: false }, () => {
       const certificate = socket.getPeerCertificate();
       resolve({
         authorized: socket.authorized,
+        authorizationError: socket.authorized ? '' : String(socket.authorizationError),
         issuer: String(certificate.issuer.O ?? ''),
         validTo: Date.parse(certificate.valid_to),
         names: certificate.subjectaltname ?? '',
@@ -300,9 +368,9 @@ function readCertificate(host: string): Promise<CertificateSummary> {
 }
 
 /** Sends a GET request over plain HTTP to a host, without following redirections. */
-function getOverHttp(host: string, path: string): Promise<Response> {
+function getOverHttp(host: string, port: number, path: string): Promise<Response> {
   return new Promise((resolve, reject) => {
-    const outgoing = httpRequest({ hostname: host, port: 80, path, method: 'GET' }, (incoming) => {
+    const outgoing = httpRequest({ hostname: host, port, path, method: 'GET' }, (incoming) => {
       incoming.resume();
       incoming.on('end', () => {
         resolve({
@@ -317,30 +385,53 @@ function getOverHttp(host: string, path: string): Promise<Response> {
   });
 }
 
-/** Live mode only: certificates and the redirection from HTTP to HTTPS, on every host. */
-async function verifyTransport(): Promise<void> {
-  const hosts = [new URL(site.canonicalOrigin).host, ...site.secondaryHosts];
-  for (const host of hosts) {
-    const certificate = await readCertificate(host);
-    check(`${host} presents a certificate trusted for that name`, certificate.authorized);
-    check(
-      `${host} certificate is issued by Let's Encrypt`,
-      certificate.issuer.includes("Let's Encrypt"),
-      certificate.issuer,
-    );
-    check(`${host} certificate names the host`, certificate.names.includes(`DNS:${host}`));
-    check(
-      `${host} certificate is valid for at least ${MIN_CERTIFICATE_DAYS} more days`,
-      certificate.validTo - Date.now() > MIN_CERTIFICATE_DAYS * DAY_MS,
-      new Date(certificate.validTo).toString(),
-    );
+/** Checks the certificate that a host presents: trust, issuer, names and remaining validity. */
+async function verifyCertificate(host: string, port: number): Promise<void> {
+  const certificate = await readCertificate(host, port);
+  check(
+    `${host} presents a certificate trusted for that name`,
+    certificate.authorized,
+    certificate.authorizationError,
+  );
+  check(
+    `${host} certificate is issued by Let's Encrypt`,
+    certificate.issuer.includes("Let's Encrypt"),
+    certificate.issuer,
+  );
+  check(
+    `${host} certificate names the host`,
+    certificate.names.includes(`DNS:${host}`),
+    certificate.names,
+  );
+  check(
+    `${host} certificate is valid for at least ${MIN_CERTIFICATE_DAYS} more days`,
+    certificate.validTo - Date.now() > MIN_CERTIFICATE_DAYS * DAY_MS,
+    new Date(certificate.validTo).toString(),
+  );
+}
 
-    const plain = await getOverHttp(host, '/a/b?x=1');
-    check(
-      `http://${host} redirects permanently to HTTPS`,
-      [301, 308].includes(plain.status) && header(plain, 'location').startsWith('https://'),
-      `${plain.status} ${header(plain, 'location')}`,
-    );
+/** Checks that a host answers a plain HTTP request with a permanent redirection to HTTPS. */
+async function verifyHttpRedirection(host: string, port: number): Promise<void> {
+  const plain = await getOverHttp(host, port, '/a/b?x=1');
+  check(
+    `http://${host} redirects permanently to HTTPS`,
+    [301, 308].includes(plain.status) && header(plain, 'location').startsWith('https://'),
+    `${plain.status} ${header(plain, 'location')}`,
+  );
+}
+
+/**
+ * Live mode only: the certificate of every host and its redirection from HTTP to HTTPS. The two
+ * steps of each host are separate groups, so a host that cannot be reached is reported under its
+ * own name and the steps and hosts after it are still checked.
+ */
+export async function verifyTransport(
+  hosts: readonly string[],
+  ports: TransportPorts = STANDARD_PORTS,
+): Promise<void> {
+  for (const host of hosts) {
+    await run(`${host} certificate`, () => verifyCertificate(host, ports.https));
+    await run(`http://${host} redirection`, () => verifyHttpRedirection(host, ports.http));
   }
 }
 
@@ -358,21 +449,29 @@ async function run<T>(label: string, group: () => Promise<T>): Promise<T | undef
   }
 }
 
-console.log(`Checking ${origin.href} (${live ? 'deployed site' : 'container'})`);
-await run('health endpoint', verifyHealth);
-const documentHtml = await run('application document', verifyDocument);
-if (documentHtml !== undefined) {
-  await run('fingerprinted asset', () => verifyFingerprintedAsset(documentHtml));
-  await run('fallbacks', () => verifyFallbacks(documentHtml));
-}
-await run('static pages', verifyStaticPages);
-await run('host redirects', verifyRedirects);
-if (live) {
-  await run('certificates and HTTP redirection', verifyTransport);
+/** Runs every group of checks against the origin and sets the exit code of the process. */
+async function main(): Promise<void> {
+  console.log(`Checking ${origin.href} (${live ? 'deployed site' : 'container'})`);
+  await run('health endpoint', verifyHealth);
+  const documentHtml = await run('application document', verifyDocument);
+  if (documentHtml !== undefined) {
+    await run('fingerprinted asset', () => verifyFingerprintedAsset(documentHtml));
+    await run('fallbacks', () => verifyFallbacks(documentHtml));
+  }
+  await run('model of the ship', verifyShipModel);
+  await run('static pages', verifyStaticPages);
+  await run('host redirects', verifyRedirects);
+  if (live) {
+    await verifyTransport([new URL(site.canonicalOrigin).host, ...site.secondaryHosts]);
+  }
+
+  console.log(`${checkCount - failures.length}/${checkCount} checks passed against ${origin.href}`);
+  if (failures.length > 0) {
+    console.error(`Failed checks:\n${failures.map((failure) => `  - ${failure}`).join('\n')}`);
+    process.exitCode = 1;
+  }
 }
 
-console.log(`${checkCount - failures.length}/${checkCount} checks passed against ${origin.href}`);
-if (failures.length > 0) {
-  console.error(`Failed checks:\n${failures.map((failure) => `  - ${failure}`).join('\n')}`);
-  process.exitCode = 1;
+if (import.meta.main) {
+  await main();
 }

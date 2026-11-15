@@ -23,7 +23,7 @@ const compressibleExtensions = new Set([
   '.xml',
 ]);
 
-/** Files below this size are served uncompressed: the encoding overhead outweighs the gain. */
+/** Files below this size get no compressed sidecar. */
 const minimumSizeBytes = 256;
 
 async function* walk(directory: string): AsyncGenerator<string> {

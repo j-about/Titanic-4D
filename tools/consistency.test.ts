@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { canonicalUrl, site } from '../src/config/site.ts';
@@ -20,6 +20,7 @@ function firstMatch(text: string, pattern: RegExp, description: string): string 
 
 interface PackageManifest {
   readonly packageManager: string;
+  readonly scripts: { readonly check: string };
   readonly devDependencies: Readonly<Record<string, string>>;
 }
 
@@ -27,6 +28,10 @@ const manifest = JSON.parse(await read('package.json')) as PackageManifest;
 const dockerfile = await read('Dockerfile');
 const caddyfile = await read('Caddyfile');
 const e2eScript = await read('tools/e2e-container.sh');
+const workflow = await read('.github/workflows/ci.yml');
+
+/** An image reference that names an exact version and the digest of its content. */
+const PINNED_IMAGE = /^[\w./-]+:[\w.-]*\d+\.\d+\.\d+[\w.-]*@sha256:[0-9a-f]{64}$/;
 
 describe('pinned toolchain versions', () => {
   const pnpmVersion = firstMatch(manifest.packageManager, /^pnpm@(.+)$/, 'the pnpm version');
@@ -51,6 +56,88 @@ describe('pinned toolchain versions', () => {
       playwrightVersion,
     );
   });
+
+  it('references the build frontend and every image by exact version and digest', () => {
+    const references = [
+      firstMatch(dockerfile, /^# syntax=(\S+)$/m, 'the build frontend of the Dockerfile'),
+      ...Array.from(dockerfile.matchAll(/^FROM (\S+)/gm), (match) => match[1] ?? ''),
+      firstMatch(e2eScript, /^readonly image="([^"]+)"$/m, 'the image of the e2e script'),
+    ];
+    expect(references).toHaveLength(4);
+    for (const reference of references) {
+      expect(reference).toMatch(PINNED_IMAGE);
+    }
+  });
+});
+
+describe('continuous integration', () => {
+  it('runs every step of `pnpm check`, with coverage for the unit tests', () => {
+    const steps = manifest.scripts.check.split('&&').map((step) => step.trim());
+    expect(steps).toContain('pnpm data:schema:check');
+    for (const step of steps) {
+      const command = step === 'pnpm test' ? 'pnpm test:coverage' : step;
+      expect(workflow).toContain(`      - run: ${command}\n`);
+    }
+  });
+
+  it('lists every job among the required checks of the deployment procedure', async () => {
+    const procedure = await read('docs/DEPLOY.md');
+    const jobNames = Array.from(workflow.matchAll(/^ {4}name: (.+)$/gm), (match) => match[1] ?? '');
+    expect(jobNames).toHaveLength(4);
+    for (const jobName of jobNames) {
+      expect(procedure).toContain(`   - \`${jobName}\`\n`);
+    }
+  });
+
+  it('checks that the container runs as the user that the image declares', () => {
+    const user = firstMatch(dockerfile, /^USER (\d+:\d+)$/m, 'the user of the image');
+    expect(workflow).toContain(
+      `test "$(docker inspect --format '{{.Config.User}}' titanic-4d:ci)" = "${user}"\n`,
+    );
+    expect(workflow).toContain(
+      `test "$(docker exec titanic-4d id -u):$(docker exec titanic-4d id -g)" = "${user}"\n`,
+    );
+  });
+});
+
+describe('performance budgets', () => {
+  interface Budgets {
+    readonly budgets: { readonly initialJavaScript: number };
+  }
+
+  it('enforces the JavaScript limit of the plan, counted in bytes of 1,000 to the kilobyte', async () => {
+    const plan = await read('docs/PLAN.md');
+    const { budgets } = JSON.parse(await read('budgets.json')) as Budgets;
+    const kilobytes = firstMatch(
+      plan,
+      /initial JavaScript at most (\d+) kB compressed/,
+      'the JavaScript budget in the plan',
+    );
+    expect(budgets.initialJavaScript).toBe(Number(kilobytes) * 1000);
+  });
+});
+
+describe('image content and caching', () => {
+  it('leaves the build manifest out of the image', async () => {
+    expect(await read('vite.config.ts')).toMatch(/\bmanifest: true\b/);
+    expect(dockerfile).toMatch(/^RUN pnpm build && rm -r dist\/\.vite$/m);
+  });
+
+  it('revalidates the models on every use and keeps them out of the one-hour rule', () => {
+    expect(caddyfile).toMatch(
+      /@model path \/models\/\*\n\s+header @model Cache-Control "no-cache"\n/,
+    );
+    const unversioned = firstMatch(caddyfile, /@unversioned not path (.+)/, 'the one-hour rule');
+    expect(unversioned.trim().split(/\s+/)).toContain('/models/*');
+  });
+
+  it('verifies on the server the model that the scene loads', async () => {
+    const verifier = await read('tools/verify-server.ts');
+    const address = firstMatch(verifier, /SHIP_MODEL_PATH = '([^']+)'/, 'the verified model');
+    expect(address).toMatch(/^\/models\//);
+    expect(await read('src/render/sceneView.ts')).toContain(`'${address}'`);
+    await expect(access(join(rootDir, 'public', address))).resolves.toBeUndefined();
+  });
 });
 
 describe('Caddyfile host redirects', () => {
@@ -61,6 +148,24 @@ describe('Caddyfile host redirects', () => {
       [...site.secondaryHosts].toSorted(byName),
     );
     expect(caddyfile).toContain(`redir @secondaryHost ${site.canonicalOrigin}{uri} permanent`);
+  });
+});
+
+describe('people who died, as stated in the README', () => {
+  interface People {
+    readonly casualty_counts: readonly { readonly lost: number }[];
+  }
+
+  it('gives the lowest and the highest count of lives lost in the dataset', async () => {
+    const people = JSON.parse(await read('data/people.json')) as People;
+    const lost = people.casualty_counts.map((count) => count.lost);
+    const format = new Intl.NumberFormat('en-GB');
+    const readme = (await read('README.md')).replace(/\s+/g, ' ');
+    expect(lost.length).toBeGreaterThan(1);
+    expect(readme).toContain(
+      `between ${format.format(Math.min(...lost))} and ${format.format(Math.max(...lost))} people died`,
+    );
+    expect(readme).not.toMatch(/about 1,500/i);
   });
 });
 

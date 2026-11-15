@@ -10,5 +10,5 @@ tests
 *.tsbuildinfo
 .venv
 
-# Asset pipeline: its output is committed where the application reads it
+# Sources of the asset pipeline; the model it builds is in public/models
 assets

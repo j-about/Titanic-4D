@@ -1,6 +1,7 @@
-# syntax=docker/dockerfile:1
+# syntax=docker/dockerfile:1.29.0@sha256:572cebbc2b15e6f84c077742952674889cb63cd5e9b80abdffcbe587b6f19183
 
-# Build stage: installs the locked dependency tree, builds the site and precompresses it.
+# Build stage: installs the locked dependency tree, builds the site, precompresses it and removes
+# the build manifest (dist/.vite), which is not part of the site.
 FROM node:26.13.1-alpine3.24@sha256:6bd9ab43c0ec0190ca7b2d193906cb8b7edf6e7f4afa43ddeccd6452710bffb5 AS build
 ENV CI=true \
     PNPM_HOME=/pnpm
@@ -11,7 +12,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
     pnpm install --frozen-lockfile
 COPY . .
-RUN pnpm build
+RUN pnpm build && rm -r dist/.vite
 
 # Runtime stage: Caddy serves the static build as an unprivileged user.
 FROM caddy:2.11.9-alpine@sha256:003a97808e781aa9f7e75cc2f43d34d461099031faf5e20faefb9f61126836f0 AS runtime

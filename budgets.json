@@ -1,10 +1,10 @@
 {
-  "$comment": "Performance budgets enforced by tools/check-budgets.ts. Sizes are bytes after gzip level 9, the least efficient encoding the server offers.",
+  "$comment": "Performance budgets enforced by tools/check-budgets.ts. Sizes are bytes after gzip level 9, the least efficient encoding the server offers; 1 kB is 1,000 bytes, so 400000 is the 400 kB of docs/PLAN.md.",
   "entry": "index.html",
   "budgets": {
-    "initialJavaScript": 409600,
-    "initialCss": 20480,
-    "entryHtml": 8192
+    "initialJavaScript": 400000,
+    "initialCss": 20000,
+    "entryHtml": 8000
   },
   "deferredChunkPatterns": []
 }

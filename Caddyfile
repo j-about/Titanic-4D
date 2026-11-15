@@ -59,7 +59,12 @@
 			@fingerprinted path /assets/*
 			header @fingerprinted Cache-Control "public, max-age=31536000, immutable"
 
-			@unversioned not path / */ *.html /assets/*
+			# Models are revalidated on every use: the stored copy is checked against the entity tag
+			# of the file, and an unchanged file is answered with a 304.
+			@model path /models/*
+			header @model Cache-Control "no-cache"
+
+			@unversioned not path / */ *.html /assets/* /models/*
 			header @unversioned Cache-Control "public, max-age=3600"
 
 			@glb path *.glb

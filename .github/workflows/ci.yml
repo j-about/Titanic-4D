@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   quality:
-    name: Typecheck, lint, unit tests, build, budgets
+    name: Typecheck, lint, schema export, unit tests, build, budgets
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -27,6 +27,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm lint
+      - run: pnpm data:schema:check
       - run: pnpm test:coverage
       - run: pnpm build
       - run: pnpm budgets
@@ -72,8 +73,10 @@ jobs:
           exit 1
       - name: Verify headers, caching, fallbacks and host redirects
         run: node tools/verify-server.ts --origin http://127.0.0.1:8080
-      - name: Verify the container runs unprivileged
-        run: test "$(docker exec titanic-4d id -u)" != "0"
+      - name: Verify the image declares the unprivileged user and the container runs as it
+        run: |
+          test "$(docker inspect --format '{{.Config.User}}' titanic-4d:ci)" = "10001:10001"
+          test "$(docker exec titanic-4d id -u):$(docker exec titanic-4d id -g)" = "10001:10001"
       - name: Run the end-to-end suite under the production content security policy
         run: tools/e2e-container.sh
         env:
