@@ -105,6 +105,10 @@ precompressed files, security headers and the redirect of the secondary hosts
 command runs the end-to-end suite against the running image, under its content security
 policy.
 
+## Deployment
+
+The procedure, its verification and how to go back are in [docs/DEPLOY.md](docs/DEPLOY.md).
+
 ## Support Titanic 4D
 
 Titanic 4D is free to use and carries no advertising. A donation helps to pay for its hosting

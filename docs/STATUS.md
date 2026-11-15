@@ -5,16 +5,16 @@ Milestones and acceptance criteria are defined in [PLAN.md](PLAN.md).
 
 ## Milestones
 
-| Milestone                                         | State       |
-| ------------------------------------------------- | ----------- |
-| M0 — Skeleton                                     | Done        |
-| M1 — Data and TimelineModel                       | Done        |
-| M2 — LOD0 scene and complete timeline             | Done        |
-| M3 — Ocean, exact sky, lighting                   | Done        |
-| M4 — Flooding, boats, rockets, break-up, wreck    | Done        |
-| M5 — LOD1/LOD2, post-processing, quality settings | In progress |
-| M6 — Accessibility, UX, support, legal notice     | Done        |
-| M7 — Deployment                                   | Not started |
+| Milestone                                         | State                               |
+| ------------------------------------------------- | ----------------------------------- |
+| M0 — Skeleton                                     | Done                                |
+| M1 — Data and TimelineModel                       | Done                                |
+| M2 — LOD0 scene and complete timeline             | Done                                |
+| M3 — Ocean, exact sky, lighting                   | Done                                |
+| M4 — Flooding, boats, rockets, break-up, wreck    | Done                                |
+| M5 — LOD1/LOD2, post-processing, quality settings | In progress                         |
+| M6 — Accessibility, UX, support, legal notice     | Done                                |
+| M7 — Deployment                                   | Artefacts ready; deployment not run |
 
 ## M0 — Skeleton (done, 2026-11-14)
 
@@ -264,6 +264,32 @@ Not verified here, and why:
   cannot be measured on the software rasteriser of this environment. The page weighs about
   0.4 MB compressed before the 3D scene starts, which is a fraction of a second at that speed;
   the frame rate remains to be measured on real hardware.
+
+## M7 — Deployment (artefacts ready, deployment not run)
+
+The tools of the `dokploy-mcp` server were not available in the authoring session, so no
+Dokploy resource was created. M7 must be run again from a session that has them, following
+`docs/DEPLOY.md`.
+
+Ready in the repository:
+
+- `Dockerfile`, `Caddyfile` and the CI job that builds the image, checks its headers, caching,
+  fallbacks and host redirects, and runs the end-to-end suite against it.
+- `docs/DEPLOY.md`: prerequisites, the sequence of Dokploy MCP calls, verification, going back,
+  maintenance.
+- `tools/verify-server.ts --live`: checks of the deployed site, including the certificate of
+  each of the four hosts and the redirection from HTTP to HTTPS.
+
+Verified:
+
+| Check                                | Command                                            | Result                                                                                    |
+| ------------------------------------ | -------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Image built from the committed files | `docker build`                                     | Pass                                                                                      |
+| Container mode of the verification   | `node tools/verify-server.ts --origin <container>` | 144 of 144                                                                                |
+| Live mode of the verification        | `node tools/verify-server.ts --live`               | Runs and reports; not meaningful from the authoring environment, whose proxy re-signs TLS |
+
+Remaining for the deployment session: steps 1 to 8 of `docs/DEPLOY.md`, then the results of the
+live verification and of the end-to-end suite against the canonical URL, recorded here.
 
 ## Tooling availability in the authoring session
 

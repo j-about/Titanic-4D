@@ -11,6 +11,7 @@ code, comments, commits and documentation are in English only.
 3. `docs/PLAN.md` — milestones and acceptance criteria.
 4. `docs/DECISIONS.md` — architecture decision records (ADR).
 5. `docs/SKY.md` — how the sky, the sea and the night lighting are computed and tested.
+6. `docs/DEPLOY.md` — deployment procedure, verification and going back.
 
 Update STATUS.md at the end of every task. A change of behaviour updates the affected
 documentation in the same commit series.
@@ -30,6 +31,7 @@ documentation in the same commit series.
 | All of the above                  | `pnpm check`                                 |
 | End-to-end tests (pinned image)   | `pnpm test:e2e:container`                    |
 | Verify a running container        | `node tools/verify-server.ts --origin <url>` |
+| Verify the deployed site          | `node tools/verify-server.ts --live`         |
 | End-to-end against a running site | `E2E_BASE_URL=<url> tools/e2e-container.sh`  |
 
 Run `pnpm check` and the end-to-end suite before every commit.
