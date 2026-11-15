@@ -53,11 +53,14 @@ function starAt(t: number, star: readonly [number, number]): { altitude: number;
 }
 
 /**
- * Independent check: altitude from the classical hour-angle formula, with Greenwich mean sidereal
- * time from the linear expression of the Astronomical Almanac and no precession. It agrees with a
- * rigorous computation to about one degree over 88 years.
+ * Independent check: altitude and azimuth from the classical hour-angle formulas, with Greenwich
+ * mean sidereal time from the linear expression of the Astronomical Almanac and no precession.
+ * They agree with a rigorous computation to about one degree on the sky over 88 years.
  */
-function classicalAltitude(t: number, star: readonly [number, number]): number {
+function classicalAltitudeAzimuth(
+  t: number,
+  star: readonly [number, number],
+): { altitude: number; azimuth: number } {
   const date = Date.UTC(1912, 3, 14, 23, 40) + (t - shipMinusGmtMinutes * 60) * 1000;
   const daysSinceJ2000 = (date - Date.UTC(2000, 0, 1, 12)) / 86_400_000;
   const siderealDeg =
@@ -65,12 +68,24 @@ function classicalAltitude(t: number, star: readonly [number, number]): number {
   const hourAngle = (siderealDeg - star[0]) / DEG;
   const declination = star[1] / DEG;
   const latitude = latitudeDeg / DEG;
-  return (
+  const altitude =
     Math.asin(
       Math.sin(latitude) * Math.sin(declination) +
         Math.cos(latitude) * Math.cos(declination) * Math.cos(hourAngle),
-    ) * DEG
-  );
+    ) * DEG;
+  // Clockwise from true north: a star east of the meridian has a negative hour angle.
+  const azimuth =
+    Math.atan2(
+      -Math.cos(declination) * Math.sin(hourAngle),
+      Math.sin(declination) * Math.cos(latitude) -
+        Math.cos(declination) * Math.cos(hourAngle) * Math.sin(latitude),
+    ) * DEG;
+  return { altitude, azimuth: ((azimuth % 360) + 360) % 360 };
+}
+
+/** Difference between two bearings, in degrees, between -180 and 180. */
+function bearingDifference(a: number, b: number): number {
+  return ((((a - b) % 360) + 540) % 360) - 180;
 }
 
 describe('orientation of the sky', () => {
@@ -95,12 +110,29 @@ describe('orientation of the sky', () => {
     }
   });
 
-  it('agrees with the classical hour-angle formula for bright stars', () => {
+  it('agrees with the classical hour-angle formulas for bright stars', () => {
     for (const t of [0, 4800, 9600]) {
       for (const star of [STARS.arcturus, STARS.vega, STARS.dubhe, STARS.sirius]) {
-        expect(Math.abs(starAt(t, star).altitude - classicalAltitude(t, star))).toBeLessThan(1);
+        const modelled = starAt(t, star);
+        const classical = classicalAltitudeAzimuth(t, star);
+        expect(Math.abs(modelled.altitude - classical.altitude)).toBeLessThan(1);
+        // A difference of azimuth moves a star on the sky by its cosine of altitude.
+        const acrossTheSky =
+          bearingDifference(modelled.azimuth, classical.azimuth) *
+          Math.cos(modelled.altitude / DEG);
+        expect(Math.abs(acrossTheSky)).toBeLessThan(1.5);
       }
     }
+  });
+
+  it('gives bearings clockwise from true north: Arcturus crosses the meridian to the south', () => {
+    // Arcturus crosses the meridian at about 1 a.m.: south-east before, south-west after.
+    const before = starAt(seconds('14T23:40'), STARS.arcturus);
+    const after = starAt(seconds('15T02:20'), STARS.arcturus);
+    expect(before.azimuth).toBeGreaterThan(120);
+    expect(before.azimuth).toBeLessThan(180);
+    expect(after.azimuth).toBeGreaterThan(180);
+    expect(after.azimuth).toBeLessThan(240);
   });
 
   it('shows the spring sky of the North Atlantic: Arcturus high, Vega rising, Sirius set', () => {
@@ -182,8 +214,17 @@ describe('Moon, Sun and planets', () => {
     const jupiter = northUp
       .evaluate(seconds('15T01:00'))
       .planets.find((planet) => planet.name === 'Jupiter');
-    expect(jupiter?.altitudeDeg).toBeGreaterThan(0);
-    expect(jupiter?.magnitude).toBeLessThan(-1.5);
+    if (jupiter === undefined) {
+      throw new RangeError('The sky has no Jupiter.');
+    }
+    expect(jupiter.altitudeDeg).toBeGreaterThan(0);
+    expect(jupiter.magnitude).toBeLessThan(-1.5);
+    // Between east (90°) and south (180°), by its bearing and by its direction in the scene.
+    expect(jupiter.azimuthDeg).toBeGreaterThan(90);
+    expect(jupiter.azimuthDeg).toBeLessThan(180);
+    expect(
+      Math.abs(bearingDifference(altitudeAzimuth(jupiter.direction).azimuth, jupiter.azimuthDeg)),
+    ).toBeLessThan(0.5);
   });
 });
 

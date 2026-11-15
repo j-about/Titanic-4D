@@ -95,9 +95,8 @@ export function rocketDisplaySeconds(timeScale: number): number {
 /**
  * Appearance of a signal on screen, or `undefined` when it is not drawn. At real speed and up to
  * the speed at which the whole sequence still lasts long enough on screen, it follows
- * `rocketAppearance`. Faster than that, the sequence would be a sudden blink: the signal is drawn
- * instead as a light at the height of the burst that comes up and fades gently over a longer
- * span of ship's time, so that what the viewer sees never flashes.
+ * `rocketAppearance`. Faster than that, the signal is drawn as a light at the height
+ * of the burst that comes up and fades gently over a longer span of ship's time.
  */
 export function rocketDisplay(ageSeconds: number, timeScale: number): RocketAppearance | undefined {
   const duration = rocketDisplaySeconds(timeScale);

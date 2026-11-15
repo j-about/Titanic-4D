@@ -7,7 +7,7 @@ import {
 
 /**
  * Surface of the sea as a short sum of sinusoidal waves, the first-order form of Gerstner's
- * trochoidal waves. It stands in for the FFT field where the latter costs too much: the slope of
+ * trochoidal waves. It stands in for the FFT field at the lowest quality level: the slope of
  * the surface is a closed expression of position and time that a shader evaluates directly.
  *
  * The wavelengths are spaced geometrically around the peak of the same JONSWAP spectrum as the

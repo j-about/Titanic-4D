@@ -95,12 +95,12 @@ These are not historical facts; they map physical quantities to what a screen ca
 | What is checked                                                            | Where                                    |
 | -------------------------------------------------------------------------- | ---------------------------------------- |
 | The equatorial-to-scene matrix is a rotation at every instant              | `src/sky/skyModel.test.ts`               |
-| Altitude and azimuth of bright stars agree with the hour-angle formula     | same file (within 1°)                    |
+| Altitude and azimuth of bright stars agree with the hour-angle formulas    | same file (1° and 1.5° on the sky)       |
 | Polaris due north at the latitude of the ship; sky turns 15° an hour       | same file                                |
-| Arcturus high, Vega rising, Sirius set                                     | same file                                |
+| Arcturus high, crossing the meridian to the south; Vega rising; Sirius set | same file                                |
 | Moon below the horizon all night, thin waning crescent                     | same file                                |
 | Sun below astronomical twilight until the end                              | same file                                |
-| Jupiter up in the south-east                                               | same file                                |
+| Jupiter up, brighter than magnitude −1.5, bearing between east and south   | same file                                |
 | Catalogue file: star count, order, unit directions, Sirius moved to 1912   | `src/sky/starCatalogueFile.node.test.ts` |
 | Star appearance follows the magnitude scale                                | `src/sky/starAppearance.test.ts`         |
 | FFT round trip, wave height, exact slopes, determinism                     | `src/ocean/ocean.test.ts`                |

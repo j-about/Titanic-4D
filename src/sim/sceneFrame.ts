@@ -20,8 +20,8 @@ function subtract(a: SceneVector, b: SceneVector): SceneVector {
 }
 
 /**
- * Column-major 4×4 matrix that places a mesh built in local coordinates according to a pose. It
- * is derived from `bodyToWorld` itself, so the scene cannot drift from the simulation.
+ * Column-major 4×4 matrix that places a mesh built in local coordinates according to a pose. Its
+ * columns are the images of the local axes and of the local origin under `bodyPointToScene`.
  */
 export function poseToMatrix(pose: Pose): number[] {
   const origin = bodyPointToScene(pose, { x: 0, y: 0, z: 0 });

@@ -26,10 +26,19 @@ describe('bright-stars.bin', () => {
   it('carries Sirius where the catalogue puts it, moved back to 1912 by its proper motion', async () => {
     const bytes = new Uint8Array(await readFile(join(import.meta.dirname, 'bright-stars.bin')));
     const sirius = decodeStar(bytes, 0);
+    // J2000 position and yearly proper motion of Sirius, in degrees and seconds of arc; the
+    // sinking was 87.7 years before J2000.
+    const j2000 = { rightAscensionDeg: 101.287, declinationDeg: -16.716 };
+    const movedRightAscensionDeg = (0.553 * 87.7) / 3600 / Math.cos(16.716 / DEG);
+    const movedDeclinationDeg = (1.205 * 87.7) / 3600;
+    // The motion is 0.014° in right ascension and 0.029° in declination: the stored position is
+    // within 0.005° of the moved one, and the J2000 one is not.
     expect(sirius.rightAscensionDeg).toBeCloseTo(
-      101.287 + (0.553 * 87.7) / 3600 / Math.cos(16.716 / DEG),
-      1,
+      j2000.rightAscensionDeg + movedRightAscensionDeg,
+      2,
     );
-    expect(sirius.declinationDeg).toBeCloseTo(-16.716 + (1.205 * 87.7) / 3600, 1);
+    expect(sirius.declinationDeg).toBeCloseTo(j2000.declinationDeg + movedDeclinationDeg, 2);
+    expect(sirius.rightAscensionDeg - j2000.rightAscensionDeg).toBeGreaterThan(0.009);
+    expect(sirius.declinationDeg - j2000.declinationDeg).toBeGreaterThan(0.02);
   });
 });

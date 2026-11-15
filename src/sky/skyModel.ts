@@ -19,7 +19,7 @@ import { toUtcDate } from '../time/shipTime.ts';
  * library gives the rotation from that frame to the observer's horizon, which includes
  * precession, nutation and the rotation of the Earth; a last rotation about the vertical turns
  * the horizon frame so that its first axis points along the ship's heading. Refraction is not
- * applied to the star field: it only matters within a few degrees of the horizon.
+ * applied to the star field.
  */
 export interface SkyBody {
   readonly name: string;

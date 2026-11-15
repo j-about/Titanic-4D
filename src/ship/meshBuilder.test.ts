@@ -102,6 +102,52 @@ describe('mesh builder', () => {
     const builder = createMeshBuilder();
     const point = { x: 1, y: 1, z: 1 };
     builder.addTriangle(point, point, point, white);
+    builder.addQuad(point, { x: 2, y: 1, z: 1 }, { x: 3, y: 1, z: 1 }, { x: 4, y: 1, z: 1 }, white);
     expect(builder.build().indices.length).toBe(0);
+  });
+
+  it('keeps the triangle left of a quad of which two corners coincide', () => {
+    const tip = { x: 4, y: 0, z: 5 };
+    for (const corners of [
+      // The second and third corners coincide, then the first and second, then the last two.
+      [{ x: 0, y: -1, z: 5 }, tip, tip, { x: 0, y: 1, z: 5 }],
+      [tip, tip, { x: 0, y: 1, z: 5 }, { x: 0, y: -1, z: 5 }],
+      [{ x: 0, y: 1, z: 5 }, { x: 0, y: -1, z: 5 }, tip, tip],
+    ] as const) {
+      const builder = createMeshBuilder();
+      builder.addQuad(corners[0], corners[1], corners[2], corners[3], white);
+      const mesh = builder.build();
+      expect(mesh.indices.length).toBe(3);
+      // The triangle lies in the plane z = 5 of the body frame and faces upward.
+      expect(mesh.normals[0]).toBeCloseTo(0, 9);
+      expect(mesh.normals[1]).toBeCloseTo(1, 9);
+      expect(mesh.normals[2]).toBeCloseTo(0, 9);
+      const [a, b, c] = [...mesh.indices].map((index) => [
+        mesh.positions[index * 3] ?? 0,
+        mesh.positions[index * 3 + 2] ?? 0,
+      ]);
+      const doubledArea =
+        ((b?.[0] ?? 0) - (a?.[0] ?? 0)) * ((c?.[1] ?? 0) - (a?.[1] ?? 0)) -
+        ((c?.[0] ?? 0) - (a?.[0] ?? 0)) * ((b?.[1] ?? 0) - (a?.[1] ?? 0));
+      expect(Math.abs(doubledArea)).toBeCloseTo(8, 9);
+    }
+  });
+
+  it('gives a quad that is not plane the normal of its whole outline', () => {
+    const builder = createMeshBuilder();
+    builder.addQuad(
+      { x: 0, y: 0, z: 0 },
+      { x: 0, y: 1, z: 0 },
+      { x: 1, y: 1, z: 1 },
+      { x: 1, y: 0, z: 0 },
+      white,
+    );
+    const mesh = builder.build();
+    expect(mesh.indices.length).toBe(6);
+    // Half the cross product of the diagonals, in scene coordinates.
+    const expected = [-1, -2, 1].map((value) => value / Math.sqrt(6));
+    [...mesh.normals.slice(0, 3)].forEach((value, axis) => {
+      expect(value).toBeCloseTo(expected[axis] ?? Number.NaN, 6);
+    });
   });
 });

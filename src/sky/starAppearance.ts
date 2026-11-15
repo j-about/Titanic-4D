@@ -18,7 +18,7 @@ const EXTRA_RADIUS_PX = 2.4;
 const REFERENCE_MAGNITUDE = 1.5;
 const MIN_INTENSITY = 0.03;
 const MAX_INTENSITY = 7;
-/** Share of the star's own colour kept: night vision perceives little colour. */
+/** Share of the star's own colour kept in the colour drawn. */
 const COLOUR_SATURATION = 0.45;
 
 /** Effective temperature of a star from its B−V colour index (Ballesteros, 2012), in kelvins. */

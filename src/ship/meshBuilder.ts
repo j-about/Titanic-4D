@@ -2,7 +2,8 @@
  * Accumulates triangles in body coordinates (`x` aft of the forward perpendicular, `y` to
  * starboard, `z` above the keel) and returns them as typed arrays in scene coordinates, where
  * `X` points forward, `Y` up and `Z` to starboard. Faces are flat-shaded: every quad owns its
- * vertices and its normal.
+ * vertices and its normal. A face without area is left out; a quad of which two corners coincide
+ * is added as the triangle that remains.
  */
 
 export type Rgb = readonly [number, number, number];
@@ -86,20 +87,29 @@ export function createMeshBuilder(): MeshBuilder {
   const indices: number[] = [];
 
   const pushFace = (corners: readonly BodyVertex[], color: Rgb): void => {
-    const [a, b, c] = corners.map(toScene);
-    if (a === undefined || b === undefined || c === undefined) {
+    const points = corners.map(toScene);
+    const origin = points[0];
+    if (origin === undefined) {
       return;
     }
-    // Body and scene frames are both right-handed, so the winding is preserved by the mapping.
-    const ux = b[0] - a[0];
-    const uy = b[1] - a[1];
-    const uz = b[2] - a[2];
-    const vx = c[0] - a[0];
-    const vy = c[1] - a[1];
-    const vz = c[2] - a[2];
-    let nx = uy * vz - uz * vy;
-    let ny = uz * vx - ux * vz;
-    let nz = ux * vy - uy * vx;
+    // Corners relative to the first one, which keeps the sums below exact for coincident corners.
+    const offsets = points.map((point): [number, number, number] => [
+      point[0] - origin[0],
+      point[1] - origin[1],
+      point[2] - origin[2],
+    ]);
+    // Newell's method: the normal of the outline is summed over all its edges, so that a face
+    // with coincident corners keeps the normal of the area it still encloses. Body and scene
+    // frames are both right-handed, so the winding is preserved by the mapping.
+    let nx = 0;
+    let ny = 0;
+    let nz = 0;
+    offsets.forEach((current, index) => {
+      const next = offsets[(index + 1) % offsets.length] ?? current;
+      nx += (current[1] - next[1]) * (current[2] + next[2]);
+      ny += (current[2] - next[2]) * (current[0] + next[0]);
+      nz += (current[0] - next[0]) * (current[1] + next[1]);
+    });
     const length = Math.hypot(nx, ny, nz);
     if (length === 0) {
       return;
@@ -108,13 +118,27 @@ export function createMeshBuilder(): MeshBuilder {
     ny /= length;
     nz /= length;
     const first = positions.length / 3;
-    for (const corner of corners) {
-      positions.push(...toScene(corner));
+    for (const point of points) {
+      positions.push(...point);
       normals.push(nx, ny, nz);
       colors.push(color[0], color[1], color[2]);
     }
-    for (let index = 1; index < corners.length - 1; index += 1) {
-      indices.push(first, first + index, first + index + 1);
+    // The face is cut into a fan of triangles around its first corner; those without area are
+    // left out.
+    for (let index = 1; index < offsets.length - 1; index += 1) {
+      const u = offsets[index];
+      const v = offsets[index + 1];
+      if (u === undefined || v === undefined) {
+        continue;
+      }
+      const area = Math.hypot(
+        u[1] * v[2] - u[2] * v[1],
+        u[2] * v[0] - u[0] * v[2],
+        u[0] * v[1] - u[1] * v[0],
+      );
+      if (area > 0) {
+        indices.push(first, first + index, first + index + 1);
+      }
     }
   };
 

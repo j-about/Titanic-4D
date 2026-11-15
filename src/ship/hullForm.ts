@@ -6,9 +6,8 @@ import { deckHeightAt } from './sheer.ts';
  * Analytic hull form of the level-of-detail 0 model.
  *
  * The principal dimensions, the sheer and the extents of the forecastle, well decks and poop come
- * from the dataset. The shape between them is a modelling choice: no table of offsets is
- * available, so the waterlines are described by a few smooth functions whose parameters are tuned
- * to reproduce the recorded block, prismatic and midship coefficients at the load draught.
+ * from the dataset. Between them the waterlines are described by a few smooth functions whose
+ * parameters reproduce the recorded block, prismatic and midship coefficients at the load draught.
  *
  * Body coordinates: `x` metres aft of the forward perpendicular, `z` metres above the keel; the
  * functions return half-breadths, in metres from the centre line.

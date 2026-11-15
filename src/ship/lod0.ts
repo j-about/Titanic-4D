@@ -131,13 +131,59 @@ function stationsBetween(
   return [...stations].sort((a, b) => a - b);
 }
 
-/** Outward normal of the starboard side of the hull at a point, from finite differences. */
+/** Distance between the samples of the shell from which its slopes are measured. */
+const NORMAL_SAMPLE_STEP_M = 0.2;
+
+function clamp(value: number, minimum: number, maximum: number): number {
+  return Math.min(Math.max(value, minimum), maximum);
+}
+
+/**
+ * Outward normal of the starboard side of the hull at a point, scaled so that its athwartship
+ * component is 1: the opposite of the slopes of the half-breadth along the hull and upward.
+ *
+ * The slopes are finite differences between samples that all lie on the shell. The point is
+ * first brought onto it, between the stem and the stern and between the bottom and the top of
+ * the plating; the samples above and below it stop at the top and at the bottom of the plating,
+ * those forward and aft of it at the stem and at the stern.
+ */
 function sideNormal(form: HullForm, x: number, z: number): BodyVertex {
-  const step = 0.2;
-  const slopeX = (form.halfBreadth(x + step, z) - form.halfBreadth(x - step, z)) / (2 * step);
-  const slopeZ = (form.halfBreadth(x, z + step) - form.halfBreadth(x, z - step)) / (2 * step);
-  const clampSlope = (value: number): number => Math.min(Math.max(value, -4), 4);
-  return { x: -clampSlope(slopeX), y: 1, z: -clampSlope(slopeZ) };
+  const station = clamp(x, form.stemX(z), form.sternX(z));
+  const keel = form.keelHeight(station);
+  const top = form.topHeight(station);
+  const height = clamp(z, keel, top);
+
+  const lower = Math.max(height - NORMAL_SAMPLE_STEP_M, keel);
+  const upper = Math.min(height + NORMAL_SAMPLE_STEP_M, top);
+  const slopeZ =
+    upper > lower
+      ? (form.halfBreadth(station, upper) - form.halfBreadth(station, lower)) / (upper - lower)
+      : 0;
+
+  // Point of the shell at a station, at the height of the plating nearest to that of the point.
+  const shellAt = (sampleX: number): BodyVertex => {
+    const sampleZ = clamp(height, form.keelHeight(sampleX), form.topHeight(sampleX));
+    return { x: sampleX, y: form.halfBreadth(sampleX, sampleZ), z: sampleZ };
+  };
+  const here = shellAt(station);
+  let before = shellAt(Math.max(station - NORMAL_SAMPLE_STEP_M, form.stemX(height)));
+  let after = shellAt(Math.min(station + NORMAL_SAMPLE_STEP_M, form.sternX(height)));
+  // A neighbour at the height of the point gives the slope directly. Where the sheer, the rise
+  // of the bottom or a step of the plating puts one neighbour at another height, the difference
+  // is taken on the other side alone.
+  const level = (sample: BodyVertex): boolean => sample.z === height && sample.x !== station;
+  if (level(before) || level(after)) {
+    before = level(before) ? before : here;
+    after = level(after) ? after : here;
+  }
+  // Where no neighbour is at the height of the point, the chord between them also climbs the
+  // shell: the part of its change of half-breadth due to the change of height is removed.
+  const slopeX =
+    after.x > before.x
+      ? (after.y - before.y - slopeZ * (after.z - before.z)) / (after.x - before.x)
+      : 0;
+
+  return { x: -slopeX, y: 1, z: -slopeZ };
 }
 
 function mirror(vertex: BodyVertex): BodyVertex {

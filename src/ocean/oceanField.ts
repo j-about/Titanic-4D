@@ -75,7 +75,8 @@ export function createOceanField(options: OceanFieldOptions): OceanField {
       }
       const frequency = deepWaterFrequency(k);
       const alignment = Math.max((kx * Math.cos(direction) + kz * Math.sin(direction)) / k, 0);
-      // Converting the frequency spectrum to wavenumber space divides by k and by the group speed.
+      // Converting the frequency spectrum to wavenumber space divides by k and multiplies by the
+      // group speed, which is proportional to 1/sqrt(k) in deep water.
       const density =
         (jonswapDensity(frequency, peakOmega) * alignment ** options.spreading) /
         (k * Math.sqrt(k));
