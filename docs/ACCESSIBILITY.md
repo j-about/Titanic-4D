@@ -95,4 +95,5 @@ These need a person and are to be done before the site is announced:
   tree and axe-core only.
 - Use with voice control and with a switch.
 - Windows high-contrast themes (`forced-colors`).
-- Frame rate of the scene on real graphics hardware; see `docs/STATUS.md`.
+- Frame rate of the scene on an integrated GPU: it was measured on a discrete card only; see
+  "Real hardware" in `docs/STATUS.md`.
