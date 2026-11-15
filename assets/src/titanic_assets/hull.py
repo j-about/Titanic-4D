@@ -19,7 +19,7 @@ _TOLERANCE_M = 1e-6
 
 ROW_MATERIALS: tuple[str, ...] = (
     *(ANTIFOULING,) * (len(m.BILGE_ROW_OFFSETS_M) + m.LOWER_SIDE_ROWS),
-    *(HULL_BLACK,) * m.BLACK_ROWS,
+    *(HULL_BLACK,) * (m.BLACK_ROWS_BELOW_KNUCKLE + m.BLACK_ROWS_ABOVE_KNUCKLE),
     SHEER_STRIPE,
     *(WHITE,) * m.WHITE_ROWS,
 )
@@ -99,24 +99,48 @@ def _columns(offsets: Offsets) -> list[tuple[float, bool]]:
     return columns
 
 
-def _row_heights(bottom: float, top: float, paint_line: float, stripe: float) -> FloatArray:
+@dataclass(frozen=True, slots=True)
+class _PaintLines:
+    """Heights that bound the bands of paint of one column and the rows inside them."""
+
+    bottom: float
+    top: float
+    paint: float
+    knuckle: float
+    stripe: float
+
+
+def _steps(start: float, end: float, count: int) -> list[float]:
+    """Return ``count`` heights evenly spaced after ``start``, the last being ``end``."""
+    return [start + (end - start) * step / count for step in range(1, count + 1)]
+
+
+def _row_heights(lines: _PaintLines) -> FloatArray:
     """Return the heights of the rows of one column, from the bottom to the top of the plating."""
-    paint = min(max(paint_line, bottom), top)
-    stripe_low = min(max(stripe - m.SHEER_STRIPE_HALF_HEIGHT_M, bottom), top)
-    stripe_high = min(max(stripe + m.SHEER_STRIPE_HALF_HEIGHT_M, bottom), top)
+    bottom, top = lines.bottom, lines.top
+    paint = min(max(lines.paint, bottom), top)
+    stripe_low = min(max(lines.stripe - m.SHEER_STRIPE_HALF_HEIGHT_M, bottom), top)
+    stripe_high = min(max(lines.stripe + m.SHEER_STRIPE_HALF_HEIGHT_M, bottom), top)
+    knuckle = min(max(lines.knuckle, paint), stripe_low)
     bilge = [min(bottom + offset, paint) for offset in m.BILGE_ROW_OFFSETS_M]
-    lower_side = [
-        bilge[-1] + (paint - bilge[-1]) * step / m.LOWER_SIDE_ROWS
-        for step in range(1, m.LOWER_SIDE_ROWS + 1)
-    ]
-    black = [
-        paint + (stripe_low - paint) * step / m.BLACK_ROWS for step in range(1, m.BLACK_ROWS + 1)
-    ]
-    white = [
-        stripe_high + (top - stripe_high) * step / m.WHITE_ROWS
-        for step in range(1, m.WHITE_ROWS + 1)
-    ]
-    return np.asarray([bottom, *bilge, *lower_side, *black, stripe_high, *white], dtype=np.float64)
+    return np.asarray(
+        [
+            bottom,
+            *bilge,
+            *_steps(bilge[-1], paint, m.LOWER_SIDE_ROWS),
+            *_steps(paint, knuckle, m.BLACK_ROWS_BELOW_KNUCKLE),
+            *_steps(knuckle, stripe_low, m.BLACK_ROWS_ABOVE_KNUCKLE),
+            stripe_high,
+            *_steps(stripe_high, top, m.WHITE_ROWS),
+        ],
+        dtype=np.float64,
+    )
+
+
+def knuckle_height(offsets: Offsets) -> float:
+    """Return the height at which the stem profile crosses the forward perpendicular."""
+    hull = offsets.hull
+    return float(np.interp(0.0, hull.stem_x[::-1], hull.waterlines[::-1]))
 
 
 def _plating_triangles(stations: FloatArray, row_count: int) -> npt.NDArray[np.int64]:
@@ -130,13 +154,15 @@ def build_hull_grid(offsets: Offsets) -> HullGrid:
     """Sample the starboard plating and compute its smooth normals."""
     hull = offsets.hull
     paint_line = offsets.particulars.load_draught + m.BOOT_TOPPING_M
+    knuckle = knuckle_height(offsets)
     columns = _columns(offsets)
     points = np.zeros((len(columns), len(ROW_MATERIALS) + 1, 3), dtype=np.float64)
     for column, (x, in_well) in enumerate(columns):
         index = hull.station_index(x)
         stripe = float(hull.deck_heights["c"][index])
         top = stripe + hull.well_bulwark_height if in_well else float(hull.top_height[index])
-        heights = _row_heights(float(hull.bottom_height[index]), top, paint_line, stripe)
+        lines = _PaintLines(float(hull.bottom_height[index]), top, paint_line, knuckle, stripe)
+        heights = _row_heights(lines)
         points[column, :, 0] = x
         points[column, :, 1] = hull.half_breadths_at(index, heights)
         points[column, :, 2] = heights

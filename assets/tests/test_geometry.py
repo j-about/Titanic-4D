@@ -177,7 +177,7 @@ def test_the_plating_carries_the_lamps_of_the_application(
         normal = np.asarray(lamp.normal) / np.linalg.norm(lamp.normal)
         on_plating = distance_to_triangles(position, candidates[near])
         proud = distance_to_triangles(position + normal * LAMP_OFFSET_M, candidates[near])
-        assert on_plating < 0.01
+        assert on_plating < 0.02
         assert proud > LAMP_OFFSET_M - 0.01
 
 

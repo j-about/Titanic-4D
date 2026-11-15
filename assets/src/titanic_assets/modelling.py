@@ -80,7 +80,7 @@ BOAT_CHOCK_HEIGHT_M = 0.7
 
 # --- Tessellation of the hull ----------------------------------------------------------------
 
-STATION_SPACINGS: tuple[tuple[float, float], ...] = ((8.0, 0.25), (30.0, 0.5))
+STATION_SPACINGS: tuple[tuple[float, float], ...] = ((12.0, 0.25), (45.0, 0.5))
 """Spacing of the stations of the mesh within a given distance of either end of the hull."""
 STATION_SPACING_M = 1.0
 """Spacing of the stations of the mesh elsewhere."""
@@ -89,10 +89,12 @@ END_SQUARED_UNIT_M = 0.1
 """Stations are added at the squares of multiples of this unit from each end of the hull."""
 BILGE_ROW_OFFSETS_M = (0.02, 0.15, 0.6, 1.3, 2.2, 3.3, 4.4)
 """Heights above the bottom of the hull of the rows of the mesh in the turn of the bilge."""
-LOWER_SIDE_ROWS = 3
+LOWER_SIDE_ROWS = 6
 """Rows of the mesh between the bilge and the top of the antifouling paint."""
-BLACK_ROWS = 6
-"""Rows of the mesh in the black paint."""
+BLACK_ROWS_BELOW_KNUCKLE = 10
+BLACK_ROWS_ABOVE_KNUCKLE = 2
+"""Rows of the mesh in the black paint, below and above the knuckle of the plating: the height
+at which the stem meets the forward perpendicular, where the flare of the hull form ends."""
 WHITE_ROWS = 2
 """Rows of the mesh in the white paint."""
 

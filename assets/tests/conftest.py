@@ -40,6 +40,12 @@ def builds(tmp_path_factory: pytest.TempPathFactory) -> tuple[Path, Path]:
     command = Path(sys.executable).with_name("titanic-assets")
     directories = (tmp_path_factory.mktemp("first"), tmp_path_factory.mktemp("second"))
     for directory in directories:
-        arguments = ["--work-directory", str(directory), "build", "--output", str(directory / MODEL_NAME)]
+        arguments = [
+            "--work-directory",
+            str(directory),
+            "build",
+            "--output",
+            str(directory / MODEL_NAME),
+        ]
         subprocess.run([str(command), *arguments], check=True, capture_output=True)  # noqa: S603
     return directories

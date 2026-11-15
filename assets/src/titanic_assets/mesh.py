@@ -18,6 +18,8 @@ type Point = tuple[float, float, float]
 
 _WELD_TOLERANCE_M = 1e-5
 _MINIMUM_DOUBLE_AREA_M2 = 1e-9
+_MINIMUM_NORMAL_AGREEMENT = 0.3
+"""Least cosine of the angle between a corner normal and the normal of its triangle."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -90,14 +92,19 @@ class MeshBuilder:
     def add(self, material: str, positions: FloatArray, normals: FloatArray) -> None:
         """Add triangles given as corner positions and corner normals of shape (n, 3, 3).
 
-        Triangles without area are dropped.
+        Triangles without area are dropped. A corner normal that leans too far from the normal
+        of its triangle is replaced by the latter.
         """
         double_areas = _double_area_vectors(positions)
         keep = np.sum(double_areas * double_areas, axis=1) > _MINIMUM_DOUBLE_AREA_M2**2
         if not bool(np.any(keep)):
             return
-        self._positions.setdefault(material, []).append(positions[keep])
-        self._normals.setdefault(material, []).append(normals[keep])
+        positions, normals = positions[keep], normals[keep]
+        face_normals = _normalised(double_areas[keep])[:, None, :]
+        agreement = np.sum(normals * face_normals, axis=2, keepdims=True)
+        normals = np.where(agreement < _MINIMUM_NORMAL_AGREEMENT, face_normals, normals)
+        self._positions.setdefault(material, []).append(positions)
+        self._normals.setdefault(material, []).append(normals)
 
     def add_indexed(
         self,
