@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { narrativeEventCount, openAt, waitForFrame } from './app.ts';
+import { findAccessibilityViolations } from './axe.ts';
 
 const clock = (page: import('@playwright/test').Page) => page.locator('.clock__time');
 
@@ -124,6 +125,22 @@ test.describe('description panels', () => {
     await expect(panel.locator('.facts')).toContainText('5.5° by the head');
     await expect(panel.locator('.facts')).toContainText('10.0° to port');
     await expect(panel.locator('.facts')).toContainText('of 20 away');
+  });
+
+  test('draws the water in the hull and gives the same values as a table', async ({
+    page,
+  }, testInfo) => {
+    await openAt(page, testInfo, '01:40');
+    const panel = page.getByRole('tabpanel', { name: 'Now' });
+    await expect(
+      panel.getByRole('img', { name: /Water in the hull, seen from starboard/ }),
+    ).toBeVisible();
+    await panel.getByText('Water level by compartment').click();
+    const table = panel.getByRole('table', { name: 'Water in each watertight compartment' });
+    await expect(table.getByRole('row')).toHaveCount(17);
+    await expect(table.getByRole('row', { name: /No\. 1 hold/ })).toContainText('Flooded');
+    await expect(table.getByRole('row', { name: /Turbine engine room/ })).toContainText('None');
+    expect(await findAccessibilityViolations(page)).toEqual([]);
   });
 
   test('shows the sources of the instant with their certainty and the other positions', async ({

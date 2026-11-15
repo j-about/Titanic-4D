@@ -101,6 +101,20 @@ test.describe('night scene', () => {
     expect(sea.medianLuma).toBeLessThan(8);
   });
 
+  test('shows a distress signal as white stars above the ship', async ({ page }, testInfo) => {
+    /** Luma above which a pixel of the sky is as bright as a star of a distress signal. */
+    const signalLuma = 170;
+    const upperSky: Band = { from: 0, to: 0.45 };
+    await openAt(page, testInfo, '00:46:40');
+    await hideOverlays(page);
+    const before = await measureBand(page.locator('#scene-canvas'), upperSky, signalLuma);
+    await openAt(page, testInfo, '00:47:07');
+    await hideOverlays(page);
+    const during = await measureBand(page.locator('#scene-canvas'), upperSky, signalLuma);
+    expect(during.bright - before.bright).toBeGreaterThan(12);
+    expect(during.bright - before.bright).toBeLessThan(400);
+  });
+
   test('loses the reflection once the lights have failed', async ({ page }, testInfo) => {
     await openAt(page, testInfo, '02:18', 'orbit');
     await hideOverlays(page);
