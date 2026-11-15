@@ -503,8 +503,34 @@ interface LampRow {
   height(x: number): number;
   /** Half-breadth at which the lamps sit; defaults to the hull side at their height. */
   readonly halfWidth?: number;
+  /**
+   * True for a row of windows of the upper works, above the shell plating: its lamps sit on the
+   * wall that carries the ship's side upward, at the half-breadth of the top of the plating.
+   */
+  readonly onUpperWorks?: boolean;
   readonly width: number;
   readonly lampHeight: number;
+}
+
+/** Depth below the top of the plating at which the side of the upper works is measured. */
+const UPPER_WORKS_SAMPLE_DEPTH_M = 0.3;
+
+/** Outward direction of the opening of a lamp of the given row. */
+function lampNormal(
+  form: HullForm,
+  row: LampRow,
+  x: number,
+  z: number,
+  platingTop: number,
+): BodyVertex {
+  if (row.halfWidth !== undefined) {
+    return { x: 0, y: 1, z: 0 };
+  }
+  if (row.onUpperWorks === true) {
+    // The walls of the upper works are vertical: only the taper of the plan turns the normal.
+    return { ...sideNormal(form, x, platingTop), z: 0 };
+  }
+  return sideNormal(form, x, z);
 }
 
 function sectionOf(ranges: readonly SectionRange[], x: number): SectionId {
@@ -537,6 +563,7 @@ function buildLamps(
       xEnd: superstructure.x_end_m - 2,
       spacing: 2.2,
       height: deck('b', 1.45),
+      onUpperWorks: true,
       width: 0.8,
       lampHeight: 1.0,
     },
@@ -545,6 +572,7 @@ function buildLamps(
       xEnd: screen.x_end_m - 1,
       spacing: 2.4,
       height: deck('a', 1.55),
+      onUpperWorks: true,
       width: 0.9,
       lampHeight: 1.1,
     },
@@ -564,11 +592,13 @@ function buildLamps(
     for (let index = 0; index <= count; index += 1) {
       const x = row.xStart + index * row.spacing;
       const z = row.height(x);
-      const halfWidth = row.halfWidth ?? form.halfBreadth(x, z);
+      const platingTop = form.topHeight(x) - UPPER_WORKS_SAMPLE_DEPTH_M;
+      const halfWidth =
+        row.halfWidth ?? form.halfBreadth(x, row.onUpperWorks === true ? platingTop : z);
       if (halfWidth < 1.5) {
         continue;
       }
-      const normal = row.halfWidth === undefined ? sideNormal(form, x, z) : { x: 0, y: 1, z: 0 };
+      const normal = lampNormal(form, row, x, z, platingTop);
       const section = sectionOf(ranges, x);
       for (const side of [1, -1] as const) {
         lamps.push({

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { dataset } from '../data/dataset.ts';
+import { createHullForm } from './hullForm.ts';
 import { buildBoatMesh, buildLod0Model, srgb } from './lod0.ts';
 import type { MeshData } from './meshBuilder.ts';
 import { factValue } from './particulars.ts';
@@ -82,6 +83,19 @@ describe('level-of-detail 0 model', () => {
       ['foremast', 'bow'],
       ['mainmast', 'stern'],
     ]);
+  });
+
+  it('lights the windows of the upper works as well as the portholes of the hull', () => {
+    const form = createHullForm(dataset.ship);
+    const above = model.lamps.filter((lamp) => lamp.position.z > form.topHeight(lamp.position.x));
+    // B deck and the enclosed promenade on the ship's side, the open promenade inboard of it.
+    const onTheSide = above.filter((lamp) => Math.abs(lamp.position.y) > form.halfBreadthMax - 0.5);
+    expect(onTheSide.length).toBeGreaterThan(150);
+    expect(above.length).toBeGreaterThan(onTheSide.length);
+    for (const lamp of onTheSide) {
+      expect(lamp.normal.z).toBe(0);
+      expect(Math.abs(lamp.position.y)).toBeLessThanOrEqual(form.halfBreadthMax);
+    }
   });
 
   it("places lamps symmetrically on the ship's sides, above the keel", () => {
