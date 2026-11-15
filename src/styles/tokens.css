@@ -40,9 +40,13 @@
 
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
-  --focus-ring: 0.1875rem solid var(--color-focus);
+  --focus-ring-width: 0.1875rem;
+  --focus-ring: var(--focus-ring-width) solid var(--color-focus);
   --focus-offset: 0.125rem;
+  --focus-extent: calc(var(--focus-offset) + var(--focus-ring-width));
+  --focus-clearance: calc(var(--focus-extent) + 0.0625rem);
   --target-min: 2.75rem;
+  --target-min-small: 1.5rem;
   --measure: 68ch;
   --duration-fast: 120ms;
   --duration-normal: 240ms;
