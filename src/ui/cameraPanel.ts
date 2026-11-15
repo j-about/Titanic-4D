@@ -1,9 +1,10 @@
 import type { CameraMode } from '../render/camera/cameraPose.ts';
+import { QUALITY_LABELS, QUALITY_LEVELS, type QualityLevel } from '../render/quality.ts';
 import { el } from './dom.ts';
 
 export interface CameraPanel {
   readonly element: HTMLElement;
-  update(mode: CameraMode): void;
+  update(mode: CameraMode, quality: QualityLevel): void;
 }
 
 const CAMERA_LABELS: Readonly<Record<CameraMode, string>> = {
@@ -24,11 +25,25 @@ const CAMERA_HELP: Readonly<Record<CameraMode, string>> = {
   free: 'Drag, or use the arrow keys, to look. Press W, A, S and D to move, Q and E to go down and up; hold Shift to move faster.',
 };
 
-/** Creates the choice of camera, the reset button and the help text for the chosen camera. */
+/** Added to the help of every camera that can be steered. */
+const GAMEPAD_HELP =
+  ' With a gamepad: right stick to turn, triggers to zoom, left stick and bumpers to move the free camera.';
+
+/**
+ * Creates the choice of camera, the reset button, the choice of the level of detail and the help
+ * text for the chosen camera.
+ */
 export function createCameraPanel(
   onSelect: (mode: CameraMode) => void,
   onReset: () => void,
+  onQuality: (quality: QualityLevel) => void,
 ): CameraPanel {
+  const quality = el(
+    'select',
+    { id: 'quality-select', class: 'select' },
+    QUALITY_LEVELS.map((level) => el('option', { value: level, text: QUALITY_LABELS[level] })),
+  );
+  quality.addEventListener('change', () => onQuality(quality.value as QualityLevel));
   const select = el(
     'select',
     { id: 'camera-select', class: 'select' },
@@ -48,15 +63,23 @@ export function createCameraPanel(
       select,
     ]),
     reset,
+    el('div', { class: 'field' }, [
+      el('label', { class: 'field__label', for: 'quality-select', text: 'Detail' }),
+      quality,
+    ]),
     help,
   ]);
 
-  const update = (mode: CameraMode): void => {
+  const update = (mode: CameraMode, level: QualityLevel): void => {
     if (select.value !== mode) {
       select.value = mode;
     }
-    if (help.textContent !== CAMERA_HELP[mode]) {
-      help.textContent = CAMERA_HELP[mode];
+    if (quality.value !== level) {
+      quality.value = level;
+    }
+    const text = mode === 'guided' ? CAMERA_HELP[mode] : `${CAMERA_HELP[mode]}${GAMEPAD_HELP}`;
+    if (help.textContent !== text) {
+      help.textContent = text;
     }
   };
 

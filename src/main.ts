@@ -38,6 +38,7 @@ const store = createStore<AppState>({
   panelTab: 'now',
   sceneStatus: 'loading',
   backend: null,
+  quality: url.quality,
   reducedMotion: reducedMotionQuery.matches,
 });
 
@@ -110,6 +111,7 @@ const cameraPanel = createCameraPanel(
     view?.resetCamera();
     needsRender = true;
   },
+  (quality) => store.update({ quality }),
 );
 requireElement('camera-root').replaceChildren(cameraPanel.element);
 
@@ -118,7 +120,7 @@ let shipState: ShipState = model.evaluate(store.get().t);
 const updateInterface = (): void => {
   const app = store.get();
   timelinePanel.update(app, shipState);
-  cameraPanel.update(app.cameraMode);
+  cameraPanel.update(app.cameraMode, app.quality);
   setText(sceneDescription, describeScene(shipState));
   if (app.panelTab === 'now') {
     nowPanel.update(shipState);
@@ -151,7 +153,7 @@ const updateAddress = (nowMs: number, force: boolean): void => {
   history.replaceState(
     null,
     '',
-    formatUrlState(store.get(), { renderer: rendererChoice, quality: url.quality }),
+    formatUrlState(store.get(), { renderer: rendererChoice, quality: store.get().quality }),
   );
 };
 
@@ -161,6 +163,9 @@ store.subscribe((state, previous) => {
   }
   needsRender = true;
   updateInterface();
+  if (state.quality !== previous.quality) {
+    restartScene();
+  }
   const moving = state.playing && previous.playing;
   updateAddress(performance.now(), !moving);
 });
@@ -183,7 +188,7 @@ const resizeView = (): void => {
   view?.resize(
     canvas.clientWidth,
     canvas.clientHeight,
-    Math.min(devicePixelRatio, QUALITY_SETTINGS[url.quality].maxPixelRatio),
+    Math.min(devicePixelRatio, QUALITY_SETTINGS[store.get().quality].maxPixelRatio),
   );
   needsRender = true;
 };
@@ -234,7 +239,7 @@ async function startScene(choice: RendererChoice, canvas: HTMLCanvasElement): Pr
       dataset,
       model,
       renderer: choice,
-      quality: url.quality,
+      quality: store.get().quality,
       onDeviceLost: fallBack,
     });
     resizeView();
@@ -243,6 +248,14 @@ async function startScene(choice: RendererChoice, canvas: HTMLCanvasElement): Pr
     console.warn('The 3D scene could not start with this renderer.', error);
     fallBack();
   }
+}
+
+/** Starts the scene again on a fresh canvas, for a setting that is fixed when the scene is built. */
+function restartScene(): void {
+  view?.dispose();
+  view = undefined;
+  store.update({ sceneStatus: 'loading', backend: null });
+  void startScene(rendererChoice, renewCanvas());
 }
 
 new ResizeObserver(resizeView).observe(sceneFrame);

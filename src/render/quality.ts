@@ -12,14 +12,23 @@ export interface QualitySettings {
   readonly reflectionResolutionScale: number;
   /** Greatest device pixel ratio used for the drawing buffer. */
   readonly maxPixelRatio: number;
+  /** Whether the brightest lights of the image glow: lamps, stars and distress signals. */
+  readonly bloom: boolean;
 }
+
+/** Name of each level in the interface. */
+export const QUALITY_LABELS: Readonly<Record<QualityLevel, string>> = {
+  low: 'Low',
+  medium: 'Medium',
+  high: 'High',
+};
 
 export const DEFAULT_QUALITY: QualityLevel = 'medium';
 
 export const QUALITY_SETTINGS: Readonly<Record<QualityLevel, QualitySettings>> = {
-  low: { waves: 'analytic', reflectionResolutionScale: 0.25, maxPixelRatio: 1 },
-  medium: { waves: 'spectral', reflectionResolutionScale: 0.5, maxPixelRatio: 1.5 },
-  high: { waves: 'spectral', reflectionResolutionScale: 1, maxPixelRatio: 2 },
+  low: { waves: 'analytic', reflectionResolutionScale: 0.25, maxPixelRatio: 1, bloom: false },
+  medium: { waves: 'spectral', reflectionResolutionScale: 0.5, maxPixelRatio: 1.5, bloom: true },
+  high: { waves: 'spectral', reflectionResolutionScale: 1, maxPixelRatio: 2, bloom: true },
 };
 
 export function isQualityLevel(value: unknown): value is QualityLevel {

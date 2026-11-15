@@ -1,3 +1,4 @@
+import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 import { pass } from 'three/tsl';
 import {
   AgXToneMapping,
@@ -70,6 +71,13 @@ export interface SceneView {
 const FIELD_OF_VIEW_DEG = 42;
 const NEAR_PLANE_M = 1;
 const FAR_PLANE_M = 45_000;
+/**
+ * Glow around the brightest lights. Only what is brighter than scene white contributes, which
+ * leaves lit paint untouched and takes the lamps, the stars and the distress signals.
+ */
+const BLOOM_STRENGTH = 0.45;
+const BLOOM_RADIUS = 0.35;
+const BLOOM_THRESHOLD = 1.1;
 
 /** Creates the renderer and the scene. Rejects when neither WebGPU nor WebGL 2 is available. */
 export async function createSceneView(options: SceneViewOptions): Promise<SceneView> {
@@ -134,7 +142,12 @@ export async function createSceneView(options: SceneViewOptions): Promise<SceneV
   let viewportHeightPx = 1;
 
   const pipeline = new RenderPipeline(renderer);
-  pipeline.outputNode = pass(scene, camera);
+  const scenePass = pass(scene, camera);
+  const glow = QUALITY_SETTINGS[options.quality].bloom
+    ? bloom(scenePass.getTextureNode('output'), BLOOM_STRENGTH, BLOOM_RADIUS, BLOOM_THRESHOLD)
+    : undefined;
+  pipeline.outputNode =
+    glow === undefined ? scenePass : scenePass.getTextureNode('output').add(glow);
   const presenter = readback
     ? createReadbackPresenter(renderer, pipeline, canvas, backend === 'webgl2')
     : createCanvasPresenter(pipeline);
@@ -210,6 +223,7 @@ export async function createSceneView(options: SceneViewOptions): Promise<SceneV
     sky.dispose();
     ocean.dispose();
     presenter.dispose();
+    glow?.dispose();
     pipeline.dispose();
     renderer.dispose();
   };

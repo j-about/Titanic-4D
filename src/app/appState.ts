@@ -1,4 +1,5 @@
 import type { CameraMode } from '../render/camera/cameraPose.ts';
+import type { QualityLevel } from '../render/quality.ts';
 
 /** Playback speeds offered, as multiples of real time. */
 export const PLAYBACK_RATES = [1, 10, 60, 300, 600] as const;
@@ -19,6 +20,8 @@ export interface AppState {
   readonly sceneStatus: SceneStatus;
   /** Rendering backend in use once the scene is ready. */
   readonly backend: 'webgpu' | 'webgl2' | null;
+  /** Level of detail of the 3D scene. */
+  readonly quality: QualityLevel;
   /** True when the user asks for reduced motion. */
   readonly reducedMotion: boolean;
 }

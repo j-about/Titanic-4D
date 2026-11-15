@@ -193,6 +193,23 @@ test.describe('views', () => {
     await waitForFrame(page, '01:00');
   });
 
+  test('changes the level of detail, restarts the scene and keeps the choice in the address', async ({
+    page,
+  }, testInfo) => {
+    await openAt(page, testInfo, '01:00', 'orbit');
+    const canvas = page.locator('#scene-canvas');
+    const medium = await canvas.screenshot();
+    await page.getByLabel('Detail', { exact: true }).selectOption('low');
+    await expect(page).toHaveURL(/quality=low/);
+    await expect(page.locator('#scene-frame')).toHaveAttribute('data-status', 'ready');
+    await waitForFrame(page, '01:00');
+    await expect(page.getByLabel('Detail', { exact: true })).toHaveValue('low');
+    expect((await page.locator('#scene-canvas').screenshot()).equals(medium)).toBe(false);
+    await page.getByLabel('Detail', { exact: true }).selectOption('medium');
+    await expect(page).not.toHaveURL(/quality=/);
+    await waitForFrame(page, '01:00');
+  });
+
   test('turns the view from the keyboard', async ({ page }, testInfo) => {
     await openAt(page, testInfo, '01:00', 'orbit');
     const canvas = page.locator('#scene-canvas');

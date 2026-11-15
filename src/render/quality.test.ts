@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_QUALITY, isQualityLevel, QUALITY_LEVELS, QUALITY_SETTINGS } from './quality.ts';
+import {
+  DEFAULT_QUALITY,
+  isQualityLevel,
+  QUALITY_LABELS,
+  QUALITY_LEVELS,
+  QUALITY_SETTINGS,
+} from './quality.ts';
 
 describe('quality levels', () => {
   it('cost more at every step', () => {
@@ -12,6 +18,15 @@ describe('quality levels', () => {
         lower?.reflectionResolutionScale ?? Number.NaN,
       );
     }
+  });
+
+  it('make the lights glow except at the lowest level, and have a name each', () => {
+    expect(QUALITY_LEVELS.map((level) => QUALITY_SETTINGS[level].bloom)).toEqual([
+      false,
+      true,
+      true,
+    ]);
+    expect(QUALITY_LEVELS.map((level) => QUALITY_LABELS[level])).toEqual(['Low', 'Medium', 'High']);
   });
 
   it('use the analytic sea only at the lowest level', () => {
