@@ -1,11 +1,13 @@
 import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
+import { staticPagesPlugin } from './tools/vite-static-pages.ts';
 
 const root = import.meta.dirname;
 
 export default defineConfig({
   root,
   publicDir: 'public',
+  plugins: [staticPagesPlugin()],
   build: {
     outDir: 'dist',
     emptyOutDir: true,
@@ -16,6 +18,9 @@ export default defineConfig({
     rolldownOptions: {
       input: {
         index: resolve(root, 'index.html'),
+        about: resolve(root, 'about/index.html'),
+        legalNotice: resolve(root, 'legal-notice/index.html'),
+        narrative: resolve(root, 'narrative/index.html'),
       },
     },
   },
