@@ -93,7 +93,9 @@ def build_mast(mast: Mast, crows_nest_height: float | None) -> MeshBuilder:
     mesh = MeshBuilder()
     slope = math.tan(math.radians(mast.rake_deg))
 
-    def ring(height: float, radius: float, forward: float = 0.0, segments: int = m.MAST_SEGMENTS) -> list[Point]:
+    def ring(
+        height: float, radius: float, forward: float = 0.0, segments: int = m.MAST_SEGMENTS
+    ) -> list[Point]:
         centre = (mast.x + (height - mast.base) * slope - forward, 0.0, height)
         return _level_ring(centre, (radius, radius), segments)
 
@@ -134,7 +136,9 @@ def _add_propeller(mesh: MeshBuilder, centre: Point, diameter: float) -> None:
 
     hub = _loft((ring(hub_start, hub_radius), ring(hub_end, hub_radius), ring(tip, 0.0)))
     mesh.add_surface((STEEL, STEEL), hub, closed=True)
-    mesh.add_surface((STEEL,), _loft((ring(hub_start, 0.0), ring(hub_start, hub_radius))), closed=True)
+    mesh.add_surface(
+        (STEEL,), _loft((ring(hub_start, 0.0), ring(hub_start, hub_radius))), closed=True
+    )
 
     pitch = diameter * m.PROPELLER_PITCH_RATIO
     chord = diameter * m.PROPELLER_CHORD_RATIO
@@ -179,7 +183,10 @@ def _add_rudder(mesh: MeshBuilder, offsets: Offsets) -> None:
     outline: list[tuple[float, float]] = [(leading, heel)]
     outline.extend((leading + along * chord, heel + up * height) for along, up in m.RUDDER_OUTLINE)
     outline.extend(
-        (leading + fraction * top_fraction * chord, under_counter(leading + fraction * top_fraction * chord))
+        (
+            leading + fraction * top_fraction * chord,
+            under_counter(leading + fraction * top_fraction * chord),
+        )
         for fraction in (0.75, 0.5, 0.25, 0.0)
     )
 
@@ -198,7 +205,9 @@ def _add_rudder(mesh: MeshBuilder, offsets: Offsets) -> None:
     for index, point in enumerate(outline):
         following = outline[(index + 1) % len(outline)]
         half.add_polygon(ANTIFOULING, (starboard(centre), starboard(following), starboard(point)))
-        mesh.add_quad(ANTIFOULING, starboard(point), starboard(following), port(following), port(point))
+        mesh.add_quad(
+            ANTIFOULING, starboard(point), starboard(following), port(following), port(point)
+        )
     mesh.add_symmetric(half)
 
     thickness = m.SKEG_HALF_THICKNESS_M
@@ -228,11 +237,23 @@ def _add_deadwood(mesh: MeshBuilder, offsets: Offsets) -> None:
     for index in range(steps):
         xa, xb = stations[index], stations[index + 1]
         low_a, low_b = (xa, thickness, 0.0), (xb, thickness, 0.0)
-        half.add_quad(ANTIFOULING, low_a, (xa, thickness, tops[index]), (xb, thickness, tops[index + 1]), low_b)
+        half.add_quad(
+            ANTIFOULING,
+            low_a,
+            (xa, thickness, tops[index]),
+            (xb, thickness, tops[index + 1]),
+            low_b,
+        )
         mesh.add_quad(ANTIFOULING, low_a, low_b, (xb, -thickness, 0.0), (xa, -thickness, 0.0))
     mesh.add_symmetric(half)
     end, top = stations[-1], tops[-1]
-    mesh.add_quad(ANTIFOULING, (end, thickness, 0.0), (end, thickness, top), (end, -thickness, top), (end, -thickness, 0.0))
+    mesh.add_quad(
+        ANTIFOULING,
+        (end, thickness, 0.0),
+        (end, thickness, top),
+        (end, -thickness, top),
+        (end, -thickness, 0.0),
+    )
 
 
 def add_stern_gear(mesh: MeshBuilder, offsets: Offsets) -> None:
@@ -246,7 +267,9 @@ def add_stern_gear(mesh: MeshBuilder, offsets: Offsets) -> None:
     hub_radius = diameter * m.PROPELLER_HUB_RADIUS_RATIO
     boss = _loft(
         (
-            _cross_ring((m.PROPELLER_POST_X_M - 1.0, 0.0, centre[2]), hub_radius, m.PROPELLER_HUB_SEGMENTS),
+            _cross_ring(
+                (m.PROPELLER_POST_X_M - 1.0, 0.0, centre[2]), hub_radius, m.PROPELLER_HUB_SEGMENTS
+            ),
             _cross_ring((centre[0], 0.0, centre[2]), hub_radius, m.PROPELLER_HUB_SEGMENTS),
         ),
     )
@@ -258,7 +281,9 @@ def add_stern_gear(mesh: MeshBuilder, offsets: Offsets) -> None:
     forward_radius, after_radius = m.BOSSING_RADII_M
     fairing = _loft(
         (
-            _cross_ring((m.BOSSING_START_X_M, wing[1], wing[2]), forward_radius, m.BOSSING_SEGMENTS),
+            _cross_ring(
+                (m.BOSSING_START_X_M, wing[1], wing[2]), forward_radius, m.BOSSING_SEGMENTS
+            ),
             _cross_ring(wing, after_radius, m.BOSSING_SEGMENTS),
         ),
     )

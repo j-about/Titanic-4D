@@ -32,7 +32,13 @@ class View:
 
 
 VIEWS: tuple[View, ...] = (
-    View("profile-starboard", (-134.0, -400.0, 28.0), (-134.0, 0.0, 28.0), scale=285.0, size=(2400, 640)),
+    View(
+        "profile-starboard",
+        (-134.0, -400.0, 28.0),
+        (-134.0, 0.0, 28.0),
+        scale=285.0,
+        size=(2400, 640),
+    ),
     View("top", (-134.0, 0.0, 400.0), (-134.0, 0.0, 0.0), scale=285.0, size=(2400, 400)),
     View("bow-three-quarter", (95.0, -120.0, 60.0), (-70.0, 0.0, 22.0)),
     View("stern-three-quarter", (-360.0, -120.0, 55.0), (-195.0, 0.0, 20.0)),
@@ -43,8 +49,8 @@ VIEWS: tuple[View, ...] = (
 )
 
 
-def _prepare_scene() -> bpy.types.Object:
-    """Set up the renderer, the light and the camera, and return the camera."""
+def _prepare_scene() -> tuple[bpy.types.Object, bpy.types.Camera]:
+    """Set up the renderer, the light and the camera; return the camera and its lens."""
     scene = bpy.context.scene
     scene.render.engine = "CYCLES"
     scene.cycles.device = "CPU"
@@ -60,16 +66,18 @@ def _prepare_scene() -> bpy.types.Object:
     background.inputs["Strength"].default_value = _SKY_STRENGTH
     scene.world = world
 
-    sun = bpy.data.objects.new("sun", bpy.data.lights.new("sun", "SUN"))
-    sun.data.energy = _SUN_STRENGTH
+    light = bpy.data.lights.new("sun", "SUN")
+    light.energy = _SUN_STRENGTH
+    sun = bpy.data.objects.new("sun", light)
     sun.rotation_euler = (math.radians(55.0), math.radians(15.0), math.radians(-35.0))
     scene.collection.objects.link(sun)
 
-    camera = bpy.data.objects.new("camera", bpy.data.cameras.new("camera"))
-    camera.data.clip_end = 5000.0
+    lens = bpy.data.cameras.new("camera")
+    lens.clip_end = 5000.0
+    camera = bpy.data.objects.new("camera", lens)
     scene.collection.objects.link(camera)
     scene.camera = camera
-    return camera
+    return camera, lens
 
 
 def _show(*, wreck: bool) -> None:
@@ -84,7 +92,7 @@ def _show(*, wreck: bool) -> None:
 def render_views(directory: Path) -> list[Path]:
     """Render every review view of the current scene as a PNG file in ``directory``."""
     directory.mkdir(parents=True, exist_ok=True)
-    camera = _prepare_scene()
+    camera, lens = _prepare_scene()
     scene = bpy.context.scene
     written: list[Path] = []
     for view in VIEWS:
@@ -92,9 +100,9 @@ def render_views(directory: Path) -> list[Path]:
         camera.location = view.position
         direction = Vector(view.target) - Vector(view.position)
         camera.rotation_euler = direction.to_track_quat("-Z", "Y").to_euler()
-        camera.data.type = "PERSP" if view.scale is None else "ORTHO"
+        lens.type = "PERSP" if view.scale is None else "ORTHO"
         if view.scale is not None:
-            camera.data.ortho_scale = view.scale
+            lens.ortho_scale = view.scale
         scene.render.resolution_x, scene.render.resolution_y = view.size
         path = directory / f"{view.name}.png"
         scene.render.filepath = str(path)

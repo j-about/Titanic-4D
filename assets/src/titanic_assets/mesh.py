@@ -113,7 +113,10 @@ class MeshBuilder:
         """Add a flat convex polygon as a fan of triangles sharing one normal."""
         points = np.asarray(corners, dtype=np.float64)
         fan = np.stack(
-            [np.stack((points[0], points[index], points[index + 1])) for index in range(1, len(points) - 1)],
+            [
+                np.stack((points[0], points[index], points[index + 1]))
+                for index in range(1, len(points) - 1)
+            ],
         )
         normal = _normalised(np.sum(_double_area_vectors(fan), axis=0))
         self.add(material, fan, np.broadcast_to(normal, fan.shape).copy())
@@ -168,7 +171,9 @@ class MeshBuilder:
         result = MeshBuilder()
         flip = np.asarray([1.0, -1.0, 1.0])
         for material in sorted(self._positions):
-            for positions, normals in zip(self._positions[material], self._normals[material], strict=True):
+            for positions, normals in zip(
+                self._positions[material], self._normals[material], strict=True
+            ):
                 result.add(material, (positions * flip)[:, ::-1], (normals * flip)[:, ::-1])
         return result
 

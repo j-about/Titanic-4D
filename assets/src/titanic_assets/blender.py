@@ -36,7 +36,10 @@ def _create_mesh(node: Node, materials: dict[str, bpy.types.Material]) -> bpy.ty
     positions = np.concatenate([node.triangles[name].positions for name in names]) * _TO_BLENDER
     normals = np.concatenate([node.triangles[name].normals for name in names]) * _TO_BLENDER
     slots = np.concatenate(
-        [np.full(node.triangles[name].count, slot, dtype=np.int32) for slot, name in enumerate(names)],
+        [
+            np.full(node.triangles[name].count, slot, dtype=np.int32)
+            for slot, name in enumerate(names)
+        ],
     )
     triangle_count = positions.shape[0]
     corner_count = triangle_count * 3

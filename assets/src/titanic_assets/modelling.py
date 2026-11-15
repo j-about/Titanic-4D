@@ -70,7 +70,13 @@ SCREEN_WINDOWS = WindowRow(1.5, 1.0, 2.4, 1.55, 0.9, 1.1)
 """Windows of the enclosed promenade of A deck."""
 
 STOWED_BOAT_INBOARD_M = 1.7
-"""Distance of the centre line of a stowed boat from the ship's side."""
+"""Distance of the centre line of a boat stowed under davits from the ship's side."""
+COLLAPSIBLE_ON_DECK_INBOARD_M = 4.4
+"""Distance of the centre line of a collapsible boat stowed on deck from the ship's side."""
+COLLAPSIBLE_ON_ROOF_OFFSET_M = 3.6
+"""Distance of a collapsible boat stowed on the officers' quarters from the centre line."""
+BOAT_CHOCK_HEIGHT_M = 0.7
+"""Height of the keel of a stowed boat above the line of the deck it stands on."""
 
 # --- Tessellation of the hull ----------------------------------------------------------------
 

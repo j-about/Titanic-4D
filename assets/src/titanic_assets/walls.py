@@ -59,10 +59,10 @@ def window_row(
     *,
     centred: bool = False,
 ) -> list[Opening]:
-    """Place a row of windows between two coordinates of a wall whose base is ``lift`` above
-    the deck line.
+    """Place a row of windows between two coordinates of a wall.
 
-    The first window is at its inset from ``start`` and the others follow at the spacing of the
+    The base of the wall is ``lift`` above the deck line from which the row is measured. The
+    first window is at its inset from ``start`` and the others follow at the spacing of the
     row; with ``centred`` the row is centred between ``start`` and ``end`` instead.
     """
     span = end - start - row.inset_start - row.inset_end
@@ -85,8 +85,10 @@ def window_row(
 
 
 def _cuts(start: float, end: float, step: float | None, openings: Sequence[Opening]) -> list[float]:
-    """Return the coordinates at which a wall is divided: its ends, the multiples of ``step``
-    and the edges of its openings."""
+    """Return the coordinates at which a wall is divided.
+
+    They are its ends, the multiples of ``step`` and the edges of its openings.
+    """
     cuts = {start, end}
     if step is not None:
         cuts.update(
@@ -142,7 +144,13 @@ def add_wall(mesh: MeshBuilder, wall: Wall, openings: Sequence[Opening] = ()) ->
         length = math.hypot(xb - xa, yb - ya)
         inward = ((yb - ya) / length * m.GLASS_RECESS_M, -(xb - xa) / length * m.GLASS_RECESS_M)
         face = _Frame((xa, ya), (xb, yb), base_a, base_b, opening)
-        glass = _Frame((xa + inward[0], ya + inward[1]), (xb + inward[0], yb + inward[1]), base_a, base_b, opening)
+        glass = _Frame(
+            (xa + inward[0], ya + inward[1]),
+            (xb + inward[0], yb + inward[1]),
+            base_a,
+            base_b,
+            opening,
+        )
         mesh.add_quad(wall.material, foot_a, face.sill_a, face.sill_b, foot_b)
         mesh.add_quad(wall.material, face.head_a, head_a, head_b, face.head_b)
         mesh.add_quad(GLASS, glass.sill_a, glass.head_a, glass.head_b, glass.sill_b)
@@ -172,33 +180,30 @@ class _Frame:
 
 
 def side_wall(
-    start: float,
-    end: float,
+    extent: tuple[float, float],
     half_width: Line,
     base: Line,
     top: Line,
     *,
-    material: str = WHITE,
     overlap: float = 0.0,
 ) -> Wall:
-    """Describe a wall along the ship facing starboard, between two stations."""
+    """Describe a white wall along the ship facing starboard, between two stations."""
     return Wall(
-        start,
-        end,
+        extent[0],
+        extent[1],
         lambda u: (u, half_width(u)),
         base,
         top,
-        material=material,
         step=m.WALL_STEP_M,
         overlap=overlap,
     )
 
 
-def inboard_wall(start: float, end: float, half_width: Line, base: Line, top: Line) -> Wall:
-    """Describe a wall along the ship facing port, between two stations."""
+def inboard_wall(extent: tuple[float, float], half_width: Line, base: Line, top: Line) -> Wall:
+    """Describe a white wall along the ship facing port, between two stations."""
     return Wall(
-        -end,
-        -start,
+        -extent[1],
+        -extent[0],
         lambda u: (-u, half_width(-u)),
         lambda u: base(-u),
         lambda u: top(-u),
@@ -214,8 +219,10 @@ def cross_wall(
     facing_aft: bool,
     material: str = WHITE,
 ) -> Wall:
-    """Describe a wall across the ship at station ``x``, between two distances from the centre
-    line and two heights."""
+    """Describe a wall across the ship at station ``x``.
+
+    The wall lies between two distances from the centre line and between two heights.
+    """
     low, high = span
     base, top = constant(heights[0]), constant(heights[1])
     if facing_aft:
@@ -280,10 +287,10 @@ def add_block(mesh: MeshBuilder, block: Block, x_start: float, x_end: float) -> 
     sides: list[Opening] = []
     if block.side_windows is not None:
         sides = window_row(block.side_windows, block.x_start, block.x_end, block.lift)
-    add_wall(mesh, side_wall(xa, xb, constant(block.y_high), block.base, block.top), sides)
+    add_wall(mesh, side_wall((xa, xb), constant(block.y_high), block.base, block.top), sides)
     add_wall(
         mesh,
-        inboard_wall(xa, xb, constant(block.y_low), block.base, block.top),
+        inboard_wall((xa, xb), constant(block.y_low), block.base, block.top),
         [opening.reversed() for opening in sides],
     )
     span = (block.y_low, block.y_high)

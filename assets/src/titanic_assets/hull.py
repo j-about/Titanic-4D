@@ -5,6 +5,7 @@ per height, on the starboard side. The port side is its reflection.
 """
 
 from dataclasses import dataclass
+from itertools import pairwise
 
 import numpy as np
 import numpy.typing as npt
@@ -215,10 +216,17 @@ def add_cap(mesh: MeshBuilder, grid: HullGrid, x: float, *, facing_aft: bool) ->
     mesh.add(SHADOW, positions, np.broadcast_to(normal, positions.shape).copy())
 
 
-def _cross_wall(mesh: MeshBuilder, corner: tuple[float, float, float], top: float, *, facing_aft: bool) -> None:
+def _cross_wall(
+    mesh: MeshBuilder, corner: tuple[float, float, float], top: float, *, facing_aft: bool
+) -> None:
     """Add a white wall across the ship, from ``corner`` on the starboard side up to ``top``."""
     x, half_width, base = corner
-    quad = ((x, half_width, base), (x, half_width, top), (x, -half_width, top), (x, -half_width, base))
+    quad = (
+        (x, half_width, base),
+        (x, half_width, top),
+        (x, -half_width, top),
+        (x, -half_width, base),
+    )
     mesh.add_polygon(WHITE, quad if facing_aft else quad[::-1])
 
 
@@ -304,13 +312,15 @@ def add_stem_head(mesh: MeshBuilder, offsets: Offsets, grid: HullGrid) -> None:
     """
     hull = offsets.hull
     top = grid.points[0, -1]
-    rake = float(hull.stem_x[-2] - hull.stem_x[-1]) / float(hull.waterlines[-1] - hull.waterlines[-2])
+    rake = float(hull.stem_x[-2] - hull.stem_x[-1]) / float(
+        hull.waterlines[-1] - hull.waterlines[-2]
+    )
     tip_x = -offsets.particulars.stem_overhang
     tip = (tip_x, 0.0, float(top[2]) + (float(top[0]) - tip_x) / rake)
     last = int(np.searchsorted(grid.stations, hull.start_x + m.STEM_HEAD_LENGTH_M))
     edge = [(float(x), float(y), float(z)) for x, y, z in grid.points[: last + 1, -1]]
     half = MeshBuilder()
-    for forward, after in zip(edge[:-1], edge[1:], strict=True):
+    for forward, after in pairwise(edge):
         half.add_polygon(WHITE, (tip, after, forward))
     mesh.add_symmetric(half)
     x, y, z = edge[-1]

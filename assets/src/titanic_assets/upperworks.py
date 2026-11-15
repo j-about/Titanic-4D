@@ -4,7 +4,8 @@ Everything is built for the part of the ship lying between the two ends of a sec
 symmetric about the centre plane are built on the starboard side and reflected.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+from itertools import pairwise
 
 from titanic_assets import modelling as m
 from titanic_assets.materials import DECK_WOOD, SHADOW, WHITE
@@ -54,7 +55,7 @@ class _Site:
         return self.section.x_start - _TOLERANCE_M <= x <= self.section.x_end + _TOLERANCE_M
 
     def cuts(self) -> list[tuple[float, bool]]:
-        """List the ends of the section that are cuts through the hull, and whether they face aft."""
+        """List the ends of the section that cut the hull, and whether each faces aft."""
         hull = self.offsets.hull
         ends: list[tuple[float, bool]] = []
         if self.section.x_start > hull.start_x + _CUT_MARGIN_M:
@@ -84,7 +85,7 @@ def _add_b_deck_level(mesh: MeshBuilder, half: MeshBuilder, site: _Site) -> None
     clipped = site.clip(zone.x_start, zone.x_end)
     if clipped is not None:
         windows = window_row(m.B_DECK_WINDOWS, zone.x_start, zone.x_end)
-        wall = side_wall(*clipped, site.side, site.deck_b, site.deck_a, overlap=m.SEAM_OVERLAP_M)
+        wall = side_wall(clipped, site.side, site.deck_b, site.deck_a, overlap=m.SEAM_OVERLAP_M)
         add_wall(half, wall, windows)
         add_plate(mesh, Plate(*clipped, negated(site.side), site.side, site.deck_a, DECK_WOOD))
     for x, facing_aft in ((zone.x_start, False), (zone.x_end, True)):
@@ -102,7 +103,7 @@ def _add_a_deck_level(mesh: MeshBuilder, half: MeshBuilder, site: _Site) -> None
     clipped = site.clip(screen.x_start, screen.x_end)
     if clipped is not None:
         windows = window_row(m.SCREEN_WINDOWS, screen.x_start, screen.x_end)
-        wall = side_wall(*clipped, site.side, site.deck_a, site.boat, overlap=m.SEAM_OVERLAP_M)
+        wall = side_wall(clipped, site.side, site.deck_a, site.boat, overlap=m.SEAM_OVERLAP_M)
         add_wall(half, wall, windows)
     if site.has(screen.x_start):
         x = screen.x_start
@@ -116,13 +117,13 @@ def _add_a_deck_level(mesh: MeshBuilder, half: MeshBuilder, site: _Site) -> None
     clipped = site.clip(screen.x_end, deck.x_end)
     if clipped is not None:
         bulwark_top = site.deck_a.raised(m.PROMENADE_BULWARK_HEIGHT_M)
-        outer = side_wall(*clipped, site.side, site.deck_a, bulwark_top, overlap=m.SEAM_OVERLAP_M)
+        outer = side_wall(clipped, site.side, site.deck_a, bulwark_top, overlap=m.SEAM_OVERLAP_M)
         add_wall(half, outer)
         inner_face = shifted(site.side, -m.BULWARK_THICKNESS_M)
-        add_wall(half, inboard_wall(*clipped, inner_face, site.deck_a, bulwark_top))
+        add_wall(half, inboard_wall(clipped, inner_face, site.deck_a, bulwark_top))
         add_plate(half, Plate(*clipped, inner_face, site.side, bulwark_top, WHITE))
-        house = side_wall(*clipped, constant(inner), site.deck_a, site.boat, material=SHADOW)
-        add_wall(half, house)
+        house = side_wall(clipped, constant(inner), site.deck_a, site.boat)
+        add_wall(half, replace(house, material=SHADOW))
         _add_stanchions(half, site, clipped, (screen.x_end, deck.x_end))
     if site.has(deck.x_end):
         x = deck.x_end
@@ -158,7 +159,7 @@ def _add_boat_deck(mesh: MeshBuilder, half: MeshBuilder, site: _Site) -> None:
     clipped = site.clip(deck.x_start, deck.x_end)
     if clipped is not None:
         add_plate(mesh, Plate(*clipped, negative_side, site.side, site.boat_top, DECK_WOOD))
-        edge = side_wall(*clipped, site.side, site.boat, site.boat_top, overlap=m.SEAM_OVERLAP_M)
+        edge = side_wall(clipped, site.side, site.boat, site.boat_top, overlap=m.SEAM_OVERLAP_M)
         add_wall(half, edge)
     clipped = site.clip(screen.x_end, deck.x_end)
     if clipped is not None:
@@ -360,7 +361,7 @@ def _add_davit_arm(half: MeshBuilder, foot: tuple[float, float, float]) -> None:
                 (x - width, inner[0], inner[1]),
             ],
         )
-    for lower, upper in zip(rings[:-1], rings[1:], strict=True):
+    for lower, upper in pairwise(rings):
         for corner in range(4):
             following = (corner + 1) % 4
             half.add_quad(WHITE, lower[corner], upper[corner], upper[following], lower[following])
