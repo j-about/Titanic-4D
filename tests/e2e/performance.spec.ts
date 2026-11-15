@@ -1,5 +1,4 @@
 import { expect, test } from '@playwright/test';
-import { BACKEND_BY_PROJECT } from './app.ts';
 
 /** Downstream and upstream rates of the connection emulated, in megabits per second. */
 const DOWNLOAD_MBPS = 50;
@@ -15,6 +14,10 @@ test.describe('performance', () => {
     page,
     context,
   }, testInfo) => {
+    test.skip(
+      testInfo.project.name !== 'webgl2',
+      'The WebGPU project draws through the read-back presenter, a path that only tests use.',
+    );
     const session = await context.newCDPSession(page);
     await session.send('Network.enable');
     await session.send('Network.setCacheDisabled', { cacheDisabled: true });
@@ -29,18 +32,14 @@ test.describe('performance', () => {
       transferred += event.encodedDataLength;
     });
 
-    const renderer = testInfo.project.name === 'webgpu' ? 'webgpu-readback' : 'webgl2';
     const start = Date.now();
-    await page.goto(`/?renderer=${renderer}`);
+    await page.goto('/?renderer=webgl2');
     await expect(page.locator('#scene-canvas')).toHaveAttribute('data-rendered-time', '0', {
       timeout: 30_000,
     });
     const elapsed = Date.now() - start;
 
-    await expect(page.locator('#scene-canvas')).toHaveAttribute(
-      'data-backend',
-      BACKEND_BY_PROJECT[testInfo.project.name] ?? '',
-    );
+    await expect(page.locator('#scene-canvas')).toHaveAttribute('data-backend', 'webgl2');
     testInfo.annotations.push({
       type: 'first frame',
       description: `${elapsed} ms, ${transferred} bytes transferred`,

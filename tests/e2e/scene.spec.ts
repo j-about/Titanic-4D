@@ -35,6 +35,25 @@ test.describe('3D scene', () => {
     expect(problems).toEqual([]);
   });
 
+  test('draws the detailed model of the ship, and the generated one at low quality', async ({
+    page,
+  }, testInfo) => {
+    const canvas = page.locator('#scene-canvas');
+    await openAt(page, testInfo, '00:45', 'orbit');
+    await expect(canvas).toHaveAttribute('data-ship-model', 'detailed');
+    await openAt(page, testInfo, '00:45', 'orbit', 'quality=low');
+    await expect(canvas).toHaveAttribute('data-ship-model', 'generated');
+  });
+
+  test('keeps the generated model when the detailed one cannot be loaded', async ({
+    page,
+  }, testInfo) => {
+    await page.route('**/models/ship-lod1.glb', (route) => route.abort());
+    await openAt(page, testInfo, '00:45', 'orbit');
+    await expect(page.locator('#scene-frame')).toHaveAttribute('data-status', 'ready');
+    await expect(page.locator('#scene-canvas')).toHaveAttribute('data-ship-model', 'generated');
+  });
+
   for (const quality of ['low', 'high'] as const) {
     test(`draws without errors at ${quality} quality`, async ({ page }, testInfo) => {
       const problems: string[] = [];

@@ -96,8 +96,10 @@ function checkSecurityHeaders(label: string, response: Response): void {
   check(`${label}: CSP denies by default`, csp.includes("default-src 'none'"), csp);
   check(`${label}: CSP forbids framing`, csp.includes("frame-ancestors 'none'"), csp);
   check(
-    `${label}: CSP allows no inline or remote script`,
-    csp.includes("script-src 'self'") && !csp.includes("'unsafe-inline'"),
+    `${label}: CSP allows own scripts and WebAssembly only, no inline or remote script`,
+    /script-src 'self' 'wasm-unsafe-eval';/.test(csp) &&
+      !csp.includes("'unsafe-inline'") &&
+      !csp.includes("'unsafe-eval'"),
     csp,
   );
   check(

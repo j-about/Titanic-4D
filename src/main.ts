@@ -178,6 +178,10 @@ reducedMotionQuery.addEventListener('change', (event) =>
 const renewCanvas = (): HTMLCanvasElement => {
   const current = requireElement<HTMLCanvasElement>('scene-canvas');
   const fresh = current.cloneNode(false) as HTMLCanvasElement;
+  // What the previous scene reported about its frames does not hold for the new one.
+  for (const name of ['renderedTime', 'backend', 'assets', 'shipModel']) {
+    delete fresh.dataset[name];
+  }
   current.replaceWith(fresh);
   attachCanvasShortcuts(fresh);
   return fresh;
@@ -275,6 +279,9 @@ const frame = (nowMs: number): void => {
     rendering = true;
     const renderedState = shipState;
     const current = store.get();
+    // Read before the frame is drawn: the frame then shows what was loaded at that moment.
+    const assetsSettled = view.assetsSettled();
+    const shipModel = view.shipModel();
     void view
       .render({
         state: renderedState,
@@ -287,6 +294,8 @@ const frame = (nowMs: number): void => {
         const canvas = requireElement<HTMLCanvasElement>('scene-canvas');
         canvas.dataset['renderedTime'] = String(Math.round(renderedState.t));
         canvas.dataset['backend'] = view?.backend ?? '';
+        canvas.dataset['assets'] = assetsSettled ? 'ready' : 'loading';
+        canvas.dataset['shipModel'] = shipModel;
       })
       .finally(() => {
         rendering = false;

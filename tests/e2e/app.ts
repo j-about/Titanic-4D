@@ -26,15 +26,16 @@ export function secondsAt(clock: string): number {
   );
 }
 
-/** Waits until the scene has drawn the frame of the given ship's clock time. */
+/**
+ * Waits until the scene has drawn the frame of the given ship's clock time with everything it
+ * loads in place, the detailed model of the ship included.
+ */
 export async function waitForFrame(page: Page, clock: string): Promise<void> {
-  await expect(page.locator('#scene-canvas')).toHaveAttribute(
-    'data-rendered-time',
-    String(secondsAt(clock)),
-    {
-      timeout: 45_000,
-    },
-  );
+  const canvas = page.locator('#scene-canvas');
+  await expect(canvas).toHaveAttribute('data-rendered-time', String(secondsAt(clock)), {
+    timeout: 45_000,
+  });
+  await expect(canvas).toHaveAttribute('data-assets', 'ready', { timeout: 45_000 });
   // Two animation frames let a render that was already in flight reach the canvas.
   await page.evaluate(
     () =>

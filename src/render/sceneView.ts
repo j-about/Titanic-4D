@@ -18,6 +18,7 @@ import { createBoatsObject } from './boatsObject.ts';
 import { createCameraInput } from './camera/cameraInput.ts';
 import type { CameraMode } from './camera/cameraPose.ts';
 import { createCameraRig } from './camera/cameraRig.ts';
+import { loadDetailedShip } from './detailedShip.ts';
 import { createEnvironment } from './environment.ts';
 import { createIcebergObject } from './icebergObject.ts';
 import { createOceanObject } from './oceanObject.ts';
@@ -28,6 +29,8 @@ import { createShipObject } from './shipObject.ts';
 import { createSkyObject } from './skyObject.ts';
 
 export type RenderBackend = 'webgpu' | 'webgl2';
+
+export type ShipModelKind = 'generated' | 'detailed';
 
 /**
  * How the scene is rendered: `auto` uses WebGPU where available and WebGL 2 otherwise, `webgl2`
@@ -60,8 +63,15 @@ export interface SceneView {
   readonly backend: RenderBackend;
   /** Sets the size of the drawing buffer, in CSS pixels and device pixel ratio. */
   resize(width: number, height: number, pixelRatio: number): void;
-  /** True while user input on the canvas calls for a new frame. */
+  /** True while user input on the canvas, or a part of the scene just loaded, calls for a new frame. */
   hasPendingInput(): boolean;
+  /**
+   * True once nothing more is being loaded: the detailed model of the ship is in place, could
+   * not be loaded, or is not used at this level of quality.
+   */
+  assetsSettled(): boolean;
+  /** Which model of the ship is drawn: the one generated from the dataset or the detailed one. */
+  shipModel(): ShipModelKind;
   /** Renders a frame; resolves once it is visible. */
   render(frame: SceneFrame): Promise<void>;
   resetCamera(): void;
@@ -71,6 +81,8 @@ export interface SceneView {
 const FIELD_OF_VIEW_DEG = 42;
 const NEAR_PLANE_M = 1;
 const FAR_PLANE_M = 45_000;
+/** Address of the detailed model of the ship, built by the asset pipeline. */
+const DETAILED_SHIP_URL = '/models/ship-lod1.glb';
 /**
  * Glow around the brightest lights. Only what is brighter than scene white contributes, which
  * leaves lit paint untouched and takes the lamps, the stars and the distress signals.
@@ -162,6 +174,30 @@ export async function createSceneView(options: SceneViewOptions): Promise<SceneV
     seabedHeightM,
   );
 
+  let disposed = false;
+  let redrawRequested = false;
+  let assetsSettled = !QUALITY_SETTINGS[options.quality].detailedShip;
+  let shipModel: ShipModelKind = 'generated';
+  if (!assetsSettled) {
+    loadDetailedShip(DETAILED_SHIP_URL)
+      .then((detailed) => {
+        if (disposed) {
+          detailed.dispose();
+        } else {
+          ship.useDetailedModel(detailed);
+          shipModel = 'detailed';
+        }
+      })
+      .catch((error: unknown) => {
+        // The generated model stays in place.
+        console.warn('The detailed model of the ship could not be loaded.', error);
+      })
+      .finally(() => {
+        assetsSettled = true;
+        redrawRequested = true;
+      });
+  }
+
   const resize = (width: number, height: number, pixelRatio: number): void => {
     renderer.setPixelRatio(pixelRatio);
     renderer.setSize(width, height, false);
@@ -172,6 +208,7 @@ export async function createSceneView(options: SceneViewOptions): Promise<SceneV
   };
 
   const render = (frame: SceneFrame): Promise<void> => {
+    redrawRequested = false;
     ship.update(frame.state);
     boats.update(frame.state);
     rockets.update(frame.state, frame.timeScale);
@@ -214,6 +251,7 @@ export async function createSceneView(options: SceneViewOptions): Promise<SceneV
   };
 
   const dispose = (): void => {
+    disposed = true;
     input.dispose();
     ship.dispose();
     boats.dispose();
@@ -231,7 +269,9 @@ export async function createSceneView(options: SceneViewOptions): Promise<SceneV
   return {
     backend,
     resize,
-    hasPendingInput: () => input.isActive(),
+    hasPendingInput: () => redrawRequested || input.isActive(),
+    assetsSettled: () => assetsSettled,
+    shipModel: () => shipModel,
     render,
     resetCamera: () => rig.reset(),
     dispose,

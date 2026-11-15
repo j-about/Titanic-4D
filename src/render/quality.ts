@@ -14,6 +14,8 @@ export interface QualitySettings {
   readonly maxPixelRatio: number;
   /** Whether the brightest lights of the image glow: lamps, stars and distress signals. */
   readonly bloom: boolean;
+  /** Whether the detailed model of the ship replaces the generated one once it has loaded. */
+  readonly detailedShip: boolean;
 }
 
 /** Name of each level in the interface. */
@@ -26,9 +28,27 @@ export const QUALITY_LABELS: Readonly<Record<QualityLevel, string>> = {
 export const DEFAULT_QUALITY: QualityLevel = 'medium';
 
 export const QUALITY_SETTINGS: Readonly<Record<QualityLevel, QualitySettings>> = {
-  low: { waves: 'analytic', reflectionResolutionScale: 0.25, maxPixelRatio: 1, bloom: false },
-  medium: { waves: 'spectral', reflectionResolutionScale: 0.5, maxPixelRatio: 1.5, bloom: true },
-  high: { waves: 'spectral', reflectionResolutionScale: 1, maxPixelRatio: 2, bloom: true },
+  low: {
+    waves: 'analytic',
+    reflectionResolutionScale: 0.25,
+    maxPixelRatio: 1,
+    bloom: false,
+    detailedShip: false,
+  },
+  medium: {
+    waves: 'spectral',
+    reflectionResolutionScale: 0.5,
+    maxPixelRatio: 1.5,
+    bloom: true,
+    detailedShip: true,
+  },
+  high: {
+    waves: 'spectral',
+    reflectionResolutionScale: 1,
+    maxPixelRatio: 2,
+    bloom: true,
+    detailedShip: true,
+  },
 };
 
 export function isQualityLevel(value: unknown): value is QualityLevel {
