@@ -509,3 +509,67 @@ transport checks are covered by `tools/verify-server.test.ts` against a local se
 self-signed certificate. A change of the job names in the workflow must be repeated in the list
 of required checks of `docs/DEPLOY.md` and in the branch protection itself; a unit test covers
 the document.
+
+## ADR 0014 — Deployment as carried out and measurements on real hardware
+
+**Status:** accepted (2026-11-15). Amends ADR 0013 (gate before deployment).
+
+**Context.** M7 was run on 2026-11-15 from a session that had the Dokploy tools and the
+owner's authorisation to merge pull request #1 and to protect `master`. That pull request
+carries M0 to M7 in one piece, a departure from the convention of one pull request per
+milestone, and the record of M7 follows separately. ADR 0013 left the
+protection of the branch to the owner. The procedure asked that no AAAA record point elsewhere
+but did not say how to recognise the IPv6 address of the server, nor that
+`domain-validateDomain` accepts a host whose AAAA record is wrong. The frame rate of the scene
+had never been measured on a graphics card, and the application has no frame counter.
+
+**Decision.**
+
+- **Protection of `master` (amends ADR 0013).** The rule was created through the GitHub API
+  before the application existed in Dokploy, so that the first push Dokploy could deploy was
+  already subject to it. A pull request is required, without an approving review: the
+  repository has one maintainer, who cannot approve their own pull request. The four jobs of
+  the workflow are required and bound to GitHub Actions, so that no other integration can
+  report a check of the same name. The branch must be up to date, the rule applies to
+  administrators, and force pushes and deletion are refused. A linear history is not required:
+  pull request #1 was merged with a merge commit.
+- **Order of the first deployment.** Protection of the branch, then the Dokploy project and
+  application, then the merge of the pull request: that merge is the first push to `master`
+  that carries a `Dockerfile`, and Dokploy deployed it by itself. The domains were created
+  after that deployment, once the DNS records were right: Traefik applies the domain of an
+  application without a new deployment.
+- **AAAA records.** A host whose AAAA record names another machine fails the DNS check even
+  when its A record names the server. Let's Encrypt validates over IPv6 first when an AAAA
+  record exists, and the `domain-validateDomain` tool of Dokploy reports such a host as valid.
+  The IPv6 address of the server is recognised by its reverse record, which is the same host
+  name as that of its IPv4 address. No domain is created in Dokploy while one of the four hosts
+  fails the check.
+- **Frame rate on real hardware.** The measurement is taken from outside the application and
+  changes none of its files: Microsoft Edge on the measuring machine is started full screen
+  with a new profile and driven through the DevTools protocol, which also installs the
+  measuring script, so the content security policy of the page is untouched. The script records
+  the times of the animation frames of the page and the times at which the application writes
+  `data-rendered-time` on the canvas, which `src/main.ts` does once for every frame of the
+  scene, as soon as its drawing commands have been issued. Both are observed in the same
+  animation frame: the series shows that the scene was redrawn and how regularly, not that the
+  graphics card finished each frame or that the display showed it. The page is opened at
+  `quality=medium` with the guided tour, with `renderer=webgl2` for the WebGL 2 backend, and
+  the backend in use is read from `data-backend`. Motion is forced on
+  (`--force-prefers-no-reduced-motion`), because the scene freezes the sea when the system asks
+  for reduced motion. Playback is started by a scripted click on "Play" and recorded after a
+  warm-up. A run with `--disable-gpu-vsync --disable-frame-rate-limit` shows whether the
+  display synchronisation is what bounds the rate: a rate that stays below the refresh rate
+  with the limits off is not bounded by it. The use of the graphics card is sampled once per
+  second by `nvidia-smi`, for the whole card. The time to the first frame is the time of the
+  first write of the attribute, counted from the start of the navigation, on the connection
+  that `tests/e2e/performance.spec.ts` emulates and, for the deployed site, on the connection
+  of the machine; the time at which the detailed model is in place is read by looking at
+  `data-assets` every 10 ms, from 700 ms after the navigation. A frame counter inside the
+  application was not retained: it would add production code for the sake of a measurement
+  that the attribute already allows.
+
+**Consequences.** `docs/DEPLOY.md` describes the rule as it is, how to read it back and how to
+create it again. A measurement on a discrete graphics card and a desktop processor does not
+settle the criterion of `docs/PLAN.md`, which names an integrated GPU; `docs/STATUS.md` says on
+which hardware and with which motion setting each figure was taken. The measuring script is
+not part of the repository.
