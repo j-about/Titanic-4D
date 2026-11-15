@@ -114,3 +114,29 @@ export function formatElapsed(t: number): string {
   const minutes = totalMinutes % 60;
   return hours === 0 ? `${minutes} min` : `${hours} h ${String(minutes).padStart(2, '0')} min`;
 }
+
+const CLOCK_PATTERN = /^([01]\d|2[0-3]):([0-5]\d)(?::([0-5]\d))?$/;
+const COLLISION_SECOND_OF_DAY = COLLISION_OFFSET_SECONDS % SECONDS_PER_DAY;
+
+/**
+ * Converts a 24-hour ship's clock time, `HH:MM` or `HH:MM:SS`, to seconds since the collision.
+ * Times before 11:40 p.m. belong to the morning of 15 April.
+ */
+export function clockToSeconds(clock: string): number | undefined {
+  const match = CLOCK_PATTERN.exec(clock);
+  if (match === null) {
+    return undefined;
+  }
+  const seconds =
+    Number(match[1]) * SECONDS_PER_HOUR +
+    Number(match[2]) * SECONDS_PER_MINUTE +
+    Number(match[3] ?? 0);
+  return (seconds - COLLISION_SECOND_OF_DAY + SECONDS_PER_DAY) % SECONDS_PER_DAY;
+}
+
+/** Converts seconds since the collision to a 24-hour ship's clock time, `HH:MM:SS`. */
+export function secondsToClock(t: number): string {
+  const seconds = secondOfDay(Math.round(t) + COLLISION_SECOND_OF_DAY);
+  const pad = (value: number): string => String(value).padStart(2, '0');
+  return `${pad(Math.floor(seconds / SECONDS_PER_HOUR))}:${pad(Math.floor((seconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE))}:${pad(seconds % SECONDS_PER_MINUTE)}`;
+}

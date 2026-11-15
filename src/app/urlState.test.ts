@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { clockToSeconds, formatUrlState, parseUrlState, secondsToClock } from './urlState.ts';
+import { clockToSeconds, secondsToClock } from '../time/shipTime.ts';
+import { formatUrlState, parseUrlState } from './urlState.ts';
 
 describe('clock conversion', () => {
   it('counts from the collision at 23:40', () => {
