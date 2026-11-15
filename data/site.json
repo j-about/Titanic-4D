@@ -225,6 +225,14 @@
       "source_ids": ["wikipedia-titanic"],
       "certainty": "debated",
       "note": "The scene does not reproduce any of them."
+    },
+    {
+      "id": "iceberg-passage",
+      "title": "Passage along the ship",
+      "summary": "The iceberg passed down the starboard side and was left astern as the ship ran on and lost her way. Its distance from the ship after the collision is not recorded.",
+      "source_ids": ["brit-inquiry-testimony", "brit-inquiry-report", "project-derivation"],
+      "certainty": "estimated",
+      "note": "The scene moves the iceberg aft at the ship's speed at the collision, falling evenly to nothing over four minutes: a modelling choice of the project, which leaves the iceberg about 1.4 km astern. Neither the time the ship took to stop nor the distance run was found in the sources read."
     }
   ],
   "californian": [
@@ -343,6 +351,22 @@
       "source_ids": ["maib-1992-reappraisal", "project-derivation"],
       "certainty": "established",
       "note": "MAIB: \"some 13 miles\". Great-circle distance computed by the project from the bow position to 41°46′N, 50°14′W: 13.0 nautical miles on a bearing of 279° true."
+    },
+    {
+      "id": "foremast-condition",
+      "title": "Foremast",
+      "summary": "The foremast was torn down and lies fallen across the port side of the bridge area.",
+      "source_ids": ["wikipedia-titanic", "project-derivation"],
+      "certainty": "estimated",
+      "note": "Known through Wikipedia, \"Wreck of the Titanic\". The moment it fell is not recorded; the scene lays it down when the bow section reaches the seabed. No description of the mainmast was found; the scene does not draw it on the wrecked stern, whose decks have collapsed."
+    },
+    {
+      "id": "funnels-lost",
+      "title": "Funnels",
+      "summary": "No funnel remains on the wreck: they were carried away during the sinking and the descent, taking the rigging with them.",
+      "source_ids": ["wikipedia-titanic", "archaeology-2012-delgado"],
+      "certainty": "estimated",
+      "note": "Known through Wikipedia, \"Wreck of the Titanic\"; Delgado records the base of the third funnel's deckhouse among the debris of the break zone."
     }
   ],
   "surveys": [

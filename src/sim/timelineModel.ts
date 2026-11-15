@@ -5,8 +5,10 @@ import { factValue } from '../ship/particulars.ts';
 import { deckHeightAt } from '../ship/sheer.ts';
 import { shipTimeToSeconds } from '../time/shipTime.ts';
 import { buildTimelineEvents, type TimelineEvent } from './events.ts';
+import { ICEBERG, type IcebergPosition, icebergPosition } from './iceberg.ts';
 import { type Curve, createLinearCurve, createMonotoneCurve } from './interpolation.ts';
 import { bodyToWorld, type Pose, seaLevelAboveKeel } from './pose.ts';
+import { ROCKET_VISIBLE_SECONDS } from './rocketAppearance.ts';
 
 export type Phase = 'afloat' | 'final-plunge' | 'break-up' | 'descent' | 'wreck';
 
@@ -65,6 +67,16 @@ export interface ShipState {
   readonly lightingOutput: number;
   /** Whether each of the four funnels, from forward to aft, is still standing. */
   readonly funnelsStanding: readonly boolean[];
+  /** Position of the iceberg of the collision, left astern as the ship ran on. */
+  readonly iceberg: IcebergPosition;
+  /** Whether each section has come to rest on the seabed. */
+  readonly wreck: { readonly bowAtRest: boolean; readonly sternAtRest: boolean };
+}
+
+/** A distress signal and the time at which it was fired, in seconds since the collision. */
+export interface RocketFiring {
+  readonly id: string;
+  readonly seconds: number;
 }
 
 export interface TimelineModel {
@@ -78,12 +90,15 @@ export interface TimelineModel {
   readonly endSeconds: number;
   /** Every dated entry of the narrative, in chronological order. */
   readonly events: readonly TimelineEvent[];
+  /** The distress signals, in the order in which they were fired. */
+  readonly rocketFirings: readonly RocketFiring[];
   /** Returns the state at `t` seconds after the collision. Pure: same `t`, same state. */
   evaluate(t: number): ShipState;
 }
 
-/** Time during which a distress signal is shown after it is fired: ascent, burst and falling stars. */
-export const ROCKET_VISIBLE_SECONDS = 14;
+/** Body station of the part of the starboard bow abreast of which the iceberg is at the collision. */
+const ICEBERG_CONTACT_STATION_M = 20;
+const METRES_PER_SECOND_PER_KNOT = 1852 / 3600;
 
 const SECONDS_PER_MINUTE = 60;
 const DRY_TOLERANCE_M = 0.05;
@@ -342,10 +357,25 @@ export function createTimelineModel(dataset: Dataset): TimelineModel {
     };
   };
 
-  const rocketTimes = signals.rockets.firings.map((firing) => ({
+  const rocketTimes: readonly RocketFiring[] = signals.rockets.firings.map((firing) => ({
     id: firing.id,
     seconds: shipTimeToSeconds(firing.ats),
   }));
+
+  const restTime = (section: HullSection): number =>
+    Math.max(...section.keyframes.map((keyframe) => shipTimeToSeconds(keyframe.ats)));
+  const bowRestSeconds = restTime(breakup.bow_section);
+  const sternRestSeconds = restTime(breakup.stern_section);
+
+  const abreast = bodyToWorld(intactPose(startSeconds), {
+    x: ICEBERG_CONTACT_STATION_M,
+    y: factValue(ship.particulars, 'breadth') / 2 + ICEBERG.clearanceM + ICEBERG.breadthM / 2,
+    z: 0,
+  });
+  const icebergPath = {
+    speedMps: factValue(ship.particulars, 'speed-at-collision') * METRES_PER_SECOND_PER_KNOT,
+    atCollision: { forwardM: abreast.forward, starboardM: abreast.starboard },
+  };
 
   const lightingOutput = createLinearCurve(
     lighting.output.map((keyframe) => shipTimeToSeconds(keyframe.ats)),
@@ -399,6 +429,8 @@ export function createTimelineModel(dataset: Dataset): TimelineModel {
       rocketsFired: rocketTimes.filter((rocket) => t >= rocket.seconds).length,
       lightingOutput: lightingOutput(t),
       funnelsStanding: funnelFallSeconds.map((fallSeconds) => t < fallSeconds),
+      iceberg: icebergPosition(icebergPath, t),
+      wreck: { bowAtRest: t >= bowRestSeconds, sternAtRest: t >= sternRestSeconds },
     };
   };
 
@@ -409,6 +441,7 @@ export function createTimelineModel(dataset: Dataset): TimelineModel {
     founderingSeconds,
     endSeconds,
     events: buildTimelineEvents(dataset),
+    rocketFirings: rocketTimes,
     evaluate,
   };
 }

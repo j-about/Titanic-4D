@@ -90,4 +90,18 @@ describe('sources of the current state', () => {
     const state = model.evaluate(4000);
     expect(describeSources(dataset, model, state)).toEqual(describeSources(dataset, model, state));
   });
+
+  it('lists the iceberg while it is near, and the state of the wreck once it is at rest', () => {
+    const ids = (t: number): string[] =>
+      describeSources(dataset, model, model.evaluate(t)).map((item) => item.id);
+    expect(ids(0)).toContain('iceberg');
+    expect(ids(1200)).not.toContain('iceberg');
+    expect(ids(model.founderingSeconds)).not.toContain('wreck-bow');
+    expect(ids(model.endSeconds)).toEqual(expect.arrayContaining(['wreck-bow', 'wreck-stern']));
+    const iceberg = describeSources(dataset, model, model.evaluate(0)).find(
+      (item) => item.id === 'iceberg',
+    );
+    expect(iceberg?.certainty).toBe('estimated');
+    expect(iceberg?.sourceIds).toContain('brit-inquiry-testimony');
+  });
 });

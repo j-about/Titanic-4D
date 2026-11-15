@@ -4,7 +4,8 @@ import { factValue } from '../ship/particulars.ts';
 import { deckHeightAt } from '../ship/sheer.ts';
 import { shipTimeToSeconds } from '../time/shipTime.ts';
 import { bodyToWorld, seaLevelAboveKeel } from './pose.ts';
-import { createTimelineModel, ROCKET_VISIBLE_SECONDS, type ShipState } from './timelineModel.ts';
+import { ROCKET_VISIBLE_SECONDS } from './rocketAppearance.ts';
+import { createTimelineModel, type ShipState } from './timelineModel.ts';
 
 const model = createTimelineModel(dataset);
 const at = (clock: string): ShipState => model.evaluate(shipTimeToSeconds(`1912-04-${clock}`));
@@ -437,5 +438,37 @@ describe('narrative events', () => {
         'stern-disappears',
       ]),
     );
+  });
+});
+
+describe('iceberg and wreck', () => {
+  it('has the iceberg abreast of the starboard bow at the collision, clear of the hull', () => {
+    const { iceberg, bow } = model.evaluate(0);
+    expect(iceberg.starboardM).toBeGreaterThan(factValue(dataset.ship.particulars, 'breadth') / 2);
+    expect(iceberg.forwardM).toBeGreaterThan(bow.forwardM);
+  });
+
+  it('leaves the iceberg more than a kilometre astern within minutes, then at rest', () => {
+    const start = model.evaluate(0).iceberg.forwardM;
+    const later = model.evaluate(600).iceberg;
+    expect(start - later.forwardM).toBeGreaterThan(1000);
+    expect(model.evaluate(9000).iceberg).toEqual(later);
+  });
+
+  it('marks each section at rest only once it has reached the seabed', () => {
+    expect(model.evaluate(model.founderingSeconds).wreck).toEqual({
+      bowAtRest: false,
+      sternAtRest: false,
+    });
+    expect(model.evaluate(model.endSeconds).wreck).toEqual({ bowAtRest: true, sternAtRest: true });
+    const bowRest = shipTimeToSeconds(dataset.breakup.bow_section.keyframes.at(-1)?.ats ?? '');
+    expect(model.evaluate(bowRest - 1).wreck.bowAtRest).toBe(false);
+    expect(model.evaluate(bowRest).wreck.bowAtRest).toBe(true);
+  });
+
+  it('lists the distress signals in the order they were fired', () => {
+    const times = model.rocketFirings.map((firing) => firing.seconds);
+    expect(times).toHaveLength(dataset.signals.rockets.firings.length);
+    expect([...times].sort((a, b) => a - b)).toEqual(times);
   });
 });

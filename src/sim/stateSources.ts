@@ -271,6 +271,59 @@ function eventEntries(model: TimelineModel, state: ShipState): SourceEntry[] {
     );
 }
 
+/** Time after the collision during which the iceberg is listed: it is then left far astern. */
+const ICEBERG_LISTED_SECONDS = 600;
+
+function icebergEntries(dataset: Dataset, state: ShipState): SourceEntry[] {
+  if (state.t > ICEBERG_LISTED_SECONDS) {
+    return [];
+  }
+  const facts = dataset.site.iceberg.filter((fact) =>
+    ['iceberg-size', 'iceberg-appearance', 'iceberg-passage'].includes(fact.id),
+  );
+  return facts.length === 0
+    ? []
+    : [
+        entry(
+          'iceberg',
+          'Surroundings',
+          'The iceberg is a generic shape of the reported size, left astern as the ship runs on.',
+          facts,
+        ),
+      ];
+}
+
+function wreckEntries(dataset: Dataset, state: ShipState): SourceEntry[] {
+  const find = (id: string) => dataset.site.wreck.find((fact) => fact.id === id);
+  const entries: SourceEntry[] = [];
+  const bow = find('bow-condition');
+  const foremast = find('foremast-condition');
+  const funnels = find('funnels-lost');
+  const stern = find('stern-condition');
+  if (state.wreck.bowAtRest && bow !== undefined) {
+    const records = [bow, foremast, funnels].filter((fact) => fact !== undefined);
+    entries.push(
+      entry(
+        'wreck-bow',
+        'Break-up',
+        `${bow.summary} ${foremast?.summary ?? ''} ${funnels?.summary ?? ''}`.trim(),
+        records,
+      ),
+    );
+  }
+  if (state.wreck.sternAtRest && stern !== undefined) {
+    entries.push(
+      entry(
+        'wreck-stern',
+        'Break-up',
+        `${stern.summary} The scene shows its hull without the upper works, as a massing only.`,
+        [stern],
+      ),
+    );
+  }
+  return entries;
+}
+
 function surroundingsEntries(dataset: Dataset): SourceEntry[] {
   const { site, timeReference } = dataset;
   const find = (id: string) => site.environment.find((fact) => fact.id === id);
@@ -306,11 +359,13 @@ export function describeSources(
     ...surroundingsEntries(dataset).slice(0, 1),
     ...intactEntries,
     ...breakupEntries(dataset, model, state),
+    ...wreckEntries(dataset, state),
     ...floodingEntries(dataset, state),
     ...boatEntries(dataset, state),
     ...rocketEntries(dataset, state),
     ...lightingEntries(dataset, state),
     ...eventEntries(model, state),
+    ...icebergEntries(dataset, state),
     ...surroundingsEntries(dataset).slice(1),
   ];
 }

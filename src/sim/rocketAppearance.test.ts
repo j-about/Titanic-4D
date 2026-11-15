@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import {
   ROCKET_ASCENT_SECONDS,
   ROCKET_BURST_HEIGHT_M,
+  ROCKET_VISIBLE_SECONDS,
   rocketAppearance,
 } from './rocketAppearance.ts';
-import { ROCKET_VISIBLE_SECONDS } from './timelineModel.ts';
 
 describe('distress signal appearance', () => {
   it('rises from the bridge to its bursting height', () => {
