@@ -6,6 +6,11 @@ export const PLAYBACK_RATES = [1, 10, 60, 300, 600] as const;
 export type PlaybackRate = (typeof PLAYBACK_RATES)[number];
 
 export type SceneStatus = 'loading' | 'ready' | 'failed';
+/**
+ * What kept the scene from starting: `renderer` when no renderer could start or keep its
+ * graphics device, `resources` when a file that the scene needs could not be loaded.
+ */
+export type SceneFailure = 'renderer' | 'resources';
 export type PanelTab = 'now' | 'sources' | 'narrative';
 
 export interface AppState {
@@ -18,6 +23,8 @@ export interface AppState {
   readonly cameraMode: CameraMode;
   readonly panelTab: PanelTab;
   readonly sceneStatus: SceneStatus;
+  /** Why the scene has failed; `null` unless `sceneStatus` is `failed`. */
+  readonly sceneFailure: SceneFailure | null;
   /** Rendering backend in use once the scene is ready. */
   readonly backend: 'webgpu' | 'webgl2' | null;
   /** Level of detail of the 3D scene. */

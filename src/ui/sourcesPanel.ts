@@ -2,7 +2,7 @@ import type { Dataset } from '../data/schema/dataset.ts';
 import type { Source } from '../data/schema/sources.ts';
 import { describeSources, type SourceEntry } from '../sim/stateSources.ts';
 import type { ShipState, TimelineModel } from '../sim/timelineModel.ts';
-import { certaintyBadge } from './certaintyBadge.ts';
+import { certaintyBadge, certaintyLegend } from './certaintyBadge.ts';
 import { el } from './dom.ts';
 
 export interface SourcesPanel {
@@ -70,8 +70,9 @@ function entryItem(entry: SourceEntry, sources: ReadonlyMap<string, Source>): HT
 }
 
 /**
- * Creates the list of the dataset records behind the current state. The list is rebuilt only
- * when the set of statements changes, and keeps open the details that the user has opened.
+ * Creates the list of the dataset records behind the current state, preceded by a disclosure
+ * that states what the levels of certainty mean. The list is rebuilt only when the set of
+ * statements changes, and keeps open the details that the user has opened.
  */
 export function createSourcesPanel(dataset: Dataset, model: TimelineModel): SourcesPanel {
   const sources = new Map(dataset.sources.sources.map((source) => [source.id, source]));
@@ -80,7 +81,7 @@ export function createSourcesPanel(dataset: Dataset, model: TimelineModel): Sour
     text: 'Every element of the scene derives from a record of the dataset. These are the records in use at this instant, with their level of certainty.',
   });
   const list = el('ul', { class: 'source-entries' });
-  const element = el('div', { class: 'panel__content' }, [intro, list]);
+  const element = el('div', { class: 'panel__content' }, [intro, certaintyLegend(), list]);
   const items = new Map<string, { readonly statement: string; readonly element: HTMLElement }>();
 
   const update = (ship: ShipState): void => {

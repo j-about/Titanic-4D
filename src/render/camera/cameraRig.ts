@@ -1,5 +1,5 @@
 import type { ShipState } from '../../sim/timelineModel.ts';
-import type { CameraRequest } from './cameraInput.ts';
+import { type CameraRequest, combineRequests, NO_REQUEST } from './cameraInput.ts';
 import {
   adjustLook,
   adjustOrbit,
@@ -22,6 +22,7 @@ import {
   UNDERWATER_LIMITS,
   underwaterCameraPose,
 } from './cameraPose.ts';
+import { type CameraStep, cameraStepRequest } from './cameraStep.ts';
 
 export interface CameraFrame {
   readonly state: ShipState;
@@ -34,7 +35,14 @@ export interface CameraFrame {
 export interface CameraRig {
   /** Applies the requests to the active mode and returns where the camera stands. */
   update(frame: CameraFrame): CameraPose;
-  /** Restores the default view of every mode. */
+  /** Adds one step to the requests applied by the next update. */
+  step(step: CameraStep): void;
+  /** True while a step is waiting for the next update. */
+  hasPendingStep(): boolean;
+  /**
+   * Restores the default view of every mode and drops the steps not yet applied. The free camera
+   * starts again from the default view around the ship.
+   */
   reset(): void;
 }
 
@@ -46,9 +54,13 @@ export function createCameraRig(bounds: TimelineBounds, seabedHeightM: number): 
   let free: FreeParameters | null = null;
   let lastPose: CameraPose | null = null;
   let lastMode: CameraMode | null = null;
+  let pendingSteps: CameraRequest | null = null;
 
   const update = (frame: CameraFrame): CameraPose => {
-    const { state, mode, request } = frame;
+    const { state, mode } = frame;
+    const request =
+      pendingSteps === null ? frame.request : combineRequests(frame.request, pendingSteps);
+    pendingSteps = null;
     let pose: CameraPose;
     switch (mode) {
       case 'guided':
@@ -79,7 +91,8 @@ export function createCameraRig(bounds: TimelineBounds, seabedHeightM: number): 
         pose = deckCameraPose(state, deckLook);
         break;
       case 'free': {
-        // On entering the free mode the camera starts from the view that was on screen.
+        // On entering the free mode the camera starts from the view that was on screen, or from
+        // the default view around the ship when no view has been computed since the last reset.
         const start: FreeParameters =
           lastMode === 'free' && free !== null
             ? free
@@ -106,12 +119,19 @@ export function createCameraRig(bounds: TimelineBounds, seabedHeightM: number): 
     return pose;
   };
 
+  const step = (requested: CameraStep): void => {
+    pendingSteps = combineRequests(pendingSteps ?? NO_REQUEST, cameraStepRequest(requested));
+  };
+
   const reset = (): void => {
     orbit = DEFAULT_ORBIT;
     underwater = DEFAULT_UNDERWATER;
     deckLook = DEFAULT_DECK_LOOK;
     free = null;
+    lastPose = null;
+    lastMode = null;
+    pendingSteps = null;
   };
 
-  return { update, reset };
+  return { update, step, hasPendingStep: () => pendingSteps !== null, reset };
 }

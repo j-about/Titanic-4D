@@ -30,8 +30,7 @@ const SEABED_SIZE_M = 8000;
 const CAMERA_LAMP_FULL_DEPTH_M = 150;
 const CAMERA_LAMP_INTENSITY = 26_000;
 /**
- * Intensity of the light of the night sky. The night was moonless; the scene is lit more than
- * starlight alone would, so that the ship remains legible.
+ * Intensity of the light of the night sky, set above that of starlight alone.
  */
 const SKY_LIGHT_INTENSITY = 1.5;
 const STARLIGHT_INTENSITY = 0.5;

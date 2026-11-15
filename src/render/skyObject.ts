@@ -27,10 +27,9 @@ import {
   Vector3,
 } from 'three/webgpu';
 import type { SceneVector } from '../sim/sceneFrame.ts';
-import starCatalogueUrl from '../sky/bright-stars.bin?url';
 import type { SkyState } from '../sky/skyModel.ts';
 import { starAppearance } from '../sky/starAppearance.ts';
-import { decodeStarCatalogue } from '../sky/starCatalogue.ts';
+import type { StarField } from '../sky/starCatalogue.ts';
 
 export interface SkyFrame {
   readonly sky: SkyState;
@@ -77,14 +76,8 @@ function createPointMaterial(pixelScale: Node<'float'>): SpriteNodeMaterial {
   return material;
 }
 
-/** Creates the night sky: a hazy dome, the catalogue stars and the planets. */
-export async function createSkyObject(): Promise<SkyObject> {
-  const response = await fetch(starCatalogueUrl);
-  if (!response.ok) {
-    throw new Error(`The star catalogue could not be loaded (HTTP ${response.status}).`);
-  }
-  const stars = decodeStarCatalogue(new Uint8Array(await response.arrayBuffer()));
-
+/** Creates the night sky: a hazy dome, the given catalogue stars and the planets. */
+export function createSkyObject(stars: StarField): SkyObject {
   const root = new Group();
   const domeGeometry = new SphereGeometry(SKY_RADIUS_M, 48, 24);
   const domeMaterial = new MeshBasicNodeMaterial({

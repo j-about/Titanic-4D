@@ -1,11 +1,13 @@
 import './styles/main.css';
-import { type AppState, DEFAULT_RATE, type PanelTab } from './app/appState.ts';
+import { createAddressWriter } from './app/addressWriter.ts';
+import { type AppState, DEFAULT_RATE, type PanelTab, type SceneFailure } from './app/appState.ts';
 import { advancePlayback, seekBy } from './app/playback.ts';
+import { createSceneSession } from './app/sceneSession.ts';
 import { createStore } from './app/store.ts';
 import { formatUrlState, parseUrlState } from './app/urlState.ts';
 import { dataset } from './data/dataset.ts';
 import { QUALITY_SETTINGS } from './render/quality.ts';
-import type { RendererChoice, SceneView } from './render/sceneView.ts';
+import type { SceneView } from './render/sceneView.ts';
 import { createTimelineModel, type ShipState } from './sim/timelineModel.ts';
 import { formatShipClock } from './time/shipTime.ts';
 import { createAnnouncer } from './ui/announcer.ts';
@@ -13,16 +15,25 @@ import { createCameraPanel } from './ui/cameraPanel.ts';
 import { requireElement, setText } from './ui/dom.ts';
 import { createNarrativePanel } from './ui/narrativePanel.ts';
 import { createNowPanel } from './ui/nowPanel.ts';
+import { activateSceneCanvas, keepFocusThrough, replaceSceneCanvas } from './ui/sceneCanvas.ts';
 import { createSourcesPanel } from './ui/sourcesPanel.ts';
 import { describeScene } from './ui/stateText.ts';
 import { createTabs } from './ui/tabs.ts';
 import { createTimelinePanel } from './ui/timelinePanel.ts';
 
-/** Interval between rewrites of the page address while time is moving, in milliseconds. */
+/** Shortest time between two rewrites of the page address, in milliseconds. */
 const URL_UPDATE_INTERVAL_MS = 500;
 /** Delay before a position reached by seeking is announced, in milliseconds. */
 const SEEK_ANNOUNCEMENT_DELAY_MS = 700;
 const CANVAS_STEP_SECONDS = 60;
+
+const LOADING_MESSAGE = 'Loading the 3D scene…';
+const TEXT_ALTERNATIVE_MESSAGE =
+  'The Now and Narrative tabs describe every moment of the night in words.';
+const FAILURE_MESSAGES: Readonly<Record<SceneFailure, string>> = {
+  renderer: `The 3D scene could not be started on this device. ${TEXT_ALTERNATIVE_MESSAGE}`,
+  resources: `A file that the 3D scene needs could not be loaded. Reloading the page may help. ${TEXT_ALTERNATIVE_MESSAGE}`,
+};
 
 const model = createTimelineModel(dataset);
 const bounds = { startSeconds: model.startSeconds, endSeconds: model.endSeconds };
@@ -37,20 +48,30 @@ const store = createStore<AppState>({
   cameraMode: url.cameraMode ?? 'guided',
   panelTab: 'now',
   sceneStatus: 'loading',
+  sceneFailure: null,
   backend: null,
   quality: url.quality,
   reducedMotion: reducedMotionQuery.matches,
 });
 
+const main = requireElement('main');
 const sceneFrame = requireElement<HTMLDivElement>('scene-frame');
 const sceneStatus = requireElement<HTMLParagraphElement>('scene-status');
 const sceneDescription = requireElement<HTMLParagraphElement>('scene-description');
 const announcer = createAnnouncer(requireElement('announcer'), model.events);
 
-let view: SceneView | undefined;
-let rendererChoice: RendererChoice = url.renderer;
 let needsRender = true;
-let rendering = false;
+
+/**
+ * Asks for the scene to be drawn again. The frame of the scene says, in `data-up-to-date`,
+ * whether the image on the canvas shows everything asked for so far.
+ */
+function requestFrame(): void {
+  needsRender = true;
+  sceneFrame.dataset['upToDate'] = 'false';
+}
+/** The view that is drawing a frame, if any. */
+let drawingView: SceneView | undefined;
 let seekAnnouncement: number | undefined;
 
 const seek = (t: number): void => {
@@ -106,12 +127,19 @@ requireElement('panel-root').replaceChildren(tabs.element);
 tabs.select(store.get().panelTab);
 
 const cameraPanel = createCameraPanel(
-  (cameraMode) => store.update({ cameraMode }),
-  () => {
-    view?.resetCamera();
-    needsRender = true;
+  {
+    selectMode: (cameraMode) => store.update({ cameraMode }),
+    step: (step) => {
+      session.view()?.stepCamera(step);
+      requestFrame();
+    },
+    reset: () => {
+      session.view()?.resetCamera();
+      requestFrame();
+    },
+    selectQuality: (quality) => store.update({ quality }),
   },
-  (quality) => store.update({ quality }),
+  { helpOpen: false },
 );
 requireElement('camera-root').replaceChildren(cameraPanel.element);
 
@@ -138,36 +166,34 @@ const updateInterface = (): void => {
     setText(
       sceneStatus,
       app.sceneStatus === 'loading'
-        ? 'Loading the 3D scene…'
-        : 'The 3D scene could not be started on this device. The Now and Narrative tabs describe every moment of the night in words.',
+        ? LOADING_MESSAGE
+        : FAILURE_MESSAGES[app.sceneFailure ?? 'renderer'],
     );
   }
 };
 
-let lastUrlUpdateMs = 0;
-const updateAddress = (nowMs: number, force: boolean): void => {
-  if (!force && nowMs - lastUrlUpdateMs < URL_UPDATE_INTERVAL_MS) {
-    return;
-  }
-  lastUrlUpdateMs = nowMs;
-  history.replaceState(
-    null,
-    '',
-    formatUrlState(store.get(), { renderer: rendererChoice, quality: store.get().quality }),
-  );
-};
+/** Keeps the address on the state of the page; it carries the renderer that the user asked for. */
+const address = createAddressWriter({
+  intervalMs: URL_UPDATE_INTERVAL_MS,
+  format: () =>
+    formatUrlState(store.get(), { renderer: url.renderer, quality: store.get().quality }),
+  write: (query) => history.replaceState(null, '', query),
+  onRefused: (error) => console.warn('The address of the page could not be updated.', error),
+});
+
+addEventListener('pagehide', () => address.flush());
 
 store.subscribe((state, previous) => {
   if (state.t !== previous.t) {
     shipState = model.evaluate(state.t);
   }
-  needsRender = true;
+  requestFrame();
   updateInterface();
   if (state.quality !== previous.quality) {
-    restartScene();
+    // The level of detail is fixed when the scene is built.
+    session.start();
   }
-  const moving = state.playing && previous.playing;
-  updateAddress(performance.now(), !moving);
+  address.request();
 });
 
 reducedMotionQuery.addEventListener('change', (event) =>
@@ -176,25 +202,21 @@ reducedMotionQuery.addEventListener('change', (event) =>
 
 /** Replaces the canvas by a fresh one: a canvas keeps the kind of context it was first given. */
 const renewCanvas = (): HTMLCanvasElement => {
-  const current = requireElement<HTMLCanvasElement>('scene-canvas');
-  const fresh = current.cloneNode(false) as HTMLCanvasElement;
-  // What the previous scene reported about its frames does not hold for the new one.
-  for (const name of ['renderedTime', 'backend', 'assets', 'shipModel']) {
-    delete fresh.dataset[name];
-  }
-  current.replaceWith(fresh);
+  const fresh = replaceSceneCanvas(requireElement<HTMLCanvasElement>('scene-canvas'));
   attachCanvasShortcuts(fresh);
   return fresh;
 };
 
 const resizeView = (): void => {
   const canvas = requireElement<HTMLCanvasElement>('scene-canvas');
-  view?.resize(
-    canvas.clientWidth,
-    canvas.clientHeight,
-    Math.min(devicePixelRatio, QUALITY_SETTINGS[store.get().quality].maxPixelRatio),
-  );
-  needsRender = true;
+  session
+    .view()
+    ?.resize(
+      canvas.clientWidth,
+      canvas.clientHeight,
+      Math.min(devicePixelRatio, QUALITY_SETTINGS[store.get().quality].maxPixelRatio),
+    );
+  requestFrame();
 };
 
 /** Keys handled while the 3D view has the focus, besides those of the camera. */
@@ -219,48 +241,43 @@ function attachCanvasShortcuts(canvas: HTMLCanvasElement): void {
   });
 }
 
+/** True once a start of the scene has been given the canvas of the document. */
+let canvasUsed = false;
+
 /**
- * Starts the 3D scene. If the chosen renderer cannot start or loses its graphics device, the
- * scene is started again with the WebGL 2 backend; if that fails too, the page stays usable
- * through its text.
+ * The starts of the 3D scene. The first one draws on the canvas of the document and each later
+ * one on a fresh canvas. When the scene has failed the page stays usable through its text, and
+ * the focus moves from the canvas, which is then hidden, to the main content.
  */
-async function startScene(choice: RendererChoice, canvas: HTMLCanvasElement): Promise<void> {
-  rendererChoice = choice;
-  const fallBack = (): void => {
-    view?.dispose();
-    view = undefined;
-    if (choice === 'webgl2') {
-      store.update({ sceneStatus: 'failed', backend: null });
-    } else {
-      store.update({ sceneStatus: 'loading', backend: null });
-      void startScene('webgl2', renewCanvas());
-    }
-  };
-  try {
+const session = createSceneSession<SceneView>({
+  requested: url.renderer,
+  create: async (renderer, onDeviceLost) => {
+    const canvas = canvasUsed ? renewCanvas() : requireElement<HTMLCanvasElement>('scene-canvas');
+    canvasUsed = true;
     const { createSceneView } = await import('./render/sceneView.ts');
-    view = await createSceneView({
+    return createSceneView({
       canvas,
       dataset,
       model,
-      renderer: choice,
+      renderer,
       quality: store.get().quality,
-      onDeviceLost: fallBack,
+      onDeviceLost,
     });
-    resizeView();
-    store.update({ sceneStatus: 'ready', backend: view.backend });
-  } catch (error) {
-    console.warn('The 3D scene could not start with this renderer.', error);
-    fallBack();
-  }
-}
-
-/** Starts the scene again on a fresh canvas, for a setting that is fixed when the scene is built. */
-function restartScene(): void {
-  view?.dispose();
-  view = undefined;
-  store.update({ sceneStatus: 'loading', backend: null });
-  void startScene(rendererChoice, renewCanvas());
-}
+  },
+  onChange: (state) => {
+    if (state.status === 'ready') {
+      resizeView();
+      store.update({ sceneStatus: 'ready', sceneFailure: null, backend: state.backend });
+    } else if (state.status === 'loading') {
+      store.update({ sceneStatus: 'loading', sceneFailure: null, backend: null });
+    } else {
+      keepFocusThrough(sceneFrame, main, () =>
+        store.update({ sceneStatus: 'failed', sceneFailure: state.failure, backend: null }),
+      );
+    }
+  },
+  onStartFailure: (error) => console.warn('The 3D scene could not start.', error),
+});
 
 new ResizeObserver(resizeView).observe(sceneFrame);
 
@@ -274,9 +291,10 @@ const frame = (nowMs: number): void => {
     announcer.playbackAdvanced(app.t, step.t, app.rate, nowMs);
     store.update({ t: step.t, playing: step.playing });
   }
-  if (view !== undefined && !rendering && (needsRender || view.hasPendingInput())) {
+  const view = session.view();
+  if (view !== undefined && drawingView !== view && (needsRender || view.hasPendingInput())) {
     needsRender = false;
-    rendering = true;
+    drawingView = view;
     const renderedState = shipState;
     const current = store.get();
     // Read before the frame is drawn: the frame then shows what was loaded at that moment.
@@ -290,21 +308,40 @@ const frame = (nowMs: number): void => {
         timeScale: current.playing ? current.rate : 1,
         reducedMotion: current.reducedMotion,
       })
-      .then(() => {
-        const canvas = requireElement<HTMLCanvasElement>('scene-canvas');
-        canvas.dataset['renderedTime'] = String(Math.round(renderedState.t));
-        canvas.dataset['backend'] = view?.backend ?? '';
-        canvas.dataset['assets'] = assetsSettled ? 'ready' : 'loading';
-        canvas.dataset['shipModel'] = shipModel;
-      })
+      .then(
+        () => {
+          // A frame of a view that has been replaced is not on the canvas of the document.
+          if (session.view() !== view) {
+            return;
+          }
+          const canvas = requireElement<HTMLCanvasElement>('scene-canvas');
+          canvas.dataset['renderedTime'] = String(Math.round(renderedState.t));
+          canvas.dataset['backend'] = view.backend;
+          canvas.dataset['assets'] = assetsSettled ? 'ready' : 'loading';
+          canvas.dataset['shipModel'] = shipModel;
+        },
+        (error: unknown) => {
+          // A view disposed of while it was drawing fails that frame; no one is waiting for it.
+          if (session.view() === view) {
+            console.error('The 3D scene could not draw a frame.', error);
+          }
+        },
+      )
       .finally(() => {
-        rendering = false;
+        if (drawingView === view) {
+          drawingView = undefined;
+        }
+        if (session.view() === view && !needsRender && !view.hasPendingInput()) {
+          sceneFrame.dataset['upToDate'] = 'true';
+        }
       });
   }
   requestAnimationFrame(frame);
 };
 
-attachCanvasShortcuts(requireElement<HTMLCanvasElement>('scene-canvas'));
+const initialCanvas = requireElement<HTMLCanvasElement>('scene-canvas');
+activateSceneCanvas(initialCanvas, '3D view of the ship', ['scene-description', 'camera-help']);
+attachCanvasShortcuts(initialCanvas);
 updateInterface();
 requestAnimationFrame(frame);
-void startScene(url.renderer, requireElement<HTMLCanvasElement>('scene-canvas'));
+session.start();

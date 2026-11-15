@@ -40,7 +40,7 @@ const LAMP_BRIGHTNESS = 3.2;
 const SUBMERGED_LAMP_FACTOR = 0.08;
 /** Depth over which a lamp fades as it goes under, in metres. */
 const LAMP_FADE_DEPTH_M = 1.2;
-/** Distance by which lamps stand proud of the plating, to avoid coplanar surfaces. */
+/** Distance by which lamps stand proud of the plating. */
 const LAMP_OFFSET_M = 0.04;
 /**
  * Lights standing for the glow of the lit decks on the ship's own structure: stations along the

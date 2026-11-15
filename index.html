@@ -34,18 +34,9 @@
       <section class="scene" aria-labelledby="scene-heading">
         <h2 id="scene-heading" class="visually-hidden">3D scene</h2>
         <div id="scene-frame" class="scene__frame" data-status="loading">
-          <!-- biome-ignore lint/a11y/noInteractiveElementToNoninteractiveRole: the application role makes assistive technology pass the arrow keys to the camera controls of the canvas -->
-          <canvas
-            id="scene-canvas"
-            class="scene__canvas"
-            tabindex="0"
-            role="application"
-            aria-roledescription="3D view"
-            aria-label="3D view of the ship"
-            aria-describedby="scene-description camera-help"
-          ></canvas>
+          <canvas id="scene-canvas" class="scene__canvas"></canvas>
           <div id="camera-root" class="scene__toolbar"></div>
-          <p id="scene-status" class="scene__status" role="status">Loading the 3D scene…</p>
+          <p id="scene-status" class="scene__status" role="status" hidden></p>
         </div>
         <p id="scene-description" class="visually-hidden"></p>
       </section>

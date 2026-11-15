@@ -31,7 +31,7 @@ export function el<Tag extends keyof HTMLElementTagNameMap>(
   return element;
 }
 
-/** Sets the text of an element only when it differs, to avoid needless layout and announcements. */
+/** Sets the text of an element only when it differs. */
 export function setText(element: Element, text: string): void {
   if (element.textContent !== text) {
     element.textContent = text;

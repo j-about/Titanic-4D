@@ -75,14 +75,53 @@
   inset-block-start: var(--space-3);
   inset-inline-start: var(--space-3);
   max-inline-size: min(100% - 2 * var(--space-3), 26rem);
+  max-block-size: calc(100% - 2 * var(--space-3));
   padding: var(--space-2);
+  overflow-y: auto;
   border: 0.0625rem solid var(--color-border);
   border-radius: var(--radius-md);
   background-color: rgb(13 19 27 / 88%);
 }
 
+.scene__toolbar:empty,
 .scene__frame[data-status="failed"] .scene__toolbar {
   display: none;
+}
+
+/* Below the two-column layout the view controls follow the canvas instead of lying over it. */
+@media (max-width: 63.99rem) {
+  .scene__frame {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 46dvh auto;
+  }
+
+  .scene__canvas {
+    position: static;
+    grid-area: 1 / 1;
+  }
+
+  .scene__status {
+    position: static;
+    grid-area: 1 / 1;
+    place-self: end center;
+    margin: var(--space-4);
+  }
+
+  .scene__frame[data-status="failed"] .scene__status {
+    place-self: center;
+  }
+
+  .scene__toolbar {
+    position: static;
+    grid-area: 2 / 1;
+    max-inline-size: none;
+    max-block-size: none;
+    border-inline-width: 0;
+    border-block-end-width: 0;
+    border-radius: 0;
+    background-color: var(--color-surface);
+  }
 }
 
 .timeline {

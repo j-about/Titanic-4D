@@ -36,7 +36,8 @@ function readGamepad(): GamepadSnapshot | undefined {
   return undefined;
 }
 
-const NO_REQUEST: CameraRequest = {
+/** The request that leaves the camera where it is. */
+export const NO_REQUEST: CameraRequest = {
   rotateRightDeg: 0,
   rotateUpDeg: 0,
   zoomFactor: 1,
@@ -46,7 +47,7 @@ const NO_REQUEST: CameraRequest = {
 };
 
 /** Adds two requests: rotations and displacements add up, zoom factors multiply. */
-function combineRequests(first: CameraRequest, second: CameraRequest): CameraRequest {
+export function combineRequests(first: CameraRequest, second: CameraRequest): CameraRequest {
   return {
     rotateRightDeg: first.rotateRightDeg + second.rotateRightDeg,
     rotateUpDeg: first.rotateUpDeg + second.rotateUpDeg,

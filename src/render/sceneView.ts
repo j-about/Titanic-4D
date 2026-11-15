@@ -14,11 +14,15 @@ import { createBoatPlacer } from '../sim/boatPlacement.ts';
 import type { ShipState, TimelineModel } from '../sim/timelineModel.ts';
 import { waterlineFootprint } from '../sim/waterline.ts';
 import { createSkyModel, type SkyState } from '../sky/skyModel.ts';
+import type { StarField } from '../sky/starCatalogue.ts';
 import { createBoatsObject } from './boatsObject.ts';
+import { createCalifornianLightObject } from './californianLightObject.ts';
 import { createCameraInput } from './camera/cameraInput.ts';
 import type { CameraMode } from './camera/cameraPose.ts';
 import { createCameraRig } from './camera/cameraRig.ts';
+import type { CameraStep } from './camera/cameraStep.ts';
 import { loadDetailedShip } from './detailedShip.ts';
+import { buildOrRelease, createDisposalStack, type DisposalStack } from './disposalStack.ts';
 import { createEnvironment } from './environment.ts';
 import { createIcebergObject } from './icebergObject.ts';
 import { createOceanObject } from './oceanObject.ts';
@@ -27,6 +31,7 @@ import { QUALITY_SETTINGS, type QualityLevel } from './quality.ts';
 import { createRocketsObject } from './rocketsObject.ts';
 import { createShipObject } from './shipObject.ts';
 import { createSkyObject } from './skyObject.ts';
+import { loadStarCatalogue } from './starCatalogueLoader.ts';
 
 export type RenderBackend = 'webgpu' | 'webgl2';
 
@@ -63,7 +68,10 @@ export interface SceneView {
   readonly backend: RenderBackend;
   /** Sets the size of the drawing buffer, in CSS pixels and device pixel ratio. */
   resize(width: number, height: number, pixelRatio: number): void;
-  /** True while user input on the canvas, or a part of the scene just loaded, calls for a new frame. */
+  /**
+   * True while user input on the canvas, a step of the camera or a part of the scene just loaded
+   * calls for a new frame.
+   */
   hasPendingInput(): boolean;
   /**
    * True once nothing more is being loaded: the detailed model of the ship is in place, could
@@ -74,6 +82,11 @@ export interface SceneView {
   shipModel(): ShipModelKind;
   /** Renders a frame; resolves once it is visible. */
   render(frame: SceneFrame): Promise<void>;
+  /**
+   * Moves the camera by one step, as the next frame drawn shows; until then `hasPendingInput`
+   * is true.
+   */
+  stepCamera(step: CameraStep): void;
   resetCamera(): void;
   dispose(): void;
 }
@@ -91,19 +104,50 @@ const BLOOM_STRENGTH = 0.45;
 const BLOOM_RADIUS = 0.35;
 const BLOOM_THRESHOLD = 1.1;
 
-/** Creates the renderer and the scene. Rejects when neither WebGPU nor WebGL 2 is available. */
+/**
+ * Creates the renderer and the scene. Rejects with a `SceneResourceError` when the star catalogue
+ * cannot be loaded, before any renderer is created, and with another error when neither WebGPU
+ * nor WebGL 2 is available or the scene cannot be built; what had been created by then is
+ * disposed of.
+ */
 export async function createSceneView(options: SceneViewOptions): Promise<SceneView> {
-  const { canvas, dataset, model } = options;
+  const stars = await loadStarCatalogue();
   const readback = options.renderer === 'webgpu-readback';
   // In read-back mode the renderer owns a canvas that is never shown, and the visible canvas is
   // painted through its 2D context.
   const renderer = new WebGPURenderer({
-    ...(readback ? {} : { canvas }),
+    ...(readback ? {} : { canvas: options.canvas }),
     antialias: true,
     forceWebGL: options.renderer === 'webgl2',
     powerPreference: 'high-performance',
   });
+  // A renderer whose initialisation fails holds nothing to dispose of.
   await renderer.init();
+  const resources = createDisposalStack();
+  resources.defer(() => {
+    Promise.resolve(renderer.dispose()).catch((error: unknown) => {
+      console.warn('The renderer of the 3D scene could not be disposed of.', error);
+    });
+  });
+  return buildOrRelease(
+    resources,
+    () => buildSceneView(options, renderer, stars, resources),
+    (error) => console.warn('A part of the 3D scene could not be disposed of.', error),
+  );
+}
+
+/**
+ * Builds the scene on an initialised renderer. Everything created is registered in `resources`,
+ * whose disposal is also the disposal of the view.
+ */
+function buildSceneView(
+  options: SceneViewOptions,
+  renderer: WebGPURenderer,
+  stars: StarField,
+  resources: DisposalStack,
+): SceneView {
+  const { canvas, dataset, model } = options;
+  const readback = options.renderer === 'webgpu-readback';
   renderer.toneMapping = AgXToneMapping;
   renderer.toneMappingExposure = 1;
   renderer.onDeviceLost = (info: {
@@ -120,16 +164,18 @@ export async function createSceneView(options: SceneViewOptions): Promise<SceneV
   const seabedHeightM = -factValue(dataset.site.environment, 'depth');
   const scene = new Scene();
   const camera = new PerspectiveCamera(FIELD_OF_VIEW_DEG, 1, NEAR_PLANE_M, FAR_PLANE_M);
-  const environment = createEnvironment(scene, seabedHeightM);
-  const sky = await createSkyObject();
-  const ocean = createOceanObject(QUALITY_SETTINGS[options.quality]);
-  const ship = createShipObject(dataset);
-  const boats = createBoatsObject(dataset, createBoatPlacer(dataset, model));
-  const rockets = createRocketsObject(dataset, model.rocketFirings);
-  const iceberg = createIcebergObject();
+  const environment = resources.own(createEnvironment(scene, seabedHeightM));
+  const sky = resources.own(createSkyObject(stars));
+  const californianLight = resources.own(createCalifornianLightObject(dataset.site));
+  const ocean = resources.own(createOceanObject(QUALITY_SETTINGS[options.quality]));
+  const ship = resources.own(createShipObject(dataset));
+  const boats = resources.own(createBoatsObject(dataset, createBoatPlacer(dataset, model)));
+  const rockets = resources.own(createRocketsObject(dataset, model.rocketFirings));
+  const iceberg = resources.own(createIcebergObject());
   scene.add(
     environment.root,
     sky.root,
+    californianLight.root,
     ocean.root,
     ship.root,
     boats.root,
@@ -153,18 +199,22 @@ export async function createSceneView(options: SceneViewOptions): Promise<SceneV
   const { bow_section: bowSection, stern_section: sternSection } = dataset.breakup;
   let viewportHeightPx = 1;
 
-  const pipeline = new RenderPipeline(renderer);
+  const pipeline = resources.own(new RenderPipeline(renderer));
   const scenePass = pass(scene, camera);
   const glow = QUALITY_SETTINGS[options.quality].bloom
-    ? bloom(scenePass.getTextureNode('output'), BLOOM_STRENGTH, BLOOM_RADIUS, BLOOM_THRESHOLD)
+    ? resources.own(
+        bloom(scenePass.getTextureNode('output'), BLOOM_STRENGTH, BLOOM_RADIUS, BLOOM_THRESHOLD),
+      )
     : undefined;
   pipeline.outputNode =
     glow === undefined ? scenePass : scenePass.getTextureNode('output').add(glow);
-  const presenter = readback
-    ? createReadbackPresenter(renderer, pipeline, canvas, backend === 'webgl2')
-    : createCanvasPresenter(pipeline);
+  const presenter = resources.own(
+    readback
+      ? createReadbackPresenter(renderer, pipeline, canvas, backend === 'webgl2')
+      : createCanvasPresenter(pipeline),
+  );
 
-  const input = createCameraInput(canvas);
+  const input = resources.own(createCameraInput(canvas));
   const rig = createCameraRig(
     {
       breakSeconds: model.breakSeconds,
@@ -232,6 +282,12 @@ export async function createSceneView(options: SceneViewOptions): Promise<SceneV
       viewportHeightPx,
       fieldOfViewDeg: FIELD_OF_VIEW_DEG,
     });
+    californianLight.update({
+      state: frame.state,
+      cameraPosition: pose.position,
+      viewportHeightPx,
+      fieldOfViewDeg: FIELD_OF_VIEW_DEG,
+    });
     const footprints = [
       waterlineFootprint(
         hullForm,
@@ -252,27 +308,17 @@ export async function createSceneView(options: SceneViewOptions): Promise<SceneV
 
   const dispose = (): void => {
     disposed = true;
-    input.dispose();
-    ship.dispose();
-    boats.dispose();
-    rockets.dispose();
-    iceberg.dispose();
-    environment.dispose();
-    sky.dispose();
-    ocean.dispose();
-    presenter.dispose();
-    glow?.dispose();
-    pipeline.dispose();
-    renderer.dispose();
+    resources.dispose();
   };
 
   return {
     backend,
     resize,
-    hasPendingInput: () => redrawRequested || input.isActive(),
+    hasPendingInput: () => redrawRequested || input.isActive() || rig.hasPendingStep(),
     assetsSettled: () => assetsSettled,
     shipModel: () => shipModel,
     render,
+    stepCamera: (step) => rig.step(step),
     resetCamera: () => rig.reset(),
     dispose,
   };

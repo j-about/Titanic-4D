@@ -258,11 +258,16 @@
   scrollbar-width: thin;
 }
 
+.bookmarks__list > li {
+  flex: none;
+}
+
 .bookmark {
   display: flex;
   align-items: center;
   gap: var(--space-2);
   min-block-size: var(--target-min);
+  block-size: 100%;
   max-inline-size: 17rem;
   padding: var(--space-1) var(--space-3);
   border: 0.0625rem solid var(--color-border);
@@ -272,7 +277,6 @@
   font: inherit;
   font-size: var(--text-xs);
   text-align: start;
-  white-space: nowrap;
   cursor: pointer;
 }
 
@@ -289,11 +293,12 @@
   flex: none;
   color: var(--color-accent);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .bookmark__title {
-  overflow: hidden;
-  text-overflow: ellipsis;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
 }
 
 /* Camera */
@@ -305,24 +310,27 @@
   gap: var(--space-2) var(--space-3);
 }
 
-.camera__help {
+.camera__steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.camera__step {
+  min-inline-size: var(--target-min);
+  padding: var(--space-2);
+}
+
+.camera__help-box {
   flex: 1 1 100%;
-  margin: 0;
+}
+
+.camera__help {
+  margin: var(--space-1) 0 0;
   max-inline-size: none;
   color: var(--color-text-muted);
   font-size: var(--text-xs);
   line-height: 1.4;
-}
-
-@media (max-width: 47.99rem) {
-  .camera__help {
-    position: absolute;
-    inline-size: 1px;
-    block-size: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
 }
 
 /* Tabs and panels */
@@ -513,6 +521,24 @@
 
 .certainty--debated {
   color: var(--color-debated);
+}
+
+.certainty-legend {
+  margin-block-end: var(--space-3);
+}
+
+.certainty-legend__list {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: baseline;
+  gap: var(--space-1) var(--space-3);
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.certainty-legend__list dd {
+  margin: 0;
 }
 
 /* Events */
