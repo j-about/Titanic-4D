@@ -3,11 +3,52 @@ import type { ShipState, TimelineModel } from '../sim/timelineModel.ts';
 import { formatShipClock } from '../time/shipTime.ts';
 import { certaintyBadge } from './certaintyBadge.ts';
 import { el, setAttribute } from './dom.ts';
+import { scrollDistanceToReveal } from './scrollReveal.ts';
 
 export interface NarrativePanel {
   readonly element: HTMLElement;
-  /** Marks the event in progress; scrolls it into view when `follow` is set. */
+  /**
+   * Marks the event in progress. When `follow` is set, brings it into view inside the box that
+   * scrolls around it, if there is one; the page itself is never scrolled.
+   */
   update(ship: ShipState, follow: boolean): void;
+}
+
+/** The nearest ancestor that scrolls its own content vertically, if there is one. */
+function scrollingAncestor(element: HTMLElement): HTMLElement | null {
+  for (let node = element.parentElement; node !== null; node = node.parentElement) {
+    const overflow = getComputedStyle(node).overflowY;
+    if ((overflow === 'auto' || overflow === 'scroll') && node.scrollHeight > node.clientHeight) {
+      return node;
+    }
+  }
+  return null;
+}
+
+/** A CSS length of a computed style, in pixels; zero when the property has no length. */
+function pixels(length: string): number {
+  return Number.parseFloat(length) || 0;
+}
+
+/**
+ * Brings an item into view by scrolling the box that scrolls around it, by the shortest distance
+ * and keeping the scroll margin of the item clear. Where no box scrolls around the item, the page
+ * is the only thing that scrolls and it stays where the user put it.
+ */
+function revealInScrollingAncestor(item: HTMLElement): void {
+  const scroller = scrollingAncestor(item);
+  if (scroller === null) {
+    return;
+  }
+  const box = item.getBoundingClientRect();
+  const margins = getComputedStyle(item);
+  const frameStart = scroller.getBoundingClientRect().top + scroller.clientTop;
+  scroller.scrollTop += scrollDistanceToReveal(
+    box.top - pixels(margins.scrollMarginTop),
+    box.bottom + pixels(margins.scrollMarginBottom),
+    frameStart,
+    frameStart + scroller.clientHeight,
+  );
 }
 
 function narrativeItem(event: TimelineEvent, onJump: (t: number) => void): HTMLElement {
@@ -83,7 +124,7 @@ export function createNarrativePanel(
     }
     setAttribute(current, 'aria-current', 'step');
     if (follow) {
-      current.scrollIntoView({ block: 'nearest' });
+      revealInScrollingAncestor(current);
     }
   };
 
