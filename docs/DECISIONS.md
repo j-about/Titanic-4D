@@ -573,3 +573,75 @@ create it again. A measurement on a discrete graphics card and a desktop process
 settle the criterion of `docs/PLAN.md`, which names an integrated GPU; `docs/STATUS.md` says on
 which hardware and with which motion setting each figure was taken. The measuring script is
 not part of the repository.
+
+## ADR 0015 — Corrections after the scripted accessibility audit of 2026-11-15
+
+**Status:** accepted (2026-11-15). Amends ADR 0008 (panels) and ADR 0013 (camera without
+dragging, announcements).
+
+**Context.** The scripted audit of `docs/ACCESSIBILITY.md` was taken again on the deployed code
+by two scripts written independently, whose results were then reconciled by a third
+measurement; the corrections were themselves reviewed against the running pages. The audit
+confirmed two failures of WCAG 2.2 level AA and several statements of the documentation that
+the measurements did not bear out; the review added two defects of the same kind.
+
+- **2.4.7 and 2.4.11.** The key moments are a row that scrolls sideways. Chromium does not
+  scroll that row when the key moment that takes the focus already shows in part: at 320 CSS
+  pixels two of the thirteen took the focus with less than one pixel in view.
+- **2.5.8.** In the night in words, the links of a list of sources are alone on their line and
+  17 CSS pixels high; with the lists open, 79 of them lay within 12 pixels of another target.
+- The ring was cut by one pixel on the key moments, by their scrolling row, and on the step
+  buttons of the camera, by the next button; a control scrolled into view by the browser could
+  have one side of its ring outside the window.
+- During playback with the "Narrative" tab open in the single-column layout, following the
+  event in progress scrolled the page itself by some two thousand pixels and took the focused
+  "Pause" button out of the window.
+- The announcement that follows a jump in time, and the statements of the "Sources" tab that
+  end with a time, read "a.m.." with two full stops; a unit test required it.
+
+**Decision.**
+
+- **Key moments.** A key moment that shows the keyboard focus (`:focus-visible`) is scrolled
+  wholly into its row, once for each time it holds the focus: when it takes the focus, or at
+  the first key pressed after a click, which makes the ring appear without a new focus event.
+  A focus given by the pointer is left alone: the row must not move between the press and the
+  release of a button. Later keys are left alone too: the arrow keys scroll the row and Page
+  Down or End scroll the page, as they did. The ring stays around the button, as on every
+  other button, and the row has the padding and the scroll padding it needs. The block padding
+  of the row adds up to what it was, one pixel moved from its bottom to its top: a higher row
+  would make the timeline higher and the canvas lower, and change every visual baseline. A
+  key moment is never wider than the timeline less the room of its ring, so that the ring fits
+  in a 320 CSS pixel window whose scroll bar takes room. Drawing the ring inside the button
+  was tried and not retained: it covers the border that marks the current key moment.
+- **Step buttons.** The focused button is drawn above its neighbours. Widening the gap between
+  two buttons was not retained: at 320 CSS pixels the six buttons would no longer fit on one
+  line.
+- **Scrolling into view.** The page, the panel and the view controls reserve the reach of the
+  ring and one pixel (`scroll-padding`), so that the browser stops short of the edge when it
+  brings a focused control into view. The width of the ring, its reach and that clearance are
+  design tokens.
+- **Links alone on a line.** Each link of the source lists of the night in words, and the
+  e-mail and telephone links of the Legal Notice, is one flex box at least 24 CSS pixels high,
+  whatever the number of its lines: the smaller of the two target sizes of the style sheets,
+  now a token. A block box with padding was tried and not retained: it moves the marker of a
+  list item to the last line of a title that takes several. The text of the Legal Notice is
+  unchanged.
+- **Following the narrative.** The event in progress is brought into view by scrolling the box
+  that scrolls around it, by the shortest distance that keeps its scroll margin clear, and
+  nothing else; the distance is a pure function with its unit tests. Where no such box
+  scrolls, as in the single-column layout, the page stays where the user put it: there the
+  list does not follow playback, and the event in progress is marked in it.
+- **Full stops.** A statement that ends with a ship's time ends with the full stop of "a.m." or
+  "p.m." and no other. The text announced after a jump is built by a function of the announcer,
+  tested with the others.
+- **Left as measured.** The contrast of the ring of the 3D view against a bright image, the
+  bottom side of the ring of the selected tab against its underline, and the side effects of
+  the text spacing of criterion 1.4.12 are recorded as known limits in
+  `docs/ACCESSIBILITY.md`: none of them hides a control or loses content.
+
+**Consequences.** `docs/ACCESSIBILITY.md` gives the figures of the audit on the corrected code
+and replaces its list of what a person has to check by the steps of those checks, with the
+weak points that the code lets expect under forced colours. End-to-end and unit tests cover
+each correction, at 1280, 640, 320 and 305 CSS pixels where the size matters. Each of them
+fails when the correction it guards is removed; those that guard a fault of the code as it was
+fail on that code.
