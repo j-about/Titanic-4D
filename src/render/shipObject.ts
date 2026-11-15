@@ -6,6 +6,7 @@ import {
   Mesh,
   MeshBasicNodeMaterial,
   MeshStandardNodeMaterial,
+  type Object3D,
   PlaneGeometry,
   PointLight,
   Quaternion,
@@ -18,11 +19,17 @@ import { deckHeightAt } from '../ship/sheer.ts';
 import type { Pose } from '../sim/pose.ts';
 import { poseToMatrix } from '../sim/sceneFrame.ts';
 import type { ShipState } from '../sim/timelineModel.ts';
+import type { DetailedShip } from './detailedShip.ts';
 import { geometryFromMeshData } from './geometry.ts';
 
 export interface ShipObject {
   readonly root: Group;
   update(state: ShipState): void;
+  /**
+   * Replaces the generated hull, funnels, masts and wreck by those of the detailed model, which
+   * the ship object then owns. The lamps and their glow are kept.
+   */
+  useDetailedModel(detailed: DetailedShip): void;
   dispose(): void;
 }
 
@@ -138,7 +145,7 @@ export function createShipObject(dataset: Dataset): ShipObject {
   };
   const disposables: { dispose(): void }[] = [paint, lampMaterial, lampGeometry];
 
-  const hulls = {} as Record<SectionId, Mesh>;
+  const hulls = {} as Record<SectionId, Object3D>;
   const lampMeshes: Partial<Record<SectionId, InstancedMesh>> = {};
   for (const id of ['bow', 'middle', 'stern'] as const) {
     const group = groups[id];
@@ -158,18 +165,18 @@ export function createShipObject(dataset: Dataset): ShipObject {
   }
   const sternWreckGeometry = geometryFromMeshData(model.sternWreck);
   disposables.push(sternWreckGeometry);
-  const sternWreck = new Mesh(sternWreckGeometry, paint);
+  let sternWreck: Object3D = new Mesh(sternWreckGeometry, paint);
   sternWreck.visible = false;
   groups.stern.add(sternWreck);
 
-  const funnels = model.funnels.map((funnel) => {
+  let funnels: Object3D[] = model.funnels.map((funnel) => {
     const geometry = geometryFromMeshData(funnel.mesh);
     disposables.push(geometry);
     const mesh = new Mesh(geometry, paint);
     groups[funnel.section].add(mesh);
     return mesh;
   });
-  const masts = new Map<string, Mesh>();
+  const masts = new Map<string, Object3D>();
   for (const mast of model.masts) {
     const geometry = geometryFromMeshData(mast.mesh);
     disposables.push(geometry);
@@ -178,8 +185,8 @@ export function createShipObject(dataset: Dataset): ShipObject {
     masts.set(mast.id, mesh);
     groups[mast.section].add(mesh);
   }
-  const foremast = masts.get('foremast');
-  const mainmast = masts.get('mainmast');
+  let foremast = masts.get('foremast');
+  let mainmast = masts.get('mainmast');
   const standing = new Matrix4();
   const fallen = fallenForemastMatrix(dataset);
 
@@ -226,11 +233,31 @@ export function createShipObject(dataset: Dataset): ShipObject {
     }
   };
 
+  const useDetailedModel = (detailed: DetailedShip): void => {
+    for (const id of ['bow', 'middle', 'stern'] as const) {
+      hulls[id].removeFromParent();
+      hulls[id] = detailed.sections[id];
+      groups[id].add(hulls[id]);
+    }
+    // The funnels and the masts of the detailed model are already children of its sections.
+    for (const generated of [...funnels, foremast, mainmast, sternWreck]) {
+      generated?.removeFromParent();
+    }
+    funnels = [...detailed.funnels];
+    foremast = detailed.foremast;
+    foremast.matrixAutoUpdate = false;
+    mainmast = detailed.mainmast;
+    sternWreck = detailed.sternWreck;
+    sternWreck.visible = false;
+    groups.stern.add(sternWreck);
+    disposables.push(detailed);
+  };
+
   const dispose = (): void => {
     for (const disposable of disposables) {
       disposable.dispose();
     }
   };
 
-  return { root, update, dispose };
+  return { root, update, useDetailedModel, dispose };
 }
