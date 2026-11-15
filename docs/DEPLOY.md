@@ -5,9 +5,10 @@ application built from the `Dockerfile`. This document is the complete procedure
 image contains, what must hold before a commit reaches `master`, how the Dokploy resources are
 created, how the result is verified and how to go back.
 
-The deployment itself (milestone M7) has not been carried out yet: it must be run from a
-session in which the tools of the `dokploy-mcp` server are available. Everything it needs is in
-the repository.
+The Dokploy resources were created on 2026-11-15 by the steps below, from a session in which
+the tools of the `dokploy-mcp` server were available; the domains were created last, once the
+DNS records had been corrected. `docs/STATUS.md` records the state of the deployment and the
+results of its verification.
 
 ## What is deployed
 
@@ -68,28 +69,46 @@ docker rm --force titanic-4d
 CI (`.github/workflows/ci.yml`) runs the same steps on every pull request and on every push to
 `master`, and rebuilds the model of the ship in a fourth job.
 
-## Protecting `master` (owner, before the first deployment)
+## Protection of `master`
 
 Dokploy deploys every push to `master` by itself and does not wait for CI. The image build runs
 `pnpm build` only: no type checking, no test, no budget, no verification of the server. Without
-a rule on the branch, a commit whose checks fail is therefore published while CI is still
-running. The gate is a setting of the GitHub repository, which only its owner can change; on
-2026-11-15 the GitHub API reported `master` as not protected.
+a rule on the branch, a commit whose checks fail would therefore be published while CI is still
+running. The gate is the protection of the branch on GitHub, in place since 2026-11-15:
 
-In the repository settings on GitHub, add a branch protection rule (or a ruleset) for `master`:
-
-1. Require a pull request before merging, so that nothing is pushed to `master` directly.
-2. Require status checks to pass before merging, and require the branch to be up to date. The
-   required checks are the four jobs of the workflow, under the names GitHub shows:
+1. A pull request is required before merging, so that nothing is pushed to `master` directly.
+   No approving review is required.
+2. Status checks must pass before merging, and the branch must be up to date. The required
+   checks are the four jobs of the workflow, under the names GitHub shows, and only GitHub
+   Actions can report them:
    - `Typecheck, lint, schema export, unit tests, build, budgets`
    - `End-to-end, accessibility and visual regression`
    - `Container image, headers, redirects and end-to-end under the production policy`
    - `Asset pipeline and reproducibility of the ship model`
-3. Do not allow the rule to be bypassed, and do not allow force pushes or deletion.
+3. The rule applies to administrators, and force pushes and deletion are not allowed.
+
+Read the rule back with:
+
+```bash
+gh api repos/j-about/Titanic-4D/branches/master/protection
+```
+
+To create it again, send its description to the same address:
+
+```bash
+gh api --method PUT repos/j-about/Titanic-4D/branches/master/protection --input protection.json
+```
+
+`protection.json` is to be written for the call. It holds `required_status_checks` with `strict`
+true and, in `checks`, one object for each name above, `{ "context": "<name>", "app_id": 15368 }`,
+where `15368` is GitHub Actions; `enforce_admins` true; `required_pull_request_reviews` with
+`required_approving_review_count` 0; `restrictions` null; `allow_force_pushes` and
+`allow_deletions` false.
 
 With the rule in place, `master` only receives commits whose pull request passed the four jobs,
 and those are the commits Dokploy deploys. The run of CI that starts on `master` after the merge
-is not waited for by Dokploy either: it checks the same tree as the pull request did.
+is not waited for by Dokploy either: it checks the same tree as the pull request did. A job
+renamed in the workflow must be renamed in the rule as well, or no pull request can be merged.
 
 ## Sequence with the Dokploy MCP tools
 
@@ -97,14 +116,29 @@ Read the schema of each tool before calling it, to use the exact names of its pa
 
 1. **Server and DNS.** `server-all`, `server-publicIp` or `settings-getIp`: identify the server
    and its IPv4 address. Check that the four hosts resolve to that address and that no AAAA
-   record points elsewhere:
+   record points elsewhere. The loop asks an authoritative server of each zone, which answers
+   without the delay of a cache, and prints every address with its reverse name:
 
    ```bash
-   for host in www.titanic-4d.org titanic-4d.org www.titanic-4d.com titanic-4d.com; do dig +short A "$host"; dig +short AAAA "$host"; done
+   for host in www.titanic-4d.org titanic-4d.org www.titanic-4d.com titanic-4d.com; do
+     server="$(dig +short NS "${host#www.}" | head -n 1)"
+     for type in A AAAA; do
+       dig +short "$type" "$host" "@$server" | grep -v '\.$' | while read -r address; do
+         echo "$host $type $address $(dig +short -x "$address")"
+       done
+     done
+   done
    ```
 
-   If any host does not resolve to the server, stop before creating any domain and report the
-   hosts at fault: a Let's Encrypt validation that fails in a loop uses up the rate limits.
+   Each of the four hosts must print an `A` line that shows the IPv4 address of the server,
+   and every line printed must end with the same reverse name: the IPv6 address of the server
+   is the one whose reverse name is that of its IPv4 address. If any host fails, stop before
+   creating any domain and report the hosts at fault:
+   a Let's Encrypt validation that fails in a loop uses up the rate limits. A host whose AAAA
+   record names another machine is at fault even when its A record is right: Let's Encrypt
+   validates over IPv6 first, and `domain-validateDomain` accepts such a host. After a
+   correction of the zone, resolvers may serve the former record until its time to live has
+   run out.
 
 2. **Project.** `project-create` with the name of the repository, unless the project exists.
    Reuse the production environment created with the project, or create it with
@@ -131,9 +165,10 @@ Read the schema of each tool before calling it, to use the exact names of its pa
    redirection to the canonical URL stays in the `Caddyfile`, the single versioned and tested
    source.
 
-7. **Deployment.** `application-deploy`. Follow `deployment-all` and `deployment-readLogs` to
-   the end, then `application-readLogs`. If it fails, find the root cause, correct it in the
-   repository, push, then `application-redeploy`.
+7. **Deployment.** A push to `master` starts it by itself once the application exists;
+   otherwise `application-deploy`. Follow `deployment-all` and `deployment-readLogs` to the
+   end, then `application-readLogs`. If it fails, find the root cause and correct it in the
+   repository through a pull request; its merge deploys the correction.
 
 8. **Verification.** See the next section. Record the results in `docs/STATUS.md`.
 
@@ -173,6 +208,13 @@ curl -sSI "https://titanic-4d.org/a/b?x=1"
 
 ```bash
 curl -sSI http://www.titanic-4d.com/
+```
+
+The four hosts also have AAAA records. From a machine that has an IPv6 route, check them over
+IPv6: the canonical host must answer 200, each of the three others 301 to the canonical URL.
+
+```bash
+for host in www.titanic-4d.org titanic-4d.org www.titanic-4d.com titanic-4d.com; do curl -6 -sSI "https://$host/"; done
 ```
 
 Then the end-to-end suite against the canonical URL:
